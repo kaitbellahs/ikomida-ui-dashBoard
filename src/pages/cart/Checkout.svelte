@@ -4,7 +4,7 @@
   import { login } from "../../stores/Auth";
   import { Geolocation } from "@capacitor/geolocation";
   import { onMount } from "svelte";
-  import { Store } from "../../stores/Cart";
+  import { Store } from "../../stores/Products";
   import { GetPaymentMethods, DoPayment, PaymentType } from "../../network/Payment";
   import Fa from "svelte-fa";
   import { faEdit } from "@fortawesome/free-solid-svg-icons";

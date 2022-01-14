@@ -1,0 +1,93 @@
+<script>
+  import { Title, Navigation, Router } from "../../stores/Navigation";
+  import { search, all } from "../../network/Products";
+  import { Views } from "@tian/components";
+  import { faSearch, faEdit } from "@fortawesome/free-solid-svg-icons";
+  import { StatusBar } from "../../stores/Setup";
+  import { onMount } from "svelte";
+  import Fa from "svelte-fa";
+
+  let value = "";
+  let oldValue;
+  let error = false;
+  let isLoading = false;
+  let items = [];
+  let products = [];
+  $: if (value != oldValue) {
+    error = false;
+    if (value.length > 0) {
+      items = search(value, products);
+      oldValue = value;
+    } else {
+      items = [];
+      oldValue = "";
+    }
+  }
+
+  function goToOrders() {
+    Navigation.goTo(Router.values.orders);
+  }
+
+  Title.set("Produtos");
+  onMount(async () => {
+    isLoading = true;
+    products = await all();
+    isLoading = false;
+  });
+ function newProduct() {
+  Navigation.goTo(Router.values.editProduct, {item: {
+      id: null,
+      title: null,
+      description: null,
+      serves: null,
+      price: null,
+      oldPrice: null,
+      src: null,
+      weight: null,
+      quantity: null
+    }, edit: false});
+};
+
+function removeProduct(item){
+  console.log(item);
+}
+</script>
+
+{#if isLoading}
+  <Views.Loading
+    topPadding={$StatusBar.height}
+    bottomPadding={$StatusBar.bottomPadding}
+  />
+{:else}
+  <div>
+    <Views.TextEdit
+      icon={faSearch}
+      bind:value
+      placeHolder="Buscar no cardápio"
+    />
+
+  <Views.Button
+  on:click={newProduct}
+  bottomPadding={$StatusBar.bottomPadding}
+  ><Fa icon={faEdit} /> <span>Novo produto</span></Views.Button
+>
+    {#if items.length > 0 && !error}
+      <Views.ItemsList
+        {items}
+        productPage={Router.values.product}
+        {Navigation}
+        {removeProduct}
+      />
+    {:else if error}
+      <h2>Nenhum produto foi encontrado</h2>
+      <h3>Tente usar outro termo para pequisar</h3>
+    {:else if products.length > 0}
+      <Views.ItemsList
+        items={products}
+        productPage={Router.values.product}
+        {Navigation}
+        {removeProduct}
+      />
+    {/if}
+  </div>
+{/if}

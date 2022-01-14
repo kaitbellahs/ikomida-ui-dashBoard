@@ -1,37 +1,25 @@
 <script>
-  import { Cart } from "../../stores/Cart";
   import { Title, Navigation, Router } from "../../stores/Navigation";
   import Fa from "svelte-fa";
   import {
-    faPlusSquare,
-    faMinusSquare,
-    faCartPlus,
+    faEdit, faTrashAlt
   } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
-  import {Views, Utils} from "@tian/components";
+  import { Views, Utils } from "@tian/components";
 
   const item = $Router.options;
-  let quantity = 1;
 
-  $: total = Utils.Strings.currency(quantity * item.price);
+const edit = async () => {
+  Navigation.goTo(Router.values.editProduct, {item, edit: true});
+};
 
-  function minos() {
-    if (quantity > 1) {
-      quantity--;
-    }
-  }
+const newProduct = async () => {
+  Navigation.goTo(Router.values.editProduct, {item, edit: false});
+};
 
-  function plus() {
-    if (quantity < item.quantity) {
-      quantity++;
-    }
-  }
-
- const addProduct = async () => {
-    item.quantity = quantity;
-    await Cart.addItem(item);
-    Navigation.goTo(Router.values.cart);
-  }
+const deleteProduct = async () => {
+  Navigation.goTo(Router.values.editProduct, {item, edit: false});
+};
 
   Title.set(item.title);
 </script>
@@ -40,7 +28,8 @@
   <img src={item.src} alt={item.title} />
   <h2>{item.title}</h2>
   <p>{item.description}</p>
-  <span class="serves">Aproximadamente {Utils.Strings.formatNumber(item.weight)} Kg</span>
+  <span class="serves"
+    >Aproximadamente {Utils.Strings.formatNumber(item.weight)} Kg</span>
 
   <div class="price">
     <span class:current={item.oldPrice != undefined && item.oldPrice != 0}
@@ -51,12 +40,19 @@
     {/if}
   </div>
   <div class="quantity">
-    <Views.Button type="transparent" size="none" on:click={minos}> <Fa icon={faMinusSquare} /></Views.Button><span
-      >{quantity}</span
-    ><Views.Button type="transparent" size="none" on:click={plus}><Fa icon={faPlusSquare} /></Views.Button>
+    Resta{item.quantity > 1 ? "m" : ""} <span>{item.quantity}</span> unidades 
   </div>
-  <Views.Button isFloat=true on:click={addProduct} bottomPadding={$StatusBar.bottomPadding}><Fa icon={faCartPlus} /> <span>Adicionar</span>
-    <span>({total})</span></Views.Button
+  <Views.Button
+    on:click={deleteProduct}
+    ><Fa icon={faTrashAlt} /> <span>Remover este produto</span></Views.Button
+  >
+  <Views.Button
+    on:click={edit}
+    ><Fa icon={faEdit} /> <span>Editar</span></Views.Button
+  >
+  <Views.Button
+    on:click={newProduct}
+    ><Fa icon={faEdit} /> <span>Novo produto Similar</span></Views.Button
   >
 </div>
 

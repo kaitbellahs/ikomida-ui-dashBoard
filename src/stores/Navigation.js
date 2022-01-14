@@ -9,6 +9,8 @@ const values = {
     profile: Symbol("/profile"),
     search: Symbol("/search"),
     product: Symbol("/product"),
+    products: Symbol("/products"),
+    editProduct: Symbol("/editProduct"),
     cart: Symbol("/cart"),
     checkout: Symbol("/checkout"),
     confirmSubscribe: Symbol("/confirmSubscribe"),

@@ -1,5 +1,5 @@
 <script>
-  import { Cart, Store } from "../../stores/Cart";
+  import { Cart, Store } from "../../stores/Products";
   import { Title, Navigation, Router, Menu } from "../../stores/Navigation";
   import { faTrash } from "@fortawesome/free-solid-svg-icons";
   import {Views, Utils} from "@tian/components";
