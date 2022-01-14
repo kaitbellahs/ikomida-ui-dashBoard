@@ -13,5 +13,5 @@
     bottomPadding={$StatusBar.bottomPadding}
   />
 {:then items}
-Products: {items.length}
+  Products: {items.length}
 {/await}

@@ -1,4 +1,6 @@
-import {Utils} from "@tian/components";
+import {
+    Utils
+} from "@tian/components";
 
 const addresses = [{
     id: "11",

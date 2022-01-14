@@ -1,25 +1,22 @@
 <script>
   import { Title, Navigation, Router } from "../../stores/Navigation";
   import Fa from "svelte-fa";
-  import {
-    faEdit, faTrashAlt
-  } from "@fortawesome/free-solid-svg-icons";
-  import { StatusBar } from "../../stores/Setup";
+  import { faEdit, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
   import { Views, Utils } from "@tian/components";
 
   const item = $Router.options;
 
-const edit = async () => {
-  Navigation.goTo(Router.values.editProduct, {item, edit: true});
-};
+  const edit = async () => {
+    Navigation.goTo(Router.values.editProduct, { item, edit: true });
+  };
 
-const newProduct = async () => {
-  Navigation.goTo(Router.values.editProduct, {item, edit: false});
-};
+  const newProduct = async () => {
+    Navigation.goTo(Router.values.editProduct, { item, edit: false });
+  };
 
-const deleteProduct = async () => {
-  Navigation.goTo(Router.values.editProduct, {item, edit: false});
-};
+  const deleteProduct = async () => {
+    Navigation.goTo(Router.values.editProduct, { item, edit: false });
+  };
 
   Title.set(item.title);
 </script>
@@ -29,7 +26,8 @@ const deleteProduct = async () => {
   <h2>{item.title}</h2>
   <p>{item.description}</p>
   <span class="serves"
-    >Aproximadamente {Utils.Strings.formatNumber(item.weight)} Kg</span>
+    >Aproximadamente {Utils.Strings.formatNumber(item.weight)} Kg</span
+  >
 
   <div class="price">
     <span class:current={item.oldPrice != undefined && item.oldPrice != 0}
@@ -40,18 +38,15 @@ const deleteProduct = async () => {
     {/if}
   </div>
   <div class="quantity">
-    Resta{item.quantity > 1 ? "m" : ""} <span>{item.quantity}</span> unidades 
+    Resta{item.quantity > 1 ? "m" : ""} <span>{item.quantity}</span> unidades
   </div>
-  <Views.Button
-    on:click={deleteProduct}
+  <Views.Button on:click={deleteProduct}
     ><Fa icon={faTrashAlt} /> <span>Remover este produto</span></Views.Button
   >
-  <Views.Button
-    on:click={edit}
+  <Views.Button on:click={edit}
     ><Fa icon={faEdit} /> <span>Editar</span></Views.Button
   >
-  <Views.Button
-    on:click={newProduct}
+  <Views.Button on:click={newProduct}
     ><Fa icon={faEdit} /> <span>Novo produto Similar</span></Views.Button
   >
 </div>

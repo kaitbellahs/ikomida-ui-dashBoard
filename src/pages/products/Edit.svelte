@@ -5,13 +5,14 @@
   import { StatusBar } from "../../stores/Setup";
   import { Views } from "@tian/components";
 
-  let {item, edit} = $Router.options;
+  let { item, edit } = $Router.options;
   const submit = async () => {
     item.quantity = quantity;
     Navigation.goTo(Router.values.cart);
   };
   Title.set(edit ? "Editar produto" : "Novo produto");
 </script>
+
 <div class="product">
   <img src={item.src} alt={item.title} />
   <input type="file" />

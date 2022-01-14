@@ -22,7 +22,10 @@ function createRouter() {
     const {
         subscribe,
         set
-    } = writable({route: values.home, options: {}});
+    } = writable({
+        route: values.home,
+        options: {}
+    });
 
     return {
         subscribe,
@@ -68,13 +71,20 @@ function createNavigation() {
         subscribe,
         update,
         set
-    } = writable([{route: values.home, options: {}}]);
+    } = writable([{
+        route: values.home,
+        options: {}
+    }]);
 
     return {
         subscribe,
         reset: (route) => {
-            set([{route}]);
-            Router.setRoute({route});
+            set([{
+                route
+            }]);
+            Router.setRoute({
+                route
+            });
             Menu.reset();
         },
         goTo: (route, options) => {
@@ -92,7 +102,7 @@ function createNavigation() {
             update(navigation => {
                 if (navigation.length > 1) {
                     let itemsToRemove = 1
-                    if(count != undefined && typeof count === 'number' && count > 1 && count < navigation.length) {
+                    if (count != undefined && typeof count === 'number' && count > 1 && count < navigation.length) {
                         itemsToRemove = count;
                     }
                     const newNavigation = [...navigation.slice(0, navigation.length - itemsToRemove)];

@@ -1,7 +1,6 @@
 <script>
-  import { Store } from "../stores/Products";
   import { Router, Navigation, Title, Menu } from "../stores/Navigation";
-  import { Views, Utils } from "@tian/components";
+  import { Views } from "@tian/components";
   import Home from "./products/Home.svelte";
   import Orders from "./Orders/Orders.svelte";
   import Order from "./Orders/Order.svelte";
@@ -9,8 +8,6 @@
   import Product from "./products/Product.svelte";
   import Products from "./products/Products.svelte";
   import Edit from "./products/Edit.svelte";
-  // import Checkout from "./cart/Checkout.svelte";
-  // import Cart from "./cart/Cart.svelte";
   import { StatusBar } from "../stores/Setup";
   import {
     faHome,
@@ -44,10 +41,6 @@
 
   $: styleHeight = $StatusBar.height + 55 + "px";
   $: route = $Router.route;
-
-  function goToCart() {
-    Navigation.goTo(Router.values.cart);
-  }
 </script>
 
 <Views.NavigationBar
@@ -65,8 +58,6 @@
     <Orders />
   {:else if route == Router.values.order}
     <Order />
-  {:else if route == Router.values.search}
-    <Search />
   {:else if route == Router.values.profile}
     <Profile />
   {:else if route == Router.values.products}
@@ -75,10 +66,6 @@
     <Product />
   {:else if route == Router.values.editProduct}
     <Edit />
-    <!-- {:else if route == Router.values.cart}
-    <Cart />
-  {:else if route == Router.values.checkout}
-    <Checkout /> -->
   {:else}
     <Home />
   {/if}

@@ -1,7 +1,12 @@
-
-	import { onDestroy } from 'svelte';
-    import {Utils} from "@tian/components";
-import {Store} from '../stores/Products';
+import {
+    onDestroy
+} from 'svelte';
+import {
+    Utils
+} from "@tian/components";
+import {
+    Store
+} from '../stores/Products';
 
 const items = [{
         title: "Massas",
@@ -80,10 +85,13 @@ export async function all() {
     let products = {};
     Store.subscribe(value => {
         products = value;
-     });
-     
-    if(products.timeout == undefined || products.timeout < Date.now() - (5 * 60 * 60)) {
-        Store.updateItems({items: items, timeout: Date.now() })
+    });
+
+    if (products.timeout == undefined || products.timeout < Date.now() - (5 * 60 * 60)) {
+        Store.updateItems({
+            items: items,
+            timeout: Date.now()
+        })
         return new Promise(resolve => setTimeout(resolve, Utils.Numbers.Random(500, 5000), items));
     } else {
         return new Promise(resolve => setTimeout(resolve, 0, products.items));

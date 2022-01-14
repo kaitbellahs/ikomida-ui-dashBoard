@@ -34,23 +34,26 @@
     products = await all();
     isLoading = false;
   });
- function newProduct() {
-  Navigation.goTo(Router.values.editProduct, {item: {
-      id: null,
-      title: null,
-      description: null,
-      serves: null,
-      price: null,
-      oldPrice: null,
-      src: null,
-      weight: null,
-      quantity: null
-    }, edit: false});
-};
+  function newProduct() {
+    Navigation.goTo(Router.values.editProduct, {
+      item: {
+        id: null,
+        title: null,
+        description: null,
+        serves: null,
+        price: null,
+        oldPrice: null,
+        src: null,
+        weight: null,
+        quantity: null,
+      },
+      edit: false,
+    });
+  }
 
-function removeProduct(item){
-  console.log(item);
-}
+  function removeProduct(item) {
+    console.log(item);
+  }
 </script>
 
 {#if isLoading}
@@ -66,11 +69,9 @@ function removeProduct(item){
       placeHolder="Buscar no cardápio"
     />
 
-  <Views.Button
-  on:click={newProduct}
-  bottomPadding={$StatusBar.bottomPadding}
-  ><Fa icon={faEdit} /> <span>Novo produto</span></Views.Button
->
+    <Views.Button on:click={newProduct} bottomPadding={$StatusBar.bottomPadding}
+      ><Fa icon={faEdit} /> <span>Novo produto</span></Views.Button
+    >
     {#if items.length > 0 && !error}
       <Views.ItemsList
         {items}

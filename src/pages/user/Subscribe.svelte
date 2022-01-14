@@ -1,6 +1,6 @@
 <script>
   import { Title, Navigation, Router, Menu } from "../../stores/Navigation";
-  import {Views} from "@tian/components";
+  import { Views } from "@tian/components";
   import { StatusBar } from "../../stores/Setup";
   import {
     faUser,
@@ -20,15 +20,20 @@
   Title.set("Cadastro");
 </script>
 
-<Views.NavigationBar {Menu} {Title} paddingTop={$StatusBar.height} {Navigation}  />
+<Views.NavigationBar
+  {Menu}
+  {Title}
+  paddingTop={$StatusBar.height}
+  {Navigation}
+/>
 {#if isLoading}
   <Views.Loading />
 {/if}
 <main
   style="padding: 20px; padding-top: {styleHeight}; overflow: hidden;max-width: 100%;"
 >
-<Views.TextEdit icon={faUser} placeHolder="Nome" />
-<Views.TextEdit icon={faUser} placeHolder="Sobre nome completo" />
+  <Views.TextEdit icon={faUser} placeHolder="Nome" />
+  <Views.TextEdit icon={faUser} placeHolder="Sobre nome completo" />
   <Views.TextEdit icon={faIdCard} type="cpf" placeHolder="CPF" />
   <Views.TextEdit icon={faPhone} placeHolder="Email" />
   <Views.TextEdit icon={faUnlock} placeHolder="Senha" />

@@ -1,15 +1,15 @@
 import {
     writable
 } from 'svelte/store';
-import {
-    Storage
-} from '@capacitor/storage';
 
 function _store() {
     const {
         subscribe,
         update
-    } = writable({items: [], timeout: 0});
+    } = writable({
+        items: [],
+        timeout: 0
+    });
 
     return {
         subscribe,

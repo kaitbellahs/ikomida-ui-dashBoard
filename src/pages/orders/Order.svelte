@@ -1,13 +1,13 @@
 <script>
   import { Title, Router } from "../../stores/Navigation";
   import { OrderStatus } from "../../network/Orders";
-  import {Utils} from "@tian/components";
+  import { Utils } from "@tian/components";
   import { PaymentType } from "../../network/Payment";
 
   const order = $Router.options;
 
   $: total = order.subtotal + order.delivery - order.coupon;
-  
+
   Title.set("Detalhes do predido");
 </script>
 
@@ -47,7 +47,9 @@
       <tr>
         <td class="resumeText">Taxa de entrega</td>
         <td class="resumeValue"
-          ><span class="deliveryFree">- {Utils.Strings.currency(order.coupon)}</span></td
+          ><span class="deliveryFree"
+            >- {Utils.Strings.currency(order.coupon)}</span
+          ></td
         >
       </tr>
     {/if}
