@@ -1,8 +1,12 @@
 import {
-    writable
+    writable,
+    derived
 } from 'svelte/store';
+import {
+    v4 as uuidV4
+} from "uuid";
 
-const values = {
+export const Routes = {
     home: Symbol("/home"),
     orders: Symbol("/orders"),
     order: Symbol("/order"),
@@ -17,24 +21,6 @@ const values = {
     subscribe: Symbol("/subscribe"),
     tac: Symbol("/tac")
 };
-
-function createRouter() {
-    const {
-        subscribe,
-        set
-    } = writable({
-        route: values.home,
-        options: {}
-    });
-
-    return {
-        subscribe,
-        setRoute: (route) => set(route),
-        values
-    };
-}
-
-export const Router = createRouter();
 
 function createTitle() {
     const {
@@ -72,30 +58,27 @@ function createNavigation() {
         update,
         set
     } = writable([{
-        route: values.home,
-        options: {}
+        route: Routes.orders,
+        options: null,
+        uuid: uuidV4()
     }]);
 
     return {
         subscribe,
         reset: (route) => {
             set([{
-                route
+                route,
+                uuid: uuidV4(),
+                options: null
             }]);
-            Router.setRoute({
-                route
-            });
             Menu.reset();
         },
         goTo: (route, options) => {
             update(navigation => [...navigation, {
                 route,
-                options
+                options,
+                uuid: uuidV4()
             }]);
-            Router.setRoute({
-                route,
-                options
-            });
             Menu.reset();
         },
         pop: (count) => {
@@ -105,9 +88,7 @@ function createNavigation() {
                     if (count != undefined && typeof count === 'number' && count > 1 && count < navigation.length) {
                         itemsToRemove = count;
                     }
-                    const newNavigation = [...navigation.slice(0, navigation.length - itemsToRemove)];
-                    Router.setRoute(newNavigation[newNavigation.length - 1]);
-                    return newNavigation;
+                    return [...navigation.slice(0, navigation.length - itemsToRemove)];
                 } else {
                     return navigation;
                 }
@@ -117,3 +98,8 @@ function createNavigation() {
     };
 }
 export const Navigation = createNavigation();
+
+export const Router = derived(
+    Navigation,
+    $Navigation => $Navigation[$Navigation.length - 1]
+);

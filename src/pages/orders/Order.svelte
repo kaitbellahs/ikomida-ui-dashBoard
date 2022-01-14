@@ -1,10 +1,17 @@
 <script>
   import { Title, Router } from "../../stores/Navigation";
   import { OrderStatus } from "../../network/Orders";
-  import { Utils } from "@tian/components";
+  import { Views, Utils } from "@tian/components";
   import { PaymentType } from "../../network/Payment";
 
   const order = $Router.options;
+  const orderOptions = [
+    { id: "accepted", name: "1. Aceitar o pedido" },
+    { id: "waitingDelivery", name: "2. Esperando o entregador" },
+    { id: "delivery", name: "3. Saiu para entrega" },
+    { id: "delivered", name: "4. Pedido entrege" },
+    { id: "canceled", name: "5. Cancelar o pedido" },
+  ];
 
   $: total = order.subtotal + order.delivery - order.coupon;
 
@@ -32,6 +39,9 @@
 <div class="paymentMethod">
   Forma de pagamento: <b>{PaymentType(order.payment.type)}</b>
 </div>
+{#if order.status === "open"}
+<Views.Selector name="seleciona uma opção" options={orderOptions} />
+{/if}
 <table>
   <thead>
     <tr>

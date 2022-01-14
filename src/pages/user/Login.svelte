@@ -2,13 +2,13 @@
   import { login } from "../../stores/Auth";
   import * as Auth from "../../network/Auth";
   import { Views } from "@tian/components";
-  import { Router, Navigation } from "../../stores/Navigation";
+  import { Router, Navigation, Routes } from "../../stores/Navigation";
   import { faPhone, faUnlock } from "@fortawesome/free-solid-svg-icons";
 
   let isLoading = false;
 
   async function doSubscribe() {
-    Navigation.goTo(Router.values.subscribe);
+    Navigation.goTo(Routes.subscribe);
   }
 
   async function doLogin() {

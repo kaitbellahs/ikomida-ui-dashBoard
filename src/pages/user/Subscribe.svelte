@@ -1,5 +1,5 @@
 <script>
-  import { Title, Navigation, Router, Menu } from "../../stores/Navigation";
+  import { Title, Navigation, Router, Menu, Routes } from "../../stores/Navigation";
   import { Views } from "@tian/components";
   import { StatusBar } from "../../stores/Setup";
   import {
@@ -14,7 +14,7 @@
   $: styleHeight = $StatusBar.height + 55 + "px";
 
   async function doSubscribe() {
-    Navigation.goTo(Router.values.confirmSubscribe);
+    Navigation.goTo(Routes.confirmSubscribe);
   }
 
   Title.set("Cadastro");

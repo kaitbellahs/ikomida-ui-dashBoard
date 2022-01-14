@@ -1,26 +1,54 @@
 <script>
-  import { Title, Navigation, Router } from "../../stores/Navigation";
+  import {
+    Title,
+    Navigation,
+    Router,
+    Menu,
+    Routes,
+  } from "../../stores/Navigation";
   import { GetOrders, OrderStatus } from "../../network/Orders";
   import { Views, Utils } from "@tian/components";
-  import { onMount } from "svelte";
   import { PaymentType } from "../../network/Payment";
   import { StatusBar } from "../../stores/Setup";
+  import { faHistory } from "@fortawesome/free-solid-svg-icons";
 
   let isLoading = false;
   let orders = [];
+  const orderOptions = [
+    { id: "accepted", name: "1. Aceitar o pedido" },
+    { id: "waitingDelivery", name: "2. Esperando o entregador" },
+    { id: "delivery", name: "3. Saiu para entrega" },
+    { id: "delivered", name: "4. Pedido entrege" },
+    { id: "canceled", name: "5. Cancelar o pedido" },
+  ];
+
+  $: if ($Router.options === null || $Router.options !== null) {
+    if ($Router.options === null || !$Router.options) {
+      Menu.addItem({
+        icon: faHistory,
+        name: "Mostrar finalizados",
+        callback: goToOrdersHistory,
+      });
+    }
+    update();
+  }
+
+  async function update() {
+    isLoading = true;
+    orders = await GetOrders($Router.options);
+    isLoading = false;
+  }
 
   function goToOrder(id) {
     const order = orders.find((order) => {
       return order.id === id;
     });
-    Navigation.goTo(Router.values.order, order);
+    Navigation.goTo(Routes.order, order);
   }
 
-  onMount(async () => {
-    isLoading = true;
-    orders = await GetOrders();
-    isLoading = false;
-  });
+  function goToOrdersHistory() {
+    Navigation.goTo(Routes.orders, true);
+  }
 
   Title.set("Pedidos");
 </script>
@@ -33,22 +61,27 @@
 {/if}
 <div>
   {#each orders as { id, status, stage, products, address, payment, created, finished, subtotal, coupon, delivery }}
-    <div class="leftShadow orderContainer" on:click={goToOrder(id)}>
-      <h3>#{id}: pedido {OrderStatus(status)}</h3>
-      {#if products.length > 0}
-        <div class="product">1. {products[0].title}</div>
-      {/if}
-      {#if products.length > 1}
-        <div class="product">
-          e mais {products.length - 1}
-          {products.length - 1 == 1 ? "item" : "itens"}
+    <div class="leftShadow orderContainer">
+      <div on:click={goToOrder(id)}>
+        <h3>#{id}: pedido {OrderStatus(status)}</h3>
+        {#if products.length > 0}
+          <div class="product">1. {products[0].title}</div>
+        {/if}
+        {#if products.length > 1}
+          <div class="product">
+            e mais {products.length - 1}
+            {products.length - 1 == 1 ? "item" : "itens"}
+          </div>
+        {/if}
+        <div class="address">Entregue em: <b>{address.address}</b></div>
+        <div class="paymentMethod">
+          Forma de pagamento: <b>{PaymentType(payment.type)}</b>
         </div>
-      {/if}
-      <div class="address">Entregue em: <b>{address.address}</b></div>
-      <div class="paymentMethod">
-        Forma de pagamento: <b>{PaymentType(payment.type)}</b>
+        <div class="time">{Utils.Strings.timestampToString(created)}</div>
       </div>
-      <div class="time">{Utils.Strings.timestampToString(created)}</div>
+      {#if status === "open"}
+        <Views.Selector name="seleciona uma opção" options={orderOptions} />
+      {/if}
     </div>
   {/each}
 </div>
@@ -62,28 +95,28 @@
     margin-top: 10px;
     background: #eeeeee33;
   }
-  .orderContainer > h3 {
+  .orderContainer > div > h3 {
     padding: 0;
     margin: 0;
     font-size: 1.1em;
     margin-bottom: 5px;
   }
-  .orderContainer > .product {
+  .orderContainer > div > .product {
     font-family: RobotoLight;
     font-size: 0.9em;
     margin-bottom: 2px;
   }
-  .orderContainer > .address {
+  .orderContainer > div > .address {
     font-family: RobotoThin;
     font-size: 0.9em;
     margin-bottom: 2px;
   }
-  .orderContainer > .paymentMethod {
+  .orderContainer > div > .paymentMethod {
     font-family: RobotoThin;
     font-size: 0.9em;
     margin-bottom: 2px;
   }
-  .orderContainer > .time {
+  .orderContainer > div > .time {
     font-family: RobotoThin;
     font-size: 0.6em;
   }

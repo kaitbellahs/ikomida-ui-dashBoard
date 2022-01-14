@@ -1,5 +1,5 @@
 <script>
-  import { Title, Navigation, Router } from "../../stores/Navigation";
+  import { Title, Navigation, Router, Routes } from "../../stores/Navigation";
   import Fa from "svelte-fa";
   import { faEdit, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
   import { Views, Utils } from "@tian/components";
@@ -7,15 +7,15 @@
   const item = $Router.options;
 
   const edit = async () => {
-    Navigation.goTo(Router.values.editProduct, { item, edit: true });
+    Navigation.goTo(Routes.editProduct, { item, edit: true });
   };
 
   const newProduct = async () => {
-    Navigation.goTo(Router.values.editProduct, { item, edit: false });
+    Navigation.goTo(Routes.editProduct, { item, edit: false });
   };
 
   const deleteProduct = async () => {
-    Navigation.goTo(Router.values.editProduct, { item, edit: false });
+    Navigation.goTo(Routes.editProduct, { item, edit: false });
   };
 
   Title.set(item.title);

@@ -1,5 +1,5 @@
 <script>
-  import { Title, Navigation, Router } from "../../stores/Navigation";
+  import { Title, Navigation, Router, Routes } from "../../stores/Navigation";
   import { search, all } from "../../network/Products";
   import { Views } from "@tian/components";
   import { faSearch, faEdit } from "@fortawesome/free-solid-svg-icons";
@@ -25,7 +25,7 @@
   }
 
   function goToOrders() {
-    Navigation.goTo(Router.values.orders);
+    Navigation.goTo(Routes.orders);
   }
 
   Title.set("Produtos");
@@ -35,7 +35,7 @@
     isLoading = false;
   });
   function newProduct() {
-    Navigation.goTo(Router.values.editProduct, {
+    Navigation.goTo(Routes.editProduct, {
       item: {
         id: null,
         title: null,
@@ -75,7 +75,7 @@
     {#if items.length > 0 && !error}
       <Views.ItemsList
         {items}
-        productPage={Router.values.product}
+        productPage={Routes.product}
         {Navigation}
         {removeProduct}
       />
@@ -85,7 +85,7 @@
     {:else if products.length > 0}
       <Views.ItemsList
         items={products}
-        productPage={Router.values.product}
+        productPage={Routes.product}
         {Navigation}
         {removeProduct}
       />

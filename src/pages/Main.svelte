@@ -1,5 +1,11 @@
 <script>
-  import { Router, Navigation, Title, Menu } from "../stores/Navigation";
+  import {
+    Routes,
+    Router,
+    Navigation,
+    Title,
+    Menu,
+  } from "../stores/Navigation";
   import { Views } from "@tian/components";
   import Home from "./products/Home.svelte";
   import Orders from "./Orders/Orders.svelte";
@@ -15,26 +21,28 @@
     faUser,
     faBook,
   } from "@fortawesome/free-solid-svg-icons";
+  import { get } from "svelte/store";
+  import { onMount } from "svelte";
 
   const tabs = [
     {
       name: "Home",
-      route: Router.values.home,
+      route: Routes.home,
       icon: faHome,
     },
     {
       name: "Produtos",
-      route: Router.values.products,
+      route: Routes.products,
       icon: faList,
     },
     {
       name: "Pedidos",
-      route: Router.values.orders,
+      route: Routes.orders,
       icon: faBook,
     },
     {
       name: "Ajustes",
-      route: Router.values.profile,
+      route: Routes.profile,
       icon: faUser,
     },
   ];
@@ -52,19 +60,19 @@
 <main
   style="padding: 20px; padding-top: {styleHeight}; padding-bottom: '50px'; overflow: hidden;max-width: 100%;"
 >
-  {#if route == Router.values.home}
+  {#if route == Routes.home}
     <Home />
-  {:else if route == Router.values.orders}
+  {:else if route == Routes.orders}
     <Orders />
-  {:else if route == Router.values.order}
+  {:else if route == Routes.order}
     <Order />
-  {:else if route == Router.values.profile}
+  {:else if route == Routes.profile}
     <Profile />
-  {:else if route == Router.values.products}
+  {:else if route == Routes.products}
     <Products />
-  {:else if route == Router.values.product}
+  {:else if route == Routes.product}
     <Product />
-  {:else if route == Router.values.editProduct}
+  {:else if route == Routes.editProduct}
     <Edit />
   {:else}
     <Home />

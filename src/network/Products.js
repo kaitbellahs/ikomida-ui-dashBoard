@@ -1,12 +1,12 @@
 import {
-    onDestroy
-} from 'svelte';
-import {
     Utils
 } from "@tian/components";
 import {
     Store
 } from '../stores/Products';
+import {
+    get
+} from 'svelte/store';
 
 const items = [{
         title: "Massas",
@@ -82,11 +82,7 @@ const items = [{
 ];
 
 export async function all() {
-    let products = {};
-    Store.subscribe(value => {
-        products = value;
-    });
-
+    let products = get(Store);
     if (products.timeout == undefined || products.timeout < Date.now() - (5 * 60 * 60)) {
         Store.updateItems({
             items: items,

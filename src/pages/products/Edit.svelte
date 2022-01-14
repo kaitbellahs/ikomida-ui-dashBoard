@@ -1,5 +1,5 @@
 <script>
-  import { Title, Navigation, Router } from "../../stores/Navigation";
+  import { Title, Navigation, Router, Routes } from "../../stores/Navigation";
   import Fa from "svelte-fa";
   import { faEdit } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
@@ -8,7 +8,7 @@
   let { item, edit } = $Router.options;
   const submit = async () => {
     item.quantity = quantity;
-    Navigation.goTo(Router.values.cart);
+    Navigation.goTo(Routes.cart);
   };
   Title.set(edit ? "Editar produto" : "Novo produto");
 </script>

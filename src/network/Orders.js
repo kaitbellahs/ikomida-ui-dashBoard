@@ -105,8 +105,14 @@ const orders = [{
     delivery: 0
 }];
 
-export async function GetOrders() {
-    return new Promise(resolve => setTimeout(resolve, Utils.Numbers.Random(500, 5000), orders));
+export async function GetOrders(showHistory) {
+    let _orders = orders
+    if(showHistory){
+        _orders = orders.filter(item => item.status !== "open");
+    }else{
+        _orders = orders.filter(item => item.status === "open");
+    }
+    return new Promise(resolve => setTimeout(resolve, Utils.Numbers.Random(500, 5000), _orders));
 }
 
 export function OrderStatus(status) {
