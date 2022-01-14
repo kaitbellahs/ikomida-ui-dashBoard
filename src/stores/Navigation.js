@@ -58,7 +58,7 @@ function createNavigation() {
         update,
         set
     } = writable([{
-        route: Routes.orders,
+        route: Routes.home,
         options: null,
         uuid: uuidV4()
     }]);
