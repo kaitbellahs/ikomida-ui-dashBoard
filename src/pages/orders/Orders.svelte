@@ -9,17 +9,20 @@
   import { GetOrders, OrderStatus } from "../../network/Orders";
   import { Views, Utils } from "@tian/components";
   import { PaymentType } from "../../network/Payment";
+  import { ChangeOrderStatus } from "../../network/Orders";
   import { StatusBar } from "../../stores/Setup";
   import { faHistory } from "@fortawesome/free-solid-svg-icons";
 
   let isLoading = false;
   let orders = [];
-  const orderOptions = [
-    { id: "accepted", name: "1. Aceitar o pedido" },
-    { id: "waitingDelivery", name: "2. Esperando o entregador" },
-    { id: "delivery", name: "3. Saiu para entrega" },
-    { id: "delivered", name: "4. Pedido entrege" },
-    { id: "canceled", name: "5. Cancelar o pedido" },
+  let selected = null;
+  let oldSelected = null;
+  const orderOptions = (orderID) => [
+    { id: "accepted", name: "1. Aceitar o pedido", orderID },
+    { id: "waitingDelivery", name: "2. Esperando o entregador", orderID },
+    { id: "delivery", name: "3. Saiu para entrega", orderID },
+    { id: "delivered", name: "4. Pedido entrege", orderID },
+    { id: "canceled", name: "5. Cancelar o pedido", orderID },
   ];
 
   $: if ($Router.options === null || $Router.options !== null) {
@@ -31,6 +34,13 @@
       });
     }
     update();
+  }
+  $: if (selected !== oldSelected) {
+    isLoading = true;
+    ChangeOrderStatus(selected.orderID, selected.id).then((response) =>
+      console.log(response)
+    );
+    isLoading = false;
   }
 
   async function update() {
@@ -80,7 +90,11 @@
         <div class="time">{Utils.Strings.timestampToString(created)}</div>
       </div>
       {#if status === "open"}
-        <Views.Selector name="seleciona uma opção" options={orderOptions} />
+        <Views.Selector
+          bind:selected
+          name="Seleciona uma opção!"
+          options={orderOptions(id)}
+        />
       {/if}
     </div>
   {/each}

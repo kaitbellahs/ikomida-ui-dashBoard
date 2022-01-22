@@ -3,17 +3,27 @@
   import { OrderStatus } from "../../network/Orders";
   import { Views, Utils } from "@tian/components";
   import { PaymentType } from "../../network/Payment";
+  import { ChangeOrderStatus } from "../../network/Orders";
 
   const order = $Router.options;
-  const orderOptions = [
-    { id: "accepted", name: "1. Aceitar o pedido" },
-    { id: "waitingDelivery", name: "2. Esperando o entregador" },
-    { id: "delivery", name: "3. Saiu para entrega" },
-    { id: "delivered", name: "4. Pedido entrege" },
-    { id: "canceled", name: "5. Cancelar o pedido" },
+  let selected = null;
+  let oldSelected = null;
+  const orderOptions = (orderID) => [
+    { id: "accepted", name: "1. Aceitar o pedido", orderID },
+    { id: "waitingDelivery", name: "2. Esperando o entregador", orderID },
+    { id: "delivery", name: "3. Saiu para entrega", orderID },
+    { id: "delivered", name: "4. Pedido entrege", orderID },
+    { id: "canceled", name: "5. Cancelar o pedido", orderID },
   ];
 
   $: total = order.subtotal + order.delivery - order.coupon;
+  $: if (selected !== oldSelected) {
+    isLoading = true;
+    ChangeOrderStatus(selected.orderID, selected.id).then((response) =>
+      console.log(response)
+    );
+    isLoading = false;
+  }
 
   Title.set("Detalhes do predido");
 </script>
@@ -40,7 +50,11 @@
   Forma de pagamento: <b>{PaymentType(order.payment.type)}</b>
 </div>
 {#if order.status === "open"}
-<Views.Selector name="seleciona uma opção" options={orderOptions} />
+  <Views.Selector
+    bind:selected
+    name="seleciona uma opção"
+    options={orderOptions(order.id)}
+  />
 {/if}
 <table>
   <thead>
