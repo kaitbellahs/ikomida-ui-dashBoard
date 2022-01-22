@@ -1,101 +1,52 @@
 import {
-    Utils
-} from "@tian/components";
-import {
     Store
 } from '../stores/Products';
 import {
     get
 } from 'svelte/store';
-
-const items = [{
-        title: "Massas",
-        items: [{
-                title: "Massa doida cheia de recheio",
-                description: "Bla bla bla bla Bla bla bla bla",
-                serves: 5,
-                price: 33.5,
-                src: "https://static-images.ifood.com.br/image/upload/t_low/pratos/8917d352-a201-4a8b-a84d-a61219baebc6/202007221530_kMPP_f.jpg",
-                weight: 1.5,
-                quantity: 10
-            },
-            {
-                title: "Massa mais doida ainda",
-                description: "Bla bla bla bla Bla bla bla bla Bla bla bla bla Bla bla bla bla Bla bla bla bla Bla bla bla bla 1",
-                serves: 2,
-                price: 33.5,
-                oldPrice: 47,
-                src: "https://static-images.ifood.com.br/image/upload/t_low/pratos/8917d352-a201-4a8b-a84d-a61219baebc6/202007221530_kMPP_f.jpg",
-                weight: 0.3,
-                quantity: 10
-            },
-        ],
-    },
-    {
-        title: "Porções",
-        items: [{
-                title: "Carne no capricho",
-                description: "Bla bla bla bla Bla bla bla bla",
-                serves: 2,
-                price: 33.5,
-                oldPrice: 47,
-                src: "https://static-images.ifood.com.br/image/upload/t_low/pratos/8917d352-a201-4a8b-a84d-a61219baebc6/202007221530_kMPP_f.jpg",
-                weight: 1,
-                quantity: 10
-            },
-            {
-                title: "Carne ao molho do chefe",
-                description: "Bla bla bla bla Bla bla bla bla Bla bla bla bla Bla bla bla bla Bla bla bla bla Bla bla bla bla 1",
-                serves: 2,
-                price: 33.5,
-                oldPrice: 47,
-                src: "https://static-images.ifood.com.br/image/upload/t_low/pratos/8917d352-a201-4a8b-a84d-a61219baebc6/202007221530_kMPP_f.jpg",
-                weight: 1,
-                quantity: 10
-            },
-        ],
-    },
-    {
-        title: "cervejas",
-        items: [{
-                title: "Cerveja alguma coisa",
-                description: "Bla bla bla bla Bla bla bla bla",
-                serves: 2,
-                price: 33.5,
-                oldPrice: 47,
-                src: "https://static-images.ifood.com.br/image/upload/t_low/pratos/8917d352-a201-4a8b-a84d-a61219baebc6/202007221530_kMPP_f.jpg",
-                weight: 1,
-                quantity: 10
-            },
-            {
-                title: "Cerveja outra coisa",
-                description: "Bla bla bla bla Bla bla bla bla Bla bla bla bla Bla bla bla bla Bla bla bla bla Bla bla bla bla 1",
-                serves: 2,
-                price: 33.5,
-                oldPrice: 47,
-                src: "https://static-images.ifood.com.br/image/upload/t_low/pratos/8917d352-a201-4a8b-a84d-a61219baebc6/202007221530_kMPP_f.jpg",
-                weight: 1,
-                quantity: 10
-            },
-        ],
-    },
-];
+import {
+    Auth
+} from '../stores/Auth';
+import {
+    Network
+} from "@tian/components";
 
 export async function all() {
     let products = get(Store);
     if (products.timeout == undefined || products.timeout < Date.now() - (5 * 60 * 60)) {
-        Store.updateItems({
-            items: items,
-            timeout: Date.now()
-        })
-        return new Promise(resolve => setTimeout(resolve, Utils.Numbers.Random(500, 5000), items));
+        const response = await Network.instance.get("/products", get(Auth));
+        console.log(response);
+        if (response.success) {
+            Store.updateItems({
+                items: response.data,
+                timeout: Date.now()
+            });
+            return response.data;
+        } else {
+            return [];
+        }
     } else {
-        return new Promise(resolve => setTimeout(resolve, 0, products.items));
+        return products.items;
     }
 }
 
-export function search(query, products) {
-    return products.map(section => {
+export async function deleteProduct(id) {
+    let response = await Network.instance.remove(`/product/${id}`, get(Auth));
+    return response.success;
+}
+
+export async function newProduct(object) {
+    let response = await Network.instance.post("/product", get(Auth), object);
+    return response.success;
+}
+
+export async function updateProduct(object) {
+    let response = await Network.instance.put("/product", get(Auth), object);
+    return response.success;
+}
+
+export async function search(query) {
+    return (await all()).map(section => {
         return {
             title: section.title,
             items: section.items.filter(item => {

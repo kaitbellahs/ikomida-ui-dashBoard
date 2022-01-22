@@ -1,6 +1,12 @@
 import {
-    Utils
+    Network
 } from "@tian/components";
+import {
+    get
+} from 'svelte/store';
+import {
+    Auth
+} from '../stores/Auth';
 
 const paymentMethods = [{
     id: "1",
@@ -17,7 +23,8 @@ const paymentMethods = [{
 }];
 
 export async function GetPaymentMethods() {
-    return new Promise(resolve => setTimeout(resolve, Utils.Numbers.Random(500, 5000), paymentMethods));
+    return Network.get("/payments", get(Auth));
+    // return new Promise(resolve => setTimeout(resolve, Utils.Numbers.Random(500, 5000), paymentMethods));
 }
 
 export async function DoPayment() {

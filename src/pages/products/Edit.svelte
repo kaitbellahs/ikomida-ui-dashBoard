@@ -4,11 +4,19 @@
   import { faEdit } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
   import { Views } from "@tian/components";
+  import { newProduct, updateProduct } from "../../network/Products";
 
   let { item, edit } = $Router.options;
   const submit = async () => {
-    item.quantity = quantity;
-    Navigation.goTo(Routes.cart);
+    let response;
+    if(edit){
+      response = await updateProduct(item);
+    }else{
+      response = await newProduct(item);
+    }
+    if(response.success){
+      Navigation.goTo(Routes.products);
+    }
   };
   Title.set(edit ? "Editar produto" : "Novo produto");
 </script>

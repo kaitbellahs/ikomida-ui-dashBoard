@@ -3,6 +3,7 @@
   import Fa from "svelte-fa";
   import { faEdit, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
   import { Views, Utils } from "@tian/components";
+  import { deleteProduct } from "../../network/Products";
 
   const item = $Router.options;
 
@@ -14,8 +15,9 @@
     Navigation.goTo(Routes.editProduct, { item, edit: false });
   };
 
-  const deleteProduct = async () => {
-    Navigation.goTo(Routes.editProduct, { item, edit: false });
+  const removeProduct = async () => {
+    const response = await deleteProduct(item.id)
+    // Navigation.goTo(Routes.editProduct, { item, edit: false });
   };
 
   Title.set(item.title);
@@ -40,7 +42,7 @@
   <div class="quantity">
     Resta{item.quantity > 1 ? "m" : ""} <span>{item.quantity}</span> unidades
   </div>
-  <Views.Button on:click={deleteProduct}
+  <Views.Button on:click={removeProduct}
     ><Fa icon={faTrashAlt} /> <span>Remover este produto</span></Views.Button
   >
   <Views.Button on:click={edit}

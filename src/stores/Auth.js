@@ -1,20 +1,49 @@
 import {
 	writable
 } from 'svelte/store';
+import {
+	Storage
+} from '@capacitor/storage';
 
-function createLogin() {
+const authToken = 'AuthToken';
+
+function createAuth() {
 	const {
 		subscribe,
-		set
-	} = writable(true);
+        set
+	} = writable(null, async (setter) => {
+		let token = null;
+		try {
+			const ret = await Storage.get({
+				key: authToken
+			});
+			token = ret.value;
+		} catch (error) {
+			token = null;
+			console.error(error.message);
+		}
+		if(token === "" || token === null) token = null;
+		setter(token);
+	});
 
 	return {
 		subscribe,
-		setLogin: (success) => set(success)
+		setToken: async (payload) => {
+			try {
+				set(payload);
+				await Storage.set({
+					key: authToken,
+					value: payload
+				});
+			} catch (error) {
+				console.log("error:");
+				console.error(error.message);
+			}
+		}
 	};
 }
 
-export const login = createLogin();
+export const Auth = createAuth();
 
 function createUserInfo() {
 	const {

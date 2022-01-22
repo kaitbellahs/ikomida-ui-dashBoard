@@ -1,6 +1,6 @@
 <script>
   import { App } from "@capacitor/app";
-  import { login } from "./stores/Auth";
+  import { Auth } from "./stores/Auth";
   import Login from "./pages/user/Login.svelte";
   import Main from "./pages/Main.svelte";
   import Subscribe from "./pages/user/Subscribe.svelte";
@@ -50,9 +50,9 @@
   <div id="internetError">Esperando por conexão a internet...</div>
 {/if}
 
-{#if $login}
+{#if $Auth}
   <Main />
-{:else if route == Routes.login}
+{:else if route == Routes.Auth}
   <Login />
 {:else if route == Routes.subscribe}
   <Subscribe />

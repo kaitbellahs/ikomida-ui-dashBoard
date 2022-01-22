@@ -1,6 +1,6 @@
 <script>
   import { Title, Navigation, Router, Routes } from "../../stores/Navigation";
-  import { search, all } from "../../network/Products";
+  import { search, all, deleteProduct } from "../../network/Products";
   import { Views } from "@tian/components";
   import { faSearch, faEdit } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
@@ -16,8 +16,10 @@
   $: if (value != oldValue) {
     error = false;
     if (value.length > 0) {
-      items = search(value, products);
+      isLoading = true;
+      search(value).then(result => items = result);
       oldValue = value;
+      isLoading = false;
     } else {
       items = [];
       oldValue = "";
@@ -51,7 +53,8 @@
     });
   }
 
-  function removeProduct(item) {
+  async function removeProduct(item) {
+    const response = await deleteProduct(item.id)
     console.log(item);
   }
 </script>
@@ -72,7 +75,7 @@
     <Views.Button on:click={newProduct} bottomPadding={$StatusBar.bottomPadding}
       ><Fa icon={faEdit} /> <span>Novo produto</span></Views.Button
     >
-    {#if items.length > 0 && !error}
+    {#if (items.length > 0 || value) && !error}
       <Views.ItemsList
         {items}
         productPage={Routes.product}

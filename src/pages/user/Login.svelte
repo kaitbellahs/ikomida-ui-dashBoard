@@ -1,11 +1,21 @@
 <script>
-  import { login } from "../../stores/Auth";
-  import * as Auth from "../../network/Auth";
+  import { Auth } from "../../stores/Auth";
+  import * as AuthNetwork from "../../network/Auth";
   import { Views } from "@tian/components";
-  import { Router, Navigation, Routes } from "../../stores/Navigation";
+  import { Routes, Navigation } from "../../stores/Navigation";
   import { faPhone, faUnlock } from "@fortawesome/free-solid-svg-icons";
+  import { Utils } from "@tian/components";
 
   let isLoading = false;
+  let cell = "11953635016";
+  let initialValue = "(11) 95363-5016";
+  let password = "123456";
+  let showAlert = false;
+  let errorMessage = "";
+  let validPhone = false;
+  let validPassword = false;
+
+  $: canLogin = validPhone && validPassword;
 
   async function doSubscribe() {
     Navigation.goTo(Routes.subscribe);
@@ -13,9 +23,24 @@
 
   async function doLogin() {
     isLoading = true;
-    const auth = await Auth.doLogin();
-    if (auth) login.setLogin(true);
+    const response = await AuthNetwork.doLogin("55" + cell, password);
+    if (response.success) {
+      const token = await Utils.Jws.extractToken(response.data);
+      if (token !== null) {
+        Auth.setToken(response.data);
+      } else {
+        errorMessage = "Token não é valido";
+        showAlert = true;
+      }
+    } else {
+      errorMessage = response.message;
+      showAlert = true;
+    }
     isLoading = false;
+  }
+
+  function toggleAlert() {
+    showAlert = !showAlert;
   }
 </script>
 
@@ -23,20 +48,33 @@
   <Views.Loading />
 {/if}
 <main>
+  {#if showAlert}
+    <Views.Alert
+      title="Alerta"
+      message={errorMessage}
+      closeCallBack={toggleAlert}
+      buttons={[{ name: "OK!", callback: toggleAlert, principal: true }]}
+    />
+  {/if}
   <h1>Login!</h1>
-  <p>
-    Se você ainda não abriu sua conta <Views.Button
-      type="transparent"
-      on:click={doSubscribe}>clica aqui</Views.Button
-    > e rápido e facil.
-  </p>
-  <Views.TextEdit icon={faPhone} placeHolder="(55) 90000-0000" />
-  <Views.TextEdit icon={faUnlock} placeHolder="Senha" />
+  <Views.TextEdit
+    bind:rawValue={cell}
+    bind:value={initialValue}
+    icon={faPhone}
+    type="phone"
+    placeHolder="Numero de celular"
+    bind:isValid={validPhone}
+  />
+  <Views.TextEdit
+    bind:value={password}
+    icon={faUnlock}
+    placeHolder="Senha"
+    secret={true}
+    bind:isValid={validPassword}
+    type="password"
+  />
   <div />
-  <Views.Button on:click={doLogin}>Entrar</Views.Button>
-  <Views.Button type="transparent" on:click={doSubscribe}
-    >Criar conta</Views.Button
-  >
+  <Views.Button on:click={doLogin} disabled={!canLogin}>Entrar</Views.Button>
 </main>
 
 <style>
