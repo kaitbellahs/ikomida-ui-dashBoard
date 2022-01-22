@@ -54,8 +54,10 @@
   }
 
   async function removeProduct(item) {
+    isLoading = true;
     const response = await deleteProduct(item.id)
-    console.log(item);
+    console.log(response);
+    isLoading = false;
   }
 </script>
 
@@ -71,10 +73,11 @@
       bind:value
       placeHolder="Buscar no cardápio"
     />
-
+    <Views.Divider />
     <Views.Button on:click={newProduct} bottomPadding={$StatusBar.bottomPadding}
       ><Fa icon={faEdit} /> <span>Novo produto</span></Views.Button
     >
+    <Views.Divider />
     {#if (items.length > 0 || value) && !error}
       <Views.ItemsList
         {items}

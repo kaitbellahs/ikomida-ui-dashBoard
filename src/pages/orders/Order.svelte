@@ -4,10 +4,12 @@
   import { Views, Utils } from "@tian/components";
   import { PaymentType } from "../../network/Payment";
   import { ChangeOrderStatus } from "../../network/Orders";
+  import { StatusBar } from "../../stores/Setup";
 
   const order = $Router.options;
   let selected = null;
   let oldSelected = null;
+  let isLoading = false;
   const orderOptions = (orderID) => [
     { id: "accepted", name: "1. Aceitar o pedido", orderID },
     { id: "waitingDelivery", name: "2. Esperando o entregador", orderID },
@@ -28,6 +30,12 @@
   Title.set("Detalhes do predido");
 </script>
 
+{#if isLoading}
+  <Views.Loading
+    topPadding={$StatusBar.height}
+    bottomPadding={$StatusBar.bottomPadding}
+  />
+{/if}
 <span class="time">Feito {Utils.Strings.timestampToString(order.created)}</span>
 <h3>Pedido #{order.id}</h3>
 <span class="status">

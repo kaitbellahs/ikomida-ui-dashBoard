@@ -4,8 +4,10 @@
   import { faEdit, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
   import { Views, Utils } from "@tian/components";
   import { deleteProduct } from "../../network/Products";
+  import { StatusBar } from "../../stores/Setup";
 
   const item = $Router.options;
+  let isLoading = false;
 
   const edit = async () => {
     Navigation.goTo(Routes.editProduct, { item, edit: true });
@@ -15,14 +17,23 @@
     Navigation.goTo(Routes.editProduct, { item, edit: false });
   };
 
-  const removeProduct = async () => {
+  async function removeProduct() {
+    isLoading = true;
     const response = await deleteProduct(item.id)
+    console.log(response);
     // Navigation.goTo(Routes.editProduct, { item, edit: false });
+    isLoading = false;
   };
 
   Title.set(item.title);
 </script>
 
+{#if isLoading}
+  <Views.Loading
+    topPadding={$StatusBar.height}
+    bottomPadding={$StatusBar.bottomPadding}
+  />
+{/if}
 <div class="product">
   <img src={item.src} alt={item.title} />
   <h2>{item.title}</h2>
@@ -42,6 +53,7 @@
   <div class="quantity">
     Resta{item.quantity > 1 ? "m" : ""} <span>{item.quantity}</span> unidades
   </div>
+  <Views.Divider />
   <Views.Button on:click={removeProduct}
     ><Fa icon={faTrashAlt} /> <span>Remover este produto</span></Views.Button
   >

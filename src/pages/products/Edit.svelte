@@ -7,20 +7,29 @@
   import { newProduct, updateProduct } from "../../network/Products";
 
   let { item, edit } = $Router.options;
+  let isLoading = false;
   const submit = async () => {
+    isLoading = true;
     let response;
     if(edit){
       response = await updateProduct(item);
     }else{
       response = await newProduct(item);
     }
-    if(response.success){
-      Navigation.goTo(Routes.products);
+    if(response){
+      Navigation.reset(Routes.products);
     }
+    isLoading = false;
   };
   Title.set(edit ? "Editar produto" : "Novo produto");
 </script>
 
+{#if isLoading}
+  <Views.Loading
+    topPadding={$StatusBar.height}
+    bottomPadding={$StatusBar.bottomPadding}
+  />
+{/if}
 <div class="product">
   <img src={item.src} alt={item.title} />
   <input type="file" />
@@ -45,6 +54,7 @@
     bind:value={item.oldPrice}
     placeHolder=""
   />
+  <Views.Divider />
   <Views.Button on:click={submit} bottomPadding={$StatusBar.bottomPadding}
     ><Fa icon={faEdit} /> <span>Salvar</span></Views.Button
   >
