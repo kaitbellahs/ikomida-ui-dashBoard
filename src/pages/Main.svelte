@@ -14,6 +14,7 @@
   import Product from "./products/Product.svelte";
   import Products from "./products/Products.svelte";
   import Edit from "./products/Edit.svelte";
+  import EditCategory from "./products/EditCategory.svelte";
   import { StatusBar } from "../stores/Setup";
   import {
     faHome,
@@ -74,6 +75,8 @@
     <Product />
   {:else if route == Routes.editProduct}
     <Edit />
+  {:else if route == Routes.editCategory}
+    <EditCategory />
   {:else}
     <Home />
   {/if}

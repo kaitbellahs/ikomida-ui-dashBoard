@@ -1,6 +1,6 @@
 <script>
   import { Title, Navigation, Router, Routes } from "../../stores/Navigation";
-  import { search, all, deleteProduct } from "../../network/Products";
+  import { search, all, deleteProduct, deleteCategory } from "../../network/Products";
   import { Views } from "@tian/components";
   import { faSearch, faEdit } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
@@ -17,7 +17,7 @@
     error = false;
     if (value.length > 0) {
       isLoading = true;
-      search(value).then(result => items = result);
+      search(value).then((result) => (items = result));
       oldValue = value;
       isLoading = false;
     } else {
@@ -36,6 +36,7 @@
     products = await all();
     isLoading = false;
   });
+
   function newProduct() {
     Navigation.goTo(Routes.editProduct, {
       item: {
@@ -45,7 +46,7 @@
         serves: null,
         price: null,
         oldPrice: null,
-        src: null,
+        image: null,
         weight: null,
         quantity: null,
       },
@@ -53,9 +54,34 @@
     });
   }
 
+  function newCategory() {
+    Navigation.goTo(Routes.editCategory, {
+      item: {
+        id: null,
+        title: null,
+        description: null,
+      },
+      edit: false,
+    });
+  }
+
   async function removeProduct(item) {
     isLoading = true;
-    const response = await deleteProduct(item.id)
+    const response = await deleteProduct(item.id);
+    console.log(response);
+    isLoading = false;
+  }
+
+  async function removeCategory(id) {
+    isLoading = true;
+    const response = await deleteCategory(id);
+    console.log(response);
+    isLoading = false;
+  }
+
+  async function editCategory(object) {
+    isLoading = true;
+    const response = await deleteProduct(item.id);
     console.log(response);
     isLoading = false;
   }
@@ -78,6 +104,12 @@
       ><Fa icon={faEdit} /> <span>Novo produto</span></Views.Button
     >
     <Views.Divider />
+    <Views.Button
+      on:click={newCategory}
+      bottomPadding={$StatusBar.bottomPadding}
+      ><Fa icon={faEdit} /> <span>Nova categoria</span></Views.Button
+    >
+    <Views.Divider />
     {#if (items.length > 0 || value) && !error}
       <Views.ItemsList
         {items}
@@ -90,6 +122,8 @@
       <h3>Tente usar outro termo para pequisar</h3>
     {:else if products.length > 0}
       <Views.ItemsList
+        {removeCategory}
+        {editCategory}
         items={products}
         productPage={Routes.product}
         {Navigation}

@@ -30,8 +30,21 @@ export async function all() {
     }
 }
 
+export async function getCategories() {
+    let response = await Network.instance.get(`/categories`, get(Auth));
+    if (response.success) {
+        return response.data;
+    }
+    return [];
+}
+
 export async function deleteProduct(id) {
     let response = await Network.instance.remove(`/product/${id}`, get(Auth));
+    return response.success;
+}
+
+export async function deleteCategory(id) {
+    let response = await Network.instance.remove(`/category/${id}`, get(Auth));
     return response.success;
 }
 
@@ -42,6 +55,16 @@ export async function newProduct(object) {
 
 export async function updateProduct(object) {
     let response = await Network.instance.put("/product", get(Auth), object);
+    return response.success;
+}
+
+export async function newCategory(object) {
+    let response = await Network.instance.post("/category", get(Auth), object);
+    return response.success;
+}
+
+export async function updateCategory(object) {
+    let response = await Network.instance.put("/category", get(Auth), object);
     return response.success;
 }
 

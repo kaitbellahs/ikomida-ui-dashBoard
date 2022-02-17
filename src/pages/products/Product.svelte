@@ -2,7 +2,7 @@
   import { Title, Navigation, Router, Routes } from "../../stores/Navigation";
   import Fa from "svelte-fa";
   import { faEdit, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
-  import { Views, Utils } from "@tian/components";
+  import { Views, Utils, Network } from "@tian/components";
   import { deleteProduct } from "../../network/Products";
   import { StatusBar } from "../../stores/Setup";
 
@@ -19,11 +19,11 @@
 
   async function removeProduct() {
     isLoading = true;
-    const response = await deleteProduct(item.id)
+    const response = await deleteProduct(item.id);
     console.log(response);
     // Navigation.goTo(Routes.editProduct, { item, edit: false });
     isLoading = false;
-  };
+  }
 
   Title.set(item.title);
 </script>
@@ -35,7 +35,10 @@
   />
 {/if}
 <div class="product">
-  <img src={item.src} alt={item.title} />
+  <img
+    src={`${Network.instance.devApiServer}/image/${item.image}`}
+    alt={item.title}
+  />
   <h2>{item.title}</h2>
   <p>{item.description}</p>
   <span class="serves"

@@ -3,25 +3,89 @@
   import Fa from "svelte-fa";
   import { faEdit } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
-  import { Views } from "@tian/components";
-  import { newProduct, updateProduct } from "../../network/Products";
+  import { Views, Network, Image } from "@tian/components";
+  import {
+    newProduct,
+    updateProduct,
+    getCategories,
+  } from "../../network/Products";
+  import { onMount } from "svelte";
 
   let { item, edit } = $Router.options;
   let isLoading = false;
-  const submit = async () => {
+  let fileinput;
+  let categoriesOptions = [];
+  let firstLaunch = false;
+  let imageSrc =
+    "https://cdn4.iconfinder.com/data/icons/small-n-flat/24/user-alt-512.png";
+
+  Title.set(edit ? "Editar produto" : "Novo produto");
+
+  async function submit() {
     isLoading = true;
     let response;
-    if(edit){
+    if (edit) {
       response = await updateProduct(item);
-    }else{
+    } else {
       response = await newProduct(item);
     }
-    if(response){
+    if (response) {
       Navigation.reset(Routes.products);
     }
     isLoading = false;
-  };
-  Title.set(edit ? "Editar produto" : "Novo produto");
+  }
+
+  async function onFileSelected(e) {
+    let imageSrcFile = e.target.files[0];
+    let reader = new FileReader();
+    reader.readAsDataURL(imageSrcFile);
+    reader.onload = async (e) => {
+      const [dataType, data] = e.target.result.split(";");
+      let imageType = "jpeg";
+      switch (dataType) {
+        case "image/jpeg":
+        case "image/jpg":
+          imageType = "jpeg";
+          break;
+        case "image/png":
+          imageType = "png";
+          break;
+      }
+      item.image = await Image.resizeImage(imageSrcFile, 400, 400, imageType);
+      imageSrc = item.image;
+    };
+  }
+
+  async function generateOptions() {
+    const response = await getCategories();
+    categoriesOptions = response.map((item) => {
+      return { id: item.id, name: item.title };
+    });
+  }
+
+  $: if (categoriesOptions.length > 0 && !firstLaunch) {
+    firstLaunch = true;
+    console.log("oi");
+    const result = categoriesOptions.filter(
+      (option) => option.id == item.categoryID
+    );
+    if (result.length > 0) {
+      item.category = result[0];
+    } else {
+      item.category = null;
+    }
+  }
+
+  onMount(async () => {
+    if (!item.category) {
+      item.category = null;
+    }
+    if (item.image) {
+      imageSrc = `${Network.instance.devApiServer}/image/${item.image}`;
+    }
+  });
+
+  generateOptions();
 </script>
 
 {#if isLoading}
@@ -31,8 +95,35 @@
   />
 {/if}
 <div class="product">
-  <img src={item.src} alt={item.title} />
-  <input type="file" />
+  <img src={imageSrc} alt={item.title} />
+  <img
+    class="upload"
+    src="https://static.thenounproject.com/png/625182-200.png"
+    alt=""
+    on:click={() => {
+      fileinput.click();
+    }}
+  />
+  <div
+    class="chan"
+    on:click={() => {
+      fileinput.click();
+    }}
+  >
+    Choose Image
+  </div>
+  <input
+    style="display:none"
+    type="file"
+    accept=".jpg, .jpeg, .png"
+    on:change={(e) => onFileSelected(e)}
+    bind:this={fileinput}
+  />
+  <Views.Selector
+    bind:selected={item.category}
+    name="Seleciona uma opção"
+    options={categoriesOptions}
+  />
   <Views.TextEdit
     name="Nome do produto"
     bind:value={item.title}
@@ -46,6 +137,16 @@
   <Views.TextEdit
     name="Peso do produto em KG"
     bind:value={item.weight}
+    placeHolder=""
+  />
+  <Views.TextEdit
+    name="Serve quantas pessoas?"
+    bind:value={item.serves}
+    placeHolder=""
+  />
+  <Views.TextEdit
+    name="Quantos itens você tem?"
+    bind:value={item.quantity}
     placeHolder=""
   />
   <Views.TextEdit name="Preço atual" bind:value={item.price} placeHolder="" />
@@ -65,7 +166,10 @@
     padding-bottom: 50px;
   }
   img {
-    width: 100%;
     max-width: 100%;
+    max-height: 200px;
+  }
+  img.upload {
+    width: 60px;
   }
 </style>
