@@ -30,6 +30,14 @@ export async function all() {
     }
 }
 
+export async function countProducts() {
+    let response = await Network.instance.get("/productsCount", get(Auth));
+    if(response.success){
+        return response.data
+    }
+    return 0;
+}
+
 export async function getCategories() {
     let response = await Network.instance.get(`/categories`, get(Auth));
     if (response.success) {
@@ -72,7 +80,7 @@ export async function search(query) {
     return (await all()).map(section => {
         return {
             title: section.title,
-            items: section.items.filter(item => {
+            products: section.products.filter(item => {
                 if (typeof item == "object") {
                     return item.title.toLowerCase().includes(query.toLowerCase()) || item.description.toLowerCase().includes(query.toLowerCase());
                 } else {
@@ -80,5 +88,5 @@ export async function search(query) {
                 }
             })
         };
-    }).filter(item => item.items.length > 0);
+    }).filter(item => item.products.length > 0);
 }

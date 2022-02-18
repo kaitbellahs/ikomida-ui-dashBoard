@@ -20,6 +20,8 @@ export const Routes = {
     checkout: Symbol("/checkout"),
     confirmSubscribe: Symbol("/confirmSubscribe"),
     subscribe: Symbol("/subscribe"),
+    coupons: Symbol("/coupons"),
+    newCoupon: Symbol("/newCoupon"),
     tac: Symbol("/tac")
 };
 

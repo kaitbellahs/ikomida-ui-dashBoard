@@ -14,6 +14,8 @@
   import Product from "./products/Product.svelte";
   import Products from "./products/Products.svelte";
   import Edit from "./products/Edit.svelte";
+  import Coupons from "./products/Coupons.svelte";
+  import NewCoupon from "./products/NewCoupon.svelte";
   import EditCategory from "./products/EditCategory.svelte";
   import { StatusBar } from "../stores/Setup";
   import {
@@ -77,6 +79,10 @@
     <Edit />
   {:else if route == Routes.editCategory}
     <EditCategory />
+  {:else if route == Routes.coupons}
+    <Coupons />
+  {:else if route == Routes.newCoupon}
+    <NewCoupon />
   {:else}
     <Home />
   {/if}

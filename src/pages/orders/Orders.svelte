@@ -70,34 +70,38 @@
   />
 {/if}
 <div>
-  {#each orders as { id, status, stage, products, address, payment, created, finished, subtotal, coupon, delivery }}
-    <div class="leftShadow orderContainer">
-      <div on:click={goToOrder(id)}>
-        <h3>#{id}: pedido {OrderStatus(status)}</h3>
-        {#if products.length > 0}
-          <div class="product">1. {products[0].title}</div>
-        {/if}
-        {#if products.length > 1}
-          <div class="product">
-            e mais {products.length - 1}
-            {products.length - 1 == 1 ? "item" : "itens"}
+  {#if orders.length > 0}
+    {#each orders as { id, status, stage, products, address, payment, created, finished, subtotal, coupon, delivery }}
+      <div class="leftShadow orderContainer">
+        <div on:click={goToOrder(id)}>
+          <h3>#{id}: pedido {OrderStatus(status)}</h3>
+          {#if products.length > 0}
+            <div class="product">1. {products[0].title}</div>
+          {/if}
+          {#if products.length > 1}
+            <div class="product">
+              e mais {products.length - 1}
+              {products.length - 1 == 1 ? "item" : "itens"}
+            </div>
+          {/if}
+          <div class="address">Entregue em: <b>{address.address}</b></div>
+          <div class="paymentMethod">
+            Forma de pagamento: <b>{PaymentType(payment.type)}</b>
           </div>
-        {/if}
-        <div class="address">Entregue em: <b>{address.address}</b></div>
-        <div class="paymentMethod">
-          Forma de pagamento: <b>{PaymentType(payment.type)}</b>
+          <div class="time">{Utils.Strings.timestampToString(created)}</div>
         </div>
-        <div class="time">{Utils.Strings.timestampToString(created)}</div>
+        {#if status === "open"}
+          <Views.Selector
+            bind:selected
+            name="Seleciona uma opção!"
+            options={orderOptions(id)}
+          />
+        {/if}
       </div>
-      {#if status === "open"}
-        <Views.Selector
-          bind:selected
-          name="Seleciona uma opção!"
-          options={orderOptions(id)}
-        />
-      {/if}
-    </div>
-  {/each}
+    {/each}
+  {:else}
+    <h2>Não ha pedidos por enquanto!</h2>
+  {/if}
 </div>
 
 <style>

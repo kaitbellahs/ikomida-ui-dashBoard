@@ -35,10 +35,12 @@
   />
 {/if}
 <div class="product">
-  <img
-    src={`${Network.instance.devApiServer}/image/${item.image}`}
-    alt={item.title}
-  />
+  {#if item.image}
+    <img
+      src={`${Network.instance.devApiServer}/image/${item.image}`}
+      alt={item.title}
+    />
+  {/if}
   <h2>{item.title}</h2>
   <p>{item.description}</p>
   <span class="serves"

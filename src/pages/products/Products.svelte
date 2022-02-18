@@ -1,8 +1,8 @@
 <script>
-  import { Title, Navigation, Router, Routes } from "../../stores/Navigation";
+  import { Title, Navigation, Routes, Menu } from "../../stores/Navigation";
   import { search, all, deleteProduct, deleteCategory } from "../../network/Products";
   import { Views } from "@tian/components";
-  import { faSearch, faEdit } from "@fortawesome/free-solid-svg-icons";
+  import { faSearch, faEdit, faGift } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
   import { onMount } from "svelte";
   import Fa from "svelte-fa";
@@ -24,10 +24,6 @@
       items = [];
       oldValue = "";
     }
-  }
-
-  function goToOrders() {
-    Navigation.goTo(Routes.orders);
   }
 
   Title.set("Produtos");
@@ -68,23 +64,25 @@
   async function removeProduct(item) {
     isLoading = true;
     const response = await deleteProduct(item.id);
-    console.log(response);
     isLoading = false;
   }
 
   async function removeCategory(id) {
     isLoading = true;
     const response = await deleteCategory(id);
-    console.log(response);
     isLoading = false;
   }
 
-  async function editCategory(object) {
-    isLoading = true;
-    const response = await deleteProduct(item.id);
-    console.log(response);
-    isLoading = false;
+  async function editCategory(item) {
+    Navigation.goTo(Routes.editCategory, { item, edit: true });
   }
+
+  async function goToCoupons() {
+    console.log("coupons")
+    Navigation.goTo(Routes.coupons);
+  }
+  
+  Menu.addItem({ name: "Cupons", icon: faGift, callback: goToCoupons });
 </script>
 
 {#if isLoading}
@@ -103,7 +101,6 @@
     <Views.Button on:click={newProduct} bottomPadding={$StatusBar.bottomPadding}
       ><Fa icon={faEdit} /> <span>Novo produto</span></Views.Button
     >
-    <Views.Divider />
     <Views.Button
       on:click={newCategory}
       bottomPadding={$StatusBar.bottomPadding}
