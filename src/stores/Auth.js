@@ -36,7 +36,7 @@ function createAuth() {
 					value: payload
 				});
 			} catch (error) {
-				console.log("error:");
+				console.error("error:");
 				console.error(error.message);
 			}
 		}

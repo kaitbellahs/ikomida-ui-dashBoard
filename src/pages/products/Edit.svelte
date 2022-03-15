@@ -15,7 +15,7 @@
   let isLoading = false;
   let fileinput;
   let categoriesOptions = [];
-  let firstLaunch = false;
+  let firstLaunch = true;
   let imageSrc =
     "https://cdn4.iconfinder.com/data/icons/small-n-flat/24/user-alt-512.png";
 
@@ -63,17 +63,13 @@
     });
   }
 
-  $: if (categoriesOptions.length > 0 && !firstLaunch) {
-    firstLaunch = true;
-    console.log("oi");
+  $: if (categoriesOptions.length > 0 && firstLaunch) {
+    firstLaunch = false;
     const result = categoriesOptions.filter(
       (option) => option.id == item.categoryID
     );
-    if (result.length > 0) {
-      item.category = result[0];
-    } else {
-      item.category = null;
-    }
+    
+    item.category = result.length > 0 ? result[0] : null;
   }
 
   onMount(async () => {

@@ -20,8 +20,7 @@
   async function removeProduct() {
     isLoading = true;
     const response = await deleteProduct(item.id);
-    console.log(response);
-    // Navigation.goTo(Routes.editProduct, { item, edit: false });
+    Navigation.pop();
     isLoading = false;
   }
 

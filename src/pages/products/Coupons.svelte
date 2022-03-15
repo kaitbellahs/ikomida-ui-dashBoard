@@ -14,7 +14,6 @@
   onMount(async () => {
     isLoading = true;
     coupons = await getCoupon();
-    console.log(coupons);
     isLoading = false;
   });
 

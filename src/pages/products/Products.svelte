@@ -78,7 +78,6 @@
   }
 
   async function goToCoupons() {
-    console.log("coupons")
     Navigation.goTo(Routes.coupons);
   }
   

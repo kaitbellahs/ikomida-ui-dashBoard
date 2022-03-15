@@ -10,7 +10,7 @@
   import Home from "./products/Home.svelte";
   import Orders from "./Orders/Orders.svelte";
   import Order from "./Orders/Order.svelte";
-  import Profile from "./user/Profile.svelte";
+  import Settings from "./user/Settings.svelte";
   import Product from "./products/Product.svelte";
   import Products from "./products/Products.svelte";
   import Edit from "./products/Edit.svelte";
@@ -45,13 +45,14 @@
     },
     {
       name: "Ajustes",
-      route: Routes.profile,
+      route: Routes.settings,
       icon: faUser,
     },
   ];
 
   $: styleHeight = $StatusBar.height + 55 + "px";
   $: route = $Router.route;
+  Menu.addItem({icon: null, name: "name", callback: null});
 </script>
 
 <Views.NavigationBar
@@ -69,8 +70,8 @@
     <Orders />
   {:else if route == Routes.order}
     <Order />
-  {:else if route == Routes.profile}
-    <Profile />
+  {:else if route == Routes.settings}
+    <Settings />
   {:else if route == Routes.products}
     <Products />
   {:else if route == Routes.product}

@@ -13,13 +13,12 @@ import {
 
 export async function all() {
     let products = get(Store);
-    if (products.timeout == undefined || products.timeout < Date.now() - (5 * 60 * 60)) {
+    if (!products.timeout || products.timeout < new Date(new Date().setMinutes(new Date().getMinutes() + 2)).getTime()) {
         const response = await Network.instance.get("/products", get(Auth));
-        console.log(response);
         if (response.success) {
             Store.updateItems({
                 items: response.data,
-                timeout: Date.now()
+                timeout: new Date().getTime()
             });
             return response.data;
         } else {

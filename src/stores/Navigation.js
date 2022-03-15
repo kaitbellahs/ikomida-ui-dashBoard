@@ -10,7 +10,7 @@ export const Routes = {
     home: Symbol("/home"),
     orders: Symbol("/orders"),
     order: Symbol("/order"),
-    profile: Symbol("/profile"),
+    settings: Symbol("/settings"),
     search: Symbol("/search"),
     product: Symbol("/product"),
     products: Symbol("/products"),

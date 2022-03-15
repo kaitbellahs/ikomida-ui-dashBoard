@@ -54,10 +54,6 @@
   <Main />
 {:else if route == Routes.Auth}
   <Login />
-{:else if route == Routes.subscribe}
-  <Subscribe />
-{:else if route == Routes.confirmSubscribe}
-  <ConfirmSubscribe />
 {:else if route == Routes.tac}
   <Tac />
 {:else}
