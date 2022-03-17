@@ -41,7 +41,7 @@ import { onMount } from "svelte";
     {/if}
     <div class="data">
       <Views.TextValue text="Nome:" value={settings?.restaurantName} fontSize="1.5em" />
-      <Views.TextValue text="CNPJ:" value={settings?.cnpj} fontSize="1.5em" />
+      <Views.TextValue text="CNPJ:" value={settings?.identity} fontSize="1.5em" />
       <Views.TextEdit
         bind:rawValue={settings.phone}
         bind:value={settings.phone}

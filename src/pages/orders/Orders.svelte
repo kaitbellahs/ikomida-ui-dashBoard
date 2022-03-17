@@ -13,6 +13,7 @@
   import { StatusBar } from "../../stores/Setup";
   import { faHistory } from "@fortawesome/free-solid-svg-icons";
 
+  const orderFinishedOptions = ["delivered", "canceled"];
   let isLoading = false;
   let orders = [];
   let selected = null;
@@ -90,7 +91,7 @@
           </div>
           <div class="time">{Utils.Strings.timestampToString(created)}</div>
         </div>
-        {#if status === "open"}
+        {#if !orderFinishedOptions.includes(status)}
           <Views.Selector
             bind:selected
             name="Seleciona uma opção!"

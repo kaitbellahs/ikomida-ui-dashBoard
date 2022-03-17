@@ -6,6 +6,7 @@
   import { ChangeOrderStatus } from "../../network/Orders";
   import { StatusBar } from "../../stores/Setup";
 
+  const orderFinishedOptions = ["delivered", "canceled"];
   const order = $Router.options;
   let selected = null;
   let oldSelected = null;
@@ -57,7 +58,7 @@
 <div class="paymentMethod">
   Forma de pagamento: <b>{PaymentType(order.payment.type)}</b>
 </div>
-{#if order.status === "open"}
+{#if !orderFinishedOptions.includes(status)}
   <Views.Selector
     bind:selected
     name="seleciona uma opção"
