@@ -58,14 +58,14 @@ import { onMount } from "svelte";
         bind:isValid={validPhone}
       />
       <Views.TextEdit
-        bind:rawValue={settings.pagSeguroEmail}
-        bind:value={settings.pagSeguroEmail}
+        bind:rawValue={settings.paymentGatewayPublicKey}
+        bind:value={settings.paymentGatewayPublicKey}
         icon={faAt}
         placeHolder="Pagseguro email:"
       />
       <Views.TextEdit
-        bind:rawValue={settings.pagSeguroAccessToken}
-        bind:value={settings.pagSeguroAccessToken}
+        bind:rawValue={settings.paymentGatewayPrivateKey}
+        bind:value={settings.paymentGatewayPrivateKey}
         icon={faKey}
         placeHolder="Pagseguro token de acesso:"
       />

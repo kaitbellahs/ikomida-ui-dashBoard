@@ -41,10 +41,12 @@
     "@capacitor/geolocation": "^1.3.0",
     "@capacitor/ios": "^3.3.4",
     "@capacitor/network": "^1.0.6",
+    "@capacitor/push-notifications": "^1.0.9",
     "@capacitor/status-bar": "file:../../capacitor-plugins/status-bar",
     "@capacitor/storage": "^1.2.3",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
     "@tian/components": "file:../projx-components",
-    "sirv-cli": "^2.0.0"
+    "sirv-cli": "^2.0.0",
+    "uuid": "^8.3.2"
   }
 }
