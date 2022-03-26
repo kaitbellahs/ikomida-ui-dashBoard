@@ -37,7 +37,7 @@
     bottomPadding={$StatusBar.bottomPadding}
   />
 {/if}
-<span class="time">Feito {Utils.Strings.timestampToString(order.created)}</span>
+<span class="time">Feito {Utils.Strings.timestampToString(order.createdAt)}</span>
 <h3>Pedido #{order.id}</h3>
 <span class="status">
   {#if order.status == "open"}
@@ -45,7 +45,7 @@
     <span>{order.stage}</span>
   {:else}
     {OrderStatus(order.status)} em
-    <span class="time">{Utils.Strings.timestampToString(order.finished)}</span>
+    <span class="time">{Utils.Strings.timestampToString(order.finishedAt)}</span>
   {/if}
 </span>
 {#each order.products as { title, price, quantity }, index}
@@ -54,11 +54,11 @@
     ><span class="price">{Utils.Strings.currency(quantity * price)}</span>
   </div>
 {/each}
-<div class="address">Entregue em: <b>{order.address.address}</b></div>
+<div class="address">Entregue em: <b>{order.address.street}</b></div>
 <div class="paymentMethod">
   Forma de pagamento: <b>{PaymentType(order.payment.type)}</b>
 </div>
-{#if !orderFinishedOptions.includes(status)}
+{#if !orderFinishedOptions.includes(order.status)}
   <Views.Selector
     bind:selected
     name="seleciona uma opção"
