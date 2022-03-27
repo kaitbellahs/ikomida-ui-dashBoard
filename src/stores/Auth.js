@@ -61,3 +61,17 @@ function createUserInfo() {
 }
 
 export const UserInfo = createUserInfo();
+
+function createPushNotificationToken() {
+	const {
+		subscribe,
+		set
+	} = writable();
+
+	return {
+		subscribe,
+		setToken: (token) => set(token)
+	};
+}
+
+export const PushNotificationToken = createPushNotificationToken();
