@@ -11,6 +11,14 @@
   let isLoading = false;
   let coupons = [];
 
+  let errorAlert;
+  let showAlert = false;
+
+  function toggleErrorAlert(messageObject) {
+    errorAlert = messageObject;
+    showAlert = true;
+  }
+
   onMount(async () => {
     isLoading = true;
     coupons = await getCoupon();
@@ -24,8 +32,10 @@
   async function removeCoupon(id) {
     isLoading = true;
     const response = await deleteCoupon(id);
-    if(response){
-        coupons = await getCoupon();
+    if (response?.success) {
+      coupons = await getCoupon();
+    } else {
+      toggleErrorAlert(response?.data);
     }
     isLoading = false;
   }
@@ -60,6 +70,8 @@
     {/if}
   </section>
 {/if}
+
+<Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 
 <style>
   section > article {

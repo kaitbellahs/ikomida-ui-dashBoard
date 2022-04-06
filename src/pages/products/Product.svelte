@@ -9,6 +9,14 @@
   const item = $Router.options;
   let isLoading = false;
 
+  let errorAlert;
+  let showAlert = false;
+
+  function toggleErrorAlert(messageObject) {
+    errorAlert = messageObject;
+    showAlert = true;
+  }
+
   const edit = async () => {
     Navigation.goTo(Routes.editProduct, { item, edit: true });
   };
@@ -20,7 +28,11 @@
   async function removeProduct() {
     isLoading = true;
     const response = await deleteProduct(item.id);
-    Navigation.pop();
+    if (response?.success) {
+      Navigation.pop();
+    } else {
+      toggleErrorAlert(response?.data);
+    }
     isLoading = false;
   }
 
@@ -68,6 +80,7 @@
     ><Fa icon={faEdit} /> <span>Novo produto Similar</span></Views.Button
   >
 </div>
+<Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 
 <style>
   .product {

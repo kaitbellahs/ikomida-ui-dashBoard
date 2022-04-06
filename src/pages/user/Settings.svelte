@@ -6,11 +6,22 @@
   import { StatusBar } from "../../stores/Setup";
   import Fa from "svelte-fa";
   import {
-    faPhone, faAt, faKey, faEnvelope
+    faPhone,
+    faAt,
+    faKey,
+    faEnvelope,
   } from "@fortawesome/free-solid-svg-icons";
-import { onMount } from "svelte";
+  import { onMount } from "svelte";
   let settings = {};
   let validPhone = false;
+
+  let errorAlert;
+  let showAlert = false;
+
+  function toggleErrorAlert(messageObject) {
+    errorAlert = messageObject;
+    showAlert = true;
+  }
 
   onMount(async () => {
     settings = await getSettings();
@@ -22,8 +33,10 @@ import { onMount } from "svelte";
 
   async function update() {
     const response = await setSettings(settings);
-    if(response){
-      settings = response;
+    if (response?.success) {
+      settings = response?.data;
+    } else {
+      toggleErrorAlert(response?.data);
     }
   }
 
@@ -33,15 +46,27 @@ import { onMount } from "svelte";
 {#if settings}
   <div class="settings">
     {#if settings.mainPicture}
-      <img class="avatarCircle" src={settings?.mainPicture} alt={settings?.restaurantName} />
+      <img
+        class="avatarCircle"
+        src={settings?.mainPicture}
+        alt={settings?.restaurantName}
+      />
     {:else}
       <div class="avatarCircle">
         {settings?.restaurantName?.[0]}{settings?.restaurantName?.[1]}
       </div>
     {/if}
     <div class="data">
-      <Views.TextValue text="Nome:" value={settings?.restaurantName} fontSize="1.5em" />
-      <Views.TextValue text="CNPJ:" value={settings?.identity} fontSize="1.5em" />
+      <Views.TextValue
+        text="Nome:"
+        value={settings?.restaurantName}
+        fontSize="1.5em"
+      />
+      <Views.TextValue
+        text="CNPJ:"
+        value={settings?.identity}
+        fontSize="1.5em"
+      />
       <Views.TextEdit
         bind:rawValue={settings.phone}
         bind:value={settings.phone}
@@ -80,6 +105,7 @@ import { onMount } from "svelte";
     bottomPadding={$StatusBar.bottomPadding}
   />
 {/if}
+<Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 
 <style>
   .settings {

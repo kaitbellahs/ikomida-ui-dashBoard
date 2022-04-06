@@ -2,49 +2,44 @@
   import { Auth, PushNotificationToken } from "../../stores/Auth";
   import * as AuthNetwork from "../../network/Auth";
   import { Views } from "@tian/components";
-  import { Routes, Navigation } from "../../stores/Navigation";
   import { faPhone, faUnlock } from "@fortawesome/free-solid-svg-icons";
   import { Utils } from "@tian/components";
-  import {registerPushNotificationToken} from "../../network/PushNotification";
+  import { registerPushNotificationToken } from "../../network/PushNotification";
 
   let isLoading = false;
   let phone = "11953635016";
   let initialValue = "(11) 95363-5016";
   let password = "123456";
-  let showAlert = false;
-  let errorMessage = "";
   let validPhone = false;
   let validPassword = false;
 
-  $: canLogin = validPhone && validPassword;
+  let errorAlert;
+  let showAlert = false;
 
-  async function doSubscribe() {
-    Navigation.goTo(Routes.subscribe);
+  function toggleErrorAlert(messageObject) {
+    errorAlert = messageObject;
+    showAlert = true;
   }
+
+  $: canLogin = validPhone && validPassword;
 
   async function doLogin() {
     isLoading = true;
     const response = await AuthNetwork.doLogin(55, phone, password);
-    if (response.success) {
-      const token = await Utils.Jws.extractToken(response.data);
+    if (response?.success) {
+      const token = await Utils.Jws.extractToken(response?.data);
       if (token !== null) {
-        Auth.setToken(response.data);
-        if($PushNotificationToken && $PushNotificationToken !== {}){
+        Auth.setToken(response?.data);
+        if ($PushNotificationToken && $PushNotificationToken !== {}) {
           await registerPushNotificationToken($PushNotificationToken);
         }
       } else {
-        errorMessage = "Token não é valido";
-        showAlert = true;
+        toggleErrorAlert("Token não é valido");
       }
     } else {
-      errorMessage = response.message;
-      showAlert = true;
+      toggleErrorAlert(response?.data);
     }
     isLoading = false;
-  }
-
-  function toggleAlert() {
-    showAlert = !showAlert;
   }
 </script>
 
@@ -52,14 +47,6 @@
   <Views.Loading />
 {/if}
 <main>
-  {#if showAlert}
-    <Views.Alert
-      title="Alerta"
-      message={errorMessage}
-      closeCallBack={toggleAlert}
-      buttons={[{ name: "OK!", callback: toggleAlert, principal: true }]}
-    />
-  {/if}
   <h1>Login!</h1>
   <Views.TextEdit
     bind:rawValue={phone}
@@ -79,6 +66,7 @@
   />
   <div />
   <Views.Button on:click={doLogin} disabled={!canLogin}>Entrar</Views.Button>
+  <Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 </main>
 
 <style>

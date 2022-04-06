@@ -19,6 +19,14 @@
   let imageSrc =
     "https://cdn4.iconfinder.com/data/icons/small-n-flat/24/user-alt-512.png";
 
+  let errorAlert;
+  let showAlert = false;
+
+  function toggleErrorAlert(messageObject) {
+    errorAlert = messageObject;
+    showAlert = true;
+  }
+
   Title.set(edit ? "Editar produto" : "Novo produto");
 
   async function submit() {
@@ -29,8 +37,10 @@
     } else {
       response = await newProduct(item);
     }
-    if (response) {
+    if (response?.success) {
       Navigation.reset(Routes.products);
+    } else {
+      toggleErrorAlert(response?.data);
     }
     isLoading = false;
   }
@@ -58,9 +68,11 @@
 
   async function generateOptions() {
     const response = await getCategories();
-    categoriesOptions = response.map((item) => {
-      return { id: item.id, name: item.title };
-    });
+    if (response) {
+      categoriesOptions = response.map((item) => {
+        return { id: item.id, name: item.title };
+      });
+    }
   }
 
   $: if (categoriesOptions.length > 0 && firstLaunch) {
@@ -68,7 +80,7 @@
     const result = categoriesOptions.filter(
       (option) => option.id == item.categoryID
     );
-    
+
     item.category = result.length > 0 ? result[0] : null;
   }
 
@@ -156,6 +168,7 @@
     ><Fa icon={faEdit} /> <span>Salvar</span></Views.Button
   >
 </div>
+<Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 
 <style>
   .product {

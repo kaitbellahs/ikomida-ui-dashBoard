@@ -15,12 +15,12 @@ export async function all() {
     let products = get(Store);
     if (!products.timeout || products.timeout < new Date(new Date().setMinutes(new Date().getMinutes() + 2)).getTime()) {
         const response = await Network.instance.get("/products", get(Auth));
-        if (response.success) {
+        if (response?.success) {
             Store.updateItems({
-                items: response.data,
+                items: response?.data,
                 timeout: new Date().getTime()
             });
-            return response.data;
+            return response?.data;
         } else {
             return [];
         }
@@ -31,48 +31,42 @@ export async function all() {
 
 export async function countProducts() {
     let response = await Network.instance.get("/productsCount", get(Auth));
-    if(response.success){
-        return response.data
+    if(response?.success){
+        return response?.data
     }
     return 0;
 }
 
 export async function getCategories() {
     let response = await Network.instance.get(`/categories`, get(Auth));
-    if (response.success) {
-        return response.data;
+    if (response?.success) {
+        return response?.data;
     }
     return [];
 }
 
 export async function deleteProduct(id) {
-    let response = await Network.instance.remove(`/product/${id}`, get(Auth));
-    return response.success;
+    return Network.instance.remove(`/product/${id}`, get(Auth));
 }
 
 export async function deleteCategory(id) {
-    let response = await Network.instance.remove(`/category/${id}`, get(Auth));
-    return response.success;
+    return Network.instance.remove(`/category/${id}`, get(Auth));
 }
 
 export async function newProduct(object) {
-    let response = await Network.instance.post("/product", get(Auth), object);
-    return response.success;
+    return Network.instance.post("/product", get(Auth), object);
 }
 
 export async function updateProduct(object) {
-    let response = await Network.instance.put("/product", get(Auth), object);
-    return response.success;
+    return Network.instance.put("/product", get(Auth), object);
 }
 
 export async function newCategory(object) {
-    let response = await Network.instance.post("/category", get(Auth), object);
-    return response.success;
+    return Network.instance.post("/category", get(Auth), object);
 }
 
 export async function updateCategory(object) {
-    let response = await Network.instance.put("/category", get(Auth), object);
-    return response.success;
+    return Network.instance.put("/category", get(Auth), object);
 }
 
 export async function search(query) {

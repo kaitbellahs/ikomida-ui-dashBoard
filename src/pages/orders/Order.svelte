@@ -19,12 +19,22 @@
     { id: "canceled", name: "5. Cancelar o pedido", orderID },
   ];
 
+  let errorAlert;
+  let showAlert = false;
+
+  function toggleErrorAlert(messageObject) {
+    errorAlert = messageObject;
+    showAlert = true;
+  }
+
   $: total = order.subtotal + order.delivery - order.coupon;
   $: if (selected !== oldSelected) {
     isLoading = true;
-    ChangeOrderStatus(selected.orderID, selected.id).then((response) =>
-      console.log(response)
-    );
+    ChangeOrderStatus(selected.orderID, selected.id).then((response) => {
+      if (!response?.success) {
+        toggleErrorAlert(response?.data);
+      }
+    });
     isLoading = false;
   }
 
@@ -37,7 +47,9 @@
     bottomPadding={$StatusBar.bottomPadding}
   />
 {/if}
-<span class="time">Feito {Utils.Strings.timestampToString(order.createdAt)}</span>
+<span class="time"
+  >Feito {Utils.Strings.timestampToString(order.createdAt)}</span
+>
 <h3>Pedido #{order.id}</h3>
 <span class="status">
   {#if order.status == "open"}
@@ -45,7 +57,8 @@
     <span>{order.stage}</span>
   {:else}
     {OrderStatus(order.status)} em
-    <span class="time">{Utils.Strings.timestampToString(order.finishedAt)}</span>
+    <span class="time">{Utils.Strings.timestampToString(order.finishedAt)}</span
+    >
   {/if}
 </span>
 {#each order.products as { title, price, quantity }, index}
@@ -100,6 +113,7 @@
     </tr>
   </tbody>
 </table>
+<Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 
 <style>
   h3 {

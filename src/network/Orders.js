@@ -11,25 +11,24 @@ import {
 export async function GetOrders(showHistory) {
     let response = await Network.instance.get("/orders", get(Auth));
     let orders = [];
-    if (response.success) {
+    if (response?.success) {
         if (showHistory) {
-            orders = response.data.filter(item => !["open", "accepted", "waitingDelivery", "delivery"].includes(item.status));
+            orders = response?.data.filter(item => !["open", "accepted", "waitingDelivery", "delivery"].includes(item.status));
         } else {
-            orders = response.data.filter(item => ["open", "accepted", "waitingDelivery", "delivery"].includes(item.status));
+            orders = response?.data.filter(item => ["open", "accepted", "waitingDelivery", "delivery"].includes(item.status));
         }
     }
     return orders;
 }
 
 export async function ChangeOrderStatus(id, status) {
-    let response = await Network.instance.put("/order", get(Auth), {id, status});
-    return response.success;
+    return Network.instance.put("/order", get(Auth), {id, status});
 }
 
 export async function countOrders() {
     let response = await Network.instance.get("/ordersCount", get(Auth));
-    if(response.success){
-        return response.data
+    if(response?.success){
+        return response?.data
     }
     return 0;
 }

@@ -10,16 +10,12 @@ import {
 
 export async function getSettings() {
     let response = await Network.instance.get("/vendorsettings", get(Auth));
-    if (response.success) {
-        return response.data
+    if (response?.success) {
+        return response?.data
     }
     return null;
 }
 
 export async function setSettings(object) {
-    let response = await Network.instance.put("/vendorsettings", get(Auth), object);
-    if (response.success) {
-        return response.data
-    }
-    return null;
+    return Network.instance.put("/vendorsettings", get(Auth), object);
 }

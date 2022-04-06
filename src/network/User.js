@@ -10,8 +10,8 @@ import {
 
 export async function countUsers() {
     let response = await Network.instance.get("/usersCount", get(Auth));
-    if (response.success) {
-        return response.data
+    if (response?.success) {
+        return response?.data
     }
     return 0;
 }

@@ -1,6 +1,11 @@
 <script>
   import { Title, Navigation, Routes, Menu } from "../../stores/Navigation";
-  import { search, all, deleteProduct, deleteCategory } from "../../network/Products";
+  import {
+    search,
+    all,
+    deleteProduct,
+    deleteCategory,
+  } from "../../network/Products";
   import { Views } from "@tian/components";
   import { faSearch, faEdit, faGift } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
@@ -13,6 +18,15 @@
   let isLoading = false;
   let items = [];
   let products = [];
+
+  let errorAlert;
+  let showAlert = false;
+
+  function toggleErrorAlert(messageObject) {
+    errorAlert = messageObject;
+    showAlert = true;
+  }
+
   $: if (value != oldValue) {
     error = false;
     if (value.length > 0) {
@@ -64,12 +78,18 @@
   async function removeProduct(item) {
     isLoading = true;
     const response = await deleteProduct(item.id);
+    if (!response?.success) {
+      toggleErrorAlert(response?.data);
+    }
     isLoading = false;
   }
 
   async function removeCategory(id) {
     isLoading = true;
     const response = await deleteCategory(id);
+    if (!response?.success) {
+      toggleErrorAlert(response?.data);
+    }
     isLoading = false;
   }
 
@@ -80,7 +100,7 @@
   async function goToCoupons() {
     Navigation.goTo(Routes.coupons);
   }
-  
+
   Menu.addItem({ name: "Cupons", icon: faGift, callback: goToCoupons });
 </script>
 
@@ -128,3 +148,5 @@
     {/if}
   </div>
 {/if}
+
+<Views.MessageAlert object={errorAlert} bind:show={showAlert} />

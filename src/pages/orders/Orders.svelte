@@ -26,6 +26,14 @@
     { id: "canceled", name: "5. Cancelar o pedido", orderID },
   ];
 
+  let errorAlert;
+  let showAlert = false;
+
+  function toggleErrorAlert(messageObject) {
+    errorAlert = messageObject;
+    showAlert = true;
+  }
+
   $: if ($Router.options === null || $Router.options !== null) {
     if ($Router.options === null || !$Router.options) {
       Menu.addItem({
@@ -38,15 +46,22 @@
   }
   $: if (selected !== oldSelected) {
     isLoading = true;
-    ChangeOrderStatus(selected.orderID, selected.id).then((response) =>
-      console.log(response)
-    );
+    ChangeOrderStatus(selected.orderID, selected.id).then((response) => {
+      if (!response?.success) {
+        toggleErrorAlert(response?.data);
+      }
+    });
     isLoading = false;
   }
 
   async function update() {
     isLoading = true;
-    orders = await GetOrders($Router.options);
+    const response = await GetOrders($Router.options);
+    if (response?.success) {
+      orders = response?.data;
+    } else {
+      toggleErrorAlert(response?.data);
+    }
     isLoading = false;
   }
 
@@ -104,6 +119,7 @@
     <h2>Não ha pedidos por enquanto!</h2>
   {/if}
 </div>
+<Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 
 <style>
   .orderContainer {
