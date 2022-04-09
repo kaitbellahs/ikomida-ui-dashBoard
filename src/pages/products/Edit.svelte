@@ -157,9 +157,15 @@
     bind:value={item.quantity}
     placeHolder=""
   />
-  <Views.TextEdit name="Preço atual" bind:value={item.price} placeHolder="" />
+  <Views.TextEdit
+    type="currency"
+    name="Preço atual"
+    bind:value={item.price}
+    placeHolder=""
+  />
   <Views.TextEdit
     name="Preço original"
+    type='currency'
     bind:value={item.oldPrice}
     placeHolder=""
   />
