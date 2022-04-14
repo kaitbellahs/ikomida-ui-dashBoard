@@ -5,11 +5,11 @@
     
     Title.set("Perfil");
   
-    $: styleHeight = StatusBar.height + 55 + "px";
+    $: styleHeight = `${(Number($StatusBar.height) + 50)}px`;
 
   </script>
   
   <Views.NavigationBar />
-  <main style="padding: 20px; padding-top: {styleHeight}; overflow: hidden;max-width: 100%;">
+  <main style="margin-top:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; overflow: hidden;max-width: 100%;">
     dsd
   </main>

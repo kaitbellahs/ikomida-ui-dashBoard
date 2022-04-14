@@ -9,7 +9,7 @@
 
   let isLoading = false;
 
-  $: styleHeight = $StatusBar.height + 55 + "px";
+  $: styleHeight = `${(Number($StatusBar.height) + 50)}px`;
 
   async function doSubscribe() {
     isLoading = true;
@@ -21,6 +21,15 @@
   Title.set("Cadastro");
 </script>
 
+<main
+  style="margin-top:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; overflow: hidden;max-width: 100%;"
+>
+  <p>Por favor confirme seu numero de telefone</p>
+  <Views.TextEdit icon={faPhone} type="phone" buttonName="Enviar" />
+  <Views.TextEdit icon={faUnlock} mask="X X X X" />
+  <div />
+  <Views.Button on:click={doSubscribe}>Confirmar</Views.Button>
+</main>
 <Views.NavigationBar
   {Menu}
   {Title}
@@ -30,15 +39,6 @@
 {#if isLoading}
   <Views.Loading />
 {/if}
-<main
-  style="padding: 20px; padding-top: {styleHeight}; overflow: hidden;max-width: 100%;"
->
-  <p>Por favor confirme seu numero de telefone</p>
-  <Views.TextEdit icon={faPhone} type="phone" buttonName="Enviar" />
-  <Views.TextEdit icon={faUnlock} mask="X X X X" />
-  <div />
-  <Views.Button on:click={doSubscribe}>Confirmar</Views.Button>
-</main>
 
 <style>
   main {

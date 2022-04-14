@@ -22,7 +22,9 @@ export const Routes = {
     subscribe: Symbol("/subscribe"),
     coupons: Symbol("/coupons"),
     newCoupon: Symbol("/newCoupon"),
-    tac: Symbol("/tac")
+    tac: Symbol("/tac"),
+    profile: Symbol("/profile"),
+    layout: Symbol("/layout")
 };
 
 function createTitle() {
@@ -54,6 +56,7 @@ function createMenu() {
 }
 
 export const Menu = createMenu();
+export const MenuHamburger = createMenu();
 
 function createNavigation() {
     const {

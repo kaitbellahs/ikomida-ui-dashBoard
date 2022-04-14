@@ -19,3 +19,11 @@ export async function getSettings() {
 export async function setSettings(object) {
     return Network.instance.put("/vendorsettings", get(Auth), object);
 }
+
+export async function updatePaymentGateway(object) {
+    return Network.instance.put("/updatePaymentGateway", get(Auth), object);
+}
+
+export async function updateBusinessHours(object) {
+    return Network.instance.put("/businessHours", get(Auth), object);
+}

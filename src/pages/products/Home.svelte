@@ -72,6 +72,8 @@
     display: flex;
     flex-direction: column;
     flex-basis: 40%;
+    text-shadow: 0.5px 1px #18056b66;
+    box-shadow: 1px 1.5px #00000099;
   }
   section > article > .name {
     width: 100%;

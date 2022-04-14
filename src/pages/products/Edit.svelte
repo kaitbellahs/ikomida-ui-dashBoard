@@ -216,6 +216,7 @@
   img {
     max-width: 100%;
     max-height: 200px;
+    object-fit: cover;
   }
   img.upload {
     width: 60px;

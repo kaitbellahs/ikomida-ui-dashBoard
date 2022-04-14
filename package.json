@@ -47,6 +47,7 @@
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
     "@tian/components": "file:../projx-components",
     "sirv-cli": "^2.0.0",
+    "svelte-color-picker": "^1.0.7",
     "uuid": "^8.3.2"
   }
 }

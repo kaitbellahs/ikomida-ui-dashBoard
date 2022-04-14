@@ -5,14 +5,17 @@
     Navigation,
     Title,
     Menu,
+    MenuHamburger,
   } from "../stores/Navigation";
   import { Views } from "@tian/components";
   import Home from "./products/Home.svelte";
   import Orders from "./Orders/Orders.svelte";
   import Order from "./Orders/Order.svelte";
+  import Profile from "./user/Profile.svelte";
   import Settings from "./user/Settings.svelte";
   import Product from "./products/Product.svelte";
   import Products from "./products/Products.svelte";
+  import Layout from "./user/Layout.svelte";
   import Edit from "./products/Edit.svelte";
   import Coupons from "./products/Coupons.svelte";
   import NewCoupon from "./products/NewCoupon.svelte";
@@ -23,6 +26,8 @@
     faList,
     faUser,
     faBook,
+    faIdCard,
+    faSlidersH,
   } from "@fortawesome/free-solid-svg-icons";
   import { get } from "svelte/store";
   import { onMount } from "svelte";
@@ -43,26 +48,38 @@
       route: Routes.orders,
       icon: faBook,
     },
+  ];
+  const menuHamburgerItems = [
     {
-      name: "Ajustes",
-      route: Routes.settings,
+      name: "Home",
+      callback: () => Navigation.goTo(Routes.home),
+      icon: faHome,
+    },
+    {
+      name: "Perfil",
+      callback: () => Navigation.goTo(Routes.profile),
       icon: faUser,
     },
+    {
+      name: "Configurações",
+      callback: () => Navigation.goTo(Routes.settings),
+      icon: faSlidersH,
+    },
+    {
+      name: "Layout",
+      callback: () => Navigation.goTo(Routes.layout),
+      icon: faIdCard,
+    },
   ];
+  menuHamburgerItems.forEach((page) => MenuHamburger.addItem(page));
 
-  $: styleHeight = $StatusBar.height + 55 + "px";
+  $: styleHeight = `${Number($StatusBar.height) + 60}px`;
   $: route = $Router.route;
-  Menu.addItem({icon: null, name: "name", callback: null});
+  Menu.addItem({ icon: null, name: "name", callback: null });
 </script>
 
-<Views.NavigationBar
-  {Menu}
-  {Title}
-  paddingTop={$StatusBar.height}
-  {Navigation}
-/>
 <main
-  style="padding: 20px; padding-top: {styleHeight}; padding-bottom: '50px'; overflow: hidden;max-width: 100%;"
+  style="margin-top:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 60px; overflow: hidden;max-width: 100%;position: relative;"
 >
   {#if route == Routes.home}
     <Home />
@@ -72,6 +89,8 @@
     <Order />
   {:else if route == Routes.settings}
     <Settings />
+  {:else if route == Routes.profile}
+    <Profile />
   {:else if route == Routes.products}
     <Products />
   {:else if route == Routes.product}
@@ -84,10 +103,21 @@
     <Coupons />
   {:else if route == Routes.newCoupon}
     <NewCoupon />
+  {:else if route == Routes.layout}
+    <Layout />
   {:else}
     <Home />
   {/if}
 </main>
+<Views.NavigationBar
+  {MenuHamburger}
+  logo="http://192.168.1.104:8080/assets/icons/logo.png"
+  {Menu}
+  {Title}
+  paddingTop={$StatusBar.height}
+  paddingBottom={$StatusBar.bottomPadding}
+  {Navigation}
+/>
 <Views.Tabs {tabs} {Navigation} bottomPadding={$StatusBar.bottomPadding} />
 
 <style global>
