@@ -27,7 +27,7 @@
     showAlert = true;
   }
 
-  $: total = order.subtotal + order.delivery - order.coupon;
+  $: total = order.subtotal + order.delivery - order.discount;
   $: if (selected !== oldSelected) {
     isLoading = true;
     ChangeOrderStatus(selected.orderID, selected.id).then((response) => {
@@ -61,10 +61,10 @@
     >
   {/if}
 </span>
-{#each order.products as { title, price, quantity }, index}
+{#each order.products as { title, price, quantity, discount, discountType }, index}
   <div class="product">
     <span class="quantity">{quantity}</span><span class="title">{title}</span
-    ><span class="price">{Utils.Strings.currency(quantity * price)}</span>
+    ><span class="price">{Utils.Strings.currency(quantity * Utils.Numbers.calcDiscount(price, discount, discountType))}</span>
   </div>
 {/each}
 <div class="address">Entregue em: <b>{order.address.street}</b></div>
@@ -89,13 +89,11 @@
       <td class="resumeText">Subtotal</td>
       <td class="resumeValue">{Utils.Strings.currency(order.subtotal)}</td>
     </tr>
-    {#if order.coupon > 0}
+    {#if order.coupon}
       <tr>
-        <td class="resumeText">Taxa de entrega</td>
+        <td class="resumeText">Desconto</td>
         <td class="resumeValue"
-          ><span class="deliveryFree"
-            >- {Utils.Strings.currency(order.coupon)}</span
-          ></td
+          ><span class="deliveryFree">- {Utils.Strings.currency(order.discount)}</span></td
         >
       </tr>
     {/if}

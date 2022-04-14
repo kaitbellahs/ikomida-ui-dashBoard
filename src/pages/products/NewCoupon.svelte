@@ -3,7 +3,7 @@
   import Fa from "svelte-fa";
   import { faEdit } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
-  import { Views } from "@tian/components";
+  import { Views, Types } from "@tian/components";
   import { newCoupon } from "../../network/Payment";
 
   let item = {
@@ -16,6 +16,17 @@
 
   let errorAlert;
   let showAlert = false;
+  let selectedDiscountType;
+  let oldSelectedDiscountType = null;
+  $: if (
+    selectedDiscountType &&
+    (oldSelectedDiscountType === null ||
+      oldSelectedDiscountType?.id !== selectedDiscountType?.id)
+  ) {
+    item.valueType = selectedDiscountType?.id;
+    item.value = 0;
+    oldSelectedDiscountType = selectedDiscountType;
+  }
 
   function toggleErrorAlert(messageObject) {
     errorAlert = messageObject;
@@ -44,7 +55,6 @@
 {/if}
 <div class="coupon">
   <Views.TextEdit name="Nome:" bind:value={item.name} placeHolder="" />
-  <Views.TextEdit name="Valor:" bind:value={item.value} placeHolder="" />
   <Views.TextEdit
     name="Quantidade:"
     bind:value={item.quantity}
@@ -56,6 +66,28 @@
     bind:value={item.validity}
     placeHolder=""
   />
+  <Views.Selector
+    bind:selected={selectedDiscountType}
+    name="seleciona uma opção"
+    options={Types.DiscountTypes.list}
+  />
+  {#if selectedDiscountType}
+    {#if selectedDiscountType.name === Types.DiscountTypes.PERCENT}
+      <Views.TextEdit
+        type="percent"
+        name="Valor:"
+        bind:value={item.value}
+        placeHolder=""
+      />
+    {:else if selectedDiscountType.name === Types.DiscountTypes.VALUE}
+      <Views.TextEdit
+        name="Valor:"
+        bind:value={item.value}
+        type="currency"
+        placeHolder=""
+      />
+    {/if}
+  {/if}
   <Views.Divider />
   <Views.Button on:click={submit} bottomPadding={$StatusBar.bottomPadding}
     ><Fa icon={faEdit} /> <span>Salvar</span></Views.Button

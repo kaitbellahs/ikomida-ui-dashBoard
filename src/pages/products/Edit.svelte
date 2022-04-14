@@ -3,7 +3,7 @@
   import Fa from "svelte-fa";
   import { faEdit } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
-  import { Views, Network, Image } from "@tian/components";
+  import { Views, Network, Image, Types } from "@tian/components";
   import {
     newProduct,
     updateProduct,
@@ -21,6 +21,18 @@
 
   let errorAlert;
   let showAlert = false;
+  let selectedDiscountType;
+  let oldSelectedDiscountType = null;
+  $: if (
+    selectedDiscountType &&
+    (oldSelectedDiscountType === null ||
+      oldSelectedDiscountType?.id !== selectedDiscountType?.id)
+  ) {
+    console.log(new Date(), selectedDiscountType)
+    item.discountType = selectedDiscountType?.id;
+    item.discount = 0;
+    oldSelectedDiscountType = selectedDiscountType;
+  }
 
   function toggleErrorAlert(messageObject) {
     errorAlert = messageObject;
@@ -103,6 +115,7 @@
   />
 {/if}
 <div class="product">
+{#if categoriesOptions.length > 0}
   <img src={imageSrc} alt={item.title} />
   <img
     class="upload"
@@ -159,20 +172,40 @@
   />
   <Views.TextEdit
     type="currency"
-    name="Preço atual"
+    name="Preço:"
     bind:value={item.price}
     placeHolder=""
   />
-  <Views.TextEdit
-    name="Preço original"
-    type='currency'
-    bind:value={item.oldPrice}
-    placeHolder=""
+  <Views.Selector
+    bind:selected={selectedDiscountType}
+    name="seleciona uma opção"
+    options={Types.DiscountTypes.list}
   />
+  {item.discount}
+  {#if selectedDiscountType}
+    {#if selectedDiscountType.name === Types.DiscountTypes.PERCENT}
+      <Views.TextEdit
+        type="percent"
+        name="Disconto:"
+        bind:value={item.discount}
+        placeHolder=""
+      />
+    {:else if selectedDiscountType.name === Types.DiscountTypes.VALUE}
+      <Views.TextEdit
+        name="Disconto:"
+        bind:value={item.discount}
+        type="currency"
+        placeHolder=""
+      />
+    {/if}
+  {/if}
   <Views.Divider />
   <Views.Button on:click={submit} bottomPadding={$StatusBar.bottomPadding}
     ><Fa icon={faEdit} /> <span>Salvar</span></Views.Button
   >
+  {:else}
+  Precisa adicionar uma categoria pelo menos antes de adicionar novo produto
+  {/if}
 </div>
 <Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 

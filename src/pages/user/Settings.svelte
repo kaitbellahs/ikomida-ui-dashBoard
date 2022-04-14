@@ -15,6 +15,7 @@
   let settings = {};
   let validPhone = false;
 
+  let isLoading = false;
   let errorAlert;
   let showAlert = false;
 
@@ -32,18 +33,17 @@
   }
 
   async function update() {
+    isLoading = true;
     const response = await setSettings(settings);
-    if (response?.success) {
-      settings = response?.data;
-    } else {
+    if (!response?.success) {
       toggleErrorAlert(response?.data);
     }
+    isLoading = false;
   }
 
   Title.set("Ajustes");
 </script>
 
-{#if settings}
   <div class="settings">
     {#if settings.mainPicture}
       <img
@@ -99,7 +99,8 @@
     </div>
     <Views.Button type="transparent" on:click={logout}>Logout</Views.Button>
   </div>
-{:else}
+
+  {#if !settings || isLoading}
   <Views.Loading
     topPadding={$StatusBar.height}
     bottomPadding={$StatusBar.bottomPadding}

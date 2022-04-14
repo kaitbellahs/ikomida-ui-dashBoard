@@ -2,7 +2,7 @@
   import { Title, Navigation, Router, Routes } from "../../stores/Navigation";
   import Fa from "svelte-fa";
   import { faEdit, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
-  import { Views, Utils, Network } from "@tian/components";
+  import { Views, Utils, Network, Types } from "@tian/components";
   import { deleteProduct } from "../../network/Products";
   import { StatusBar } from "../../stores/Setup";
 
@@ -59,12 +59,14 @@
   >
 
   <div class="price">
-    <span class:current={item.oldPrice != undefined && item.oldPrice != 0}
-      >{Utils.Strings.currency(item.price)}</span
-    >
-    {#if item.oldPrice != undefined && item.oldPrice != 0}
-      <span class="oldPrice">{Utils.Strings.currency(item.oldPrice)}</span>
+    {#if [Types.DiscountTypes.PERCENT, Types.DiscountTypes.VALUE].includes(Types.DiscountTypes[item.discountType])}
+      <span class="oldPrice">{Utils.Strings.currency(item.price)}</span>
     {/if}
+    <span class="current"
+      >{Utils.Strings.currency(
+        Utils.Numbers.calcDiscount(item.price, item.discount, item.discountType)
+      )}</span
+    >
   </div>
   <div class="quantity">
     Resta{item.quantity > 1 ? "m" : ""} <span>{item.quantity}</span> unidades

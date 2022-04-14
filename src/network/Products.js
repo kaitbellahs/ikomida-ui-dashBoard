@@ -54,6 +54,7 @@ export async function deleteCategory(id) {
 }
 
 export async function newProduct(object) {
+    console.log(object)
     return Network.instance.post("/product", get(Auth), object);
 }
 

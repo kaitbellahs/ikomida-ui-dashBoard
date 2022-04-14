@@ -56,12 +56,7 @@
 
   async function update() {
     isLoading = true;
-    const response = await GetOrders($Router.options);
-    if (response?.success) {
-      orders = response?.data;
-    } else {
-      toggleErrorAlert(response?.data);
-    }
+    orders = await GetOrders($Router.options);
     isLoading = false;
   }
 
