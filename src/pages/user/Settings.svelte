@@ -6,6 +6,7 @@
     getSettings,
     updatePaymentGateway,
     updateBusinessHours,
+    setDelivery,
   } from "../../network/Settings";
   import { updatePassword } from "../../network/Auth";
   import { StatusBar } from "../../stores/Setup";
@@ -21,6 +22,7 @@
   import { onMount } from "svelte";
   import { v4 as uuid } from "uuid";
   let paymentGateway = {};
+  let delivery = { value: 0, min: 0, free: false };
   let validPhone = false;
 
   let isLoading = false;
@@ -142,14 +144,24 @@
         },
       ],
     };
-    for(const index of business.days){
+    for (const index of business.days) {
       days[index].checked = true;
     }
+    delivery = { ...delivery, ...response?.delivery };
   });
 
   async function setPaymentGateway() {
     isLoading = true;
     const response = await updatePaymentGateway(paymentGateway);
+    if (!response?.success) {
+      toggleErrorAlert(response?.data);
+    }
+    isLoading = false;
+  }
+
+  async function updateDelivery() {
+    isLoading = true;
+    const response = await setDelivery(delivery);
     if (!response?.success) {
       toggleErrorAlert(response?.data);
     }
@@ -219,6 +231,25 @@
     />
     <Views.Divider />
     <Views.Button on:click={setPaymentGateway}>Atualizar os dados</Views.Button>
+    <Views.Divider />
+    <h2>Delivery</h2>
+    <Views.Switch name="Frete grátis:" bind:checked={delivery.free} />
+    <Views.TextEdit
+      type="currency"
+      bind:rawValue={delivery.value}
+      bind:value={delivery.value}
+      icon={faAt}
+      name="Valor por KM:"
+    />
+    <Views.TextEdit
+      type="currency"
+      bind:rawValue={delivery.min}
+      bind:value={delivery.min}
+      icon={faAt}
+      name="Valor mínimo:"
+    />
+    <Views.Divider />
+    <Views.Button on:click={updateDelivery}>Atualizar delivery</Views.Button>
     <Views.Divider />
     <h2>Senha</h2>
     <Views.TextEdit
@@ -294,8 +325,8 @@
     border: 1px solid red;
     background: red;
     border-radius: 16px;
-    width: 16px;
-    height: 16px;
+    width: 28px;
+    height: 28px;
     vertical-align: middle;
     text-align: center;
     padding: 6px;

@@ -95,6 +95,6 @@
     height: 25px;
     vertical-align: middle;
     text-align: center;
-    padding: 6px;
+    padding: 4px;
   }
 </style>

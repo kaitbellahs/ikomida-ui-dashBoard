@@ -38,11 +38,11 @@ function pushNotificationActionPerformedCallBack(notification){
 }
 
 let pushNotification = new PushNotification(hasRegisteredCallBack, pushNotificationReceivedCallBack, pushNotificationActionPerformedCallBack);
-pushNotification.init();
 
   onMount(async () => {
     networkStatus = await Network.getStatus();
     if (Capacitor.isNativePlatform()) {
+      pushNotification.init();
       _StatusBar.setStatusBar(await StatusBar.getInfo());
     }
   });

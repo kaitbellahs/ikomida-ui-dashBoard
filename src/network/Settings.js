@@ -27,3 +27,7 @@ export async function updatePaymentGateway(object) {
 export async function updateBusinessHours(object) {
     return Network.instance.put("/businessHours", get(Auth), object);
 }
+
+export async function setDelivery(object) {
+    return Network.instance.put("/delivery", get(Auth), object);
+}

@@ -13,10 +13,7 @@
 <section>
   <article>
     {#await countProducts()}
-      <Views.LocalLoading
-        topPadding={$StatusBar.height}
-        bottomPadding={$StatusBar.bottomPadding}
-      />
+      <Views.LocalLoading />
     {:then productsCount}
       <span class="count">{productsCount}</span>
       <span class="name">produtos</span>
@@ -24,10 +21,7 @@
   </article>
   <article>
     {#await countOrders()}
-      <Views.LocalLoading
-        topPadding={$StatusBar.height}
-        bottomPadding={$StatusBar.bottomPadding}
-      />
+      <Views.LocalLoading />
     {:then ordersCount}
       <span class="count">{ordersCount}</span>
       <span class="name">pedidos</span>
@@ -35,10 +29,7 @@
   </article>
   <article>
     {#await countUsers()}
-      <Views.LocalLoading
-        topPadding={$StatusBar.height}
-        bottomPadding={$StatusBar.bottomPadding}
-      />
+      <Views.LocalLoading />
     {:then usersCount}
       <span class="count">{usersCount}</span>
       <span class="name">Clientes</span>
@@ -46,10 +37,7 @@
   </article>
   <article>
     {#await countCoupons()}
-      <Views.LocalLoading
-        topPadding={$StatusBar.height}
-        bottomPadding={$StatusBar.bottomPadding}
-      />
+      <Views.LocalLoading />
     {:then couponsCount}
       <span class="count">{couponsCount}</span>
       <span class="name">Cupons</span>

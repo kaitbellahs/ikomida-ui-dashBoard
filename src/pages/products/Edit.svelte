@@ -3,7 +3,7 @@
   import Fa from "svelte-fa";
   import { faEdit } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
-  import { Views, Network, Image, Types } from "@tian/components";
+  import { Views, Network, Image, Types, Utils } from "@tian/components";
   import {
     newProduct,
     updateProduct,
@@ -11,13 +11,13 @@
   } from "../../network/Products";
   import { onMount } from "svelte";
 
-  let { item, edit } = $Router.options;
+  let { item, edit } = Utils.Objects.copy($Router.options);
   let isLoading = false;
   let fileinput;
   let categoriesOptions = [];
   let firstLaunch = true;
   let imageSrc =
-    "https://cdn4.iconfinder.com/data/icons/small-n-flat/24/user-alt-512.png";
+    "/Assets/Images/food-plate.svg";
 
   let errorAlert;
   let showAlert = false;
@@ -28,9 +28,8 @@
     (oldSelectedDiscountType === null ||
       oldSelectedDiscountType?.id !== selectedDiscountType?.id)
   ) {
-    console.log(new Date(), selectedDiscountType)
     item.discountType = selectedDiscountType?.id;
-    item.discount = 0;
+    item.discount = item.discount;
     oldSelectedDiscountType = selectedDiscountType;
   }
 
@@ -84,16 +83,34 @@
       categoriesOptions = response.map((item) => {
         return { id: item.id, name: item.title };
       });
+      if (categoriesOptions.length > 0) {
+        const result = categoriesOptions.filter(
+          (option) => option.id == item.categoryID
+        );
+
+        item.category = result.length > 0 ? result[0] : null;
+      }
     }
   }
 
-  $: if (categoriesOptions.length > 0 && firstLaunch) {
-    firstLaunch = false;
-    const result = categoriesOptions.filter(
-      (option) => option.id == item.categoryID
-    );
+  $: if (firstLaunch) {
+    if (categoriesOptions.length > 0) {
+      const result = categoriesOptions.filter(
+        (option) => option.id == item.categoryID
+      );
 
-    item.category = result.length > 0 ? result[0] : null;
+      item.category = result.length > 0 ? result[0] : null;
+    }
+
+    if (Types.DiscountTypes.list.length > 0) {
+      const result = Types.DiscountTypes.list.filter(
+        (option) => option.id == item.discountType
+      );
+
+      selectedDiscountType =
+        result.length > 0 ? result[0] : null;
+    }
+    firstLaunch = false;
   }
 
   onMount(async () => {
@@ -101,7 +118,7 @@
       item.category = null;
     }
     if (item.image) {
-      imageSrc = `${Network.instance.devApiServer}/image/${item.image}`;
+      imageSrc = item.image;
     }
   });
 
@@ -115,96 +132,95 @@
   />
 {/if}
 <div class="product">
-{#if categoriesOptions.length > 0}
-  <img src={imageSrc} alt={item.title} />
-  <img
-    class="upload"
-    src="https://static.thenounproject.com/png/625182-200.png"
-    alt=""
-    on:click={() => {
-      fileinput.click();
-    }}
-  />
-  <div
-    class="chan"
-    on:click={() => {
-      fileinput.click();
-    }}
-  >
-    Choose Image
-  </div>
-  <input
-    style="display:none"
-    type="file"
-    accept=".jpg, .jpeg, .png"
-    on:change={(e) => onFileSelected(e)}
-    bind:this={fileinput}
-  />
-  <Views.Selector
-    bind:selected={item.category}
-    name="Seleciona uma opção"
-    options={categoriesOptions}
-  />
-  <Views.TextEdit
-    name="Nome do produto"
-    bind:value={item.title}
-    placeHolder=""
-  />
-  <Views.TextEdit
-    name="Descrição do produto"
-    bind:value={item.description}
-    placeHolder=""
-  />
-  <Views.TextEdit
-    name="Peso do produto em KG"
-    bind:value={item.weight}
-    placeHolder=""
-  />
-  <Views.TextEdit
-    name="Serve quantas pessoas?"
-    bind:value={item.serves}
-    placeHolder=""
-  />
-  <Views.TextEdit
-    name="Quantos itens você tem?"
-    bind:value={item.quantity}
-    placeHolder=""
-  />
-  <Views.TextEdit
-    type="currency"
-    name="Preço:"
-    bind:value={item.price}
-    placeHolder=""
-  />
-  <Views.Selector
-    bind:selected={selectedDiscountType}
-    name="seleciona uma opção"
-    options={Types.DiscountTypes.list}
-  />
-  {item.discount}
-  {#if selectedDiscountType}
-    {#if selectedDiscountType.name === Types.DiscountTypes.PERCENT}
-      <Views.TextEdit
-        type="percent"
-        name="Disconto:"
-        bind:value={item.discount}
-        placeHolder=""
+  {#if categoriesOptions.length > 0}
+    <div class="imageContainer">
+      <img src={imageSrc} alt={item.title} />
+      <img
+        class="upload"
+        src="/Assets/Images/upload.png"
+        alt=""
+        on:click={fileinput.click()}
       />
-    {:else if selectedDiscountType.name === Types.DiscountTypes.VALUE}
-      <Views.TextEdit
-        name="Disconto:"
-        bind:value={item.discount}
-        type="currency"
-        placeHolder=""
+      <input
+        style="display:none"
+        type="file"
+        accept=".jpg, .jpeg, .png"
+        on:change={(e) => onFileSelected(e)}
+        bind:this={fileinput}
       />
+    </div>
+    <Views.Selector
+      bind:selected={item.category}
+      name="Seleciona uma opção"
+      options={categoriesOptions}
+    />
+    <Views.TextEdit
+      name="Nome do produto"
+      bind:value={item.title}
+      placeHolder=""
+    />
+    <Views.TextEdit
+      name="Descrição do produto"
+      bind:value={item.description}
+      placeHolder=""
+    />
+    <Views.TextEdit
+      type="number"
+      name="Peso do produto em KG"
+      bind:value={item.weight}
+      bind:rawValue={item.weight}
+      placeHolder=""
+    />
+    <Views.TextEdit
+      type="number"
+      name="Serve quantas pessoas?"
+      bind:value={item.serves}
+      bind:rawValue={item.serves}
+      placeHolder=""
+    />
+    <Views.TextEdit
+      name="Quantos itens você tem?"
+      bind:value={item.quantity}
+      bind:rawValue={item.quantity}
+      placeHolder=""
+    />
+    <Views.TextEdit
+      type="currency"
+      name="Preço:"
+      bind:value={item.price}
+      bind:rawValue={item.price}
+      placeHolder=""
+    />
+    <Views.Selector
+      bind:selected={selectedDiscountType}
+      name="seleciona uma opção"
+      options={Types.DiscountTypes.list}
+    />
+    {#if selectedDiscountType}
+      {#if selectedDiscountType.name === Types.DiscountTypes.PERCENT}
+        <Views.TextEdit
+          type="percent"
+          name="Disconto:"
+          bind:value={item.discount}
+          bind:rawValue={item.discount}
+          placeHolder=""
+        />
+      {:else if selectedDiscountType.name === Types.DiscountTypes.VALUE}
+        <Views.TextEdit
+          name="Disconto:"
+          bind:value={item.discount}
+          bind:rawValue={item.discount}
+          type="currency"
+          placeHolder=""
+        />
+      {/if}
     {/if}
-  {/if}
-  <Views.Divider />
-  <Views.Button on:click={submit} bottomPadding={$StatusBar.bottomPadding}
-    ><Fa icon={faEdit} /> <span>Salvar</span></Views.Button
-  >
+    <Views.Divider />
+    <Views.Button on:click={submit} bottomPadding={$StatusBar.bottomPadding}
+      ><Fa icon={faEdit} /> <span>Salvar</span></Views.Button
+    >
   {:else}
-  Precisa adicionar uma categoria pelo menos antes de adicionar novo produto
+    Precisa adicionar uma categoria pelo menos antes de adicionar novo produto
   {/if}
 </div>
 <Views.MessageAlert object={errorAlert} bind:show={showAlert} />
@@ -213,12 +229,22 @@
   .product {
     padding-bottom: 50px;
   }
-  img {
-    max-width: 100%;
-    max-height: 200px;
-    object-fit: cover;
+  .imageContainer {
+    position: relative;
+    border-radius: 4px;
+    width: 100%;
+    overflow: hidden;
   }
-  img.upload {
+  .imageContainer > img {
+    max-width: 100%;
+    /* max-height: 200px; */
+    width: 100%;
+  }
+  .imageContainer > img.upload {
     width: 60px;
+    position: absolute;
+    left: 0;
+    background: #00000077;
+    border-radius: 4px;
   }
 </style>

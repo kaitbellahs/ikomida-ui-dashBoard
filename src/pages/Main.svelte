@@ -71,6 +71,7 @@
       icon: faIdCard,
     },
   ];
+  MenuHamburger.reset();
   menuHamburgerItems.forEach((page) => MenuHamburger.addItem(page));
 
   $: styleHeight = `${Number($StatusBar.height) + 60}px`;
@@ -111,7 +112,7 @@
 </main>
 <Views.NavigationBar
   {MenuHamburger}
-  logo="http://192.168.1.104:8080/assets/icons/logo.png"
+  logo="/Assets/Icons/logo.png"
   {Menu}
   {Title}
   paddingTop={$StatusBar.height}
