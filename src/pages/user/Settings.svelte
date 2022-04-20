@@ -12,10 +12,8 @@
   import { StatusBar } from "../../stores/Setup";
   import Fa from "svelte-fa";
   import {
-    faPhone,
     faAt,
     faKey,
-    faEnvelope,
     faClock,
     faTrashAlt,
   } from "@fortawesome/free-solid-svg-icons";
@@ -23,25 +21,18 @@
   import { v4 as uuid } from "uuid";
   let paymentGateway = {};
   let delivery = { value: 0, min: 0, free: false };
-  let validPhone = false;
-
   let isLoading = false;
   let errorAlert;
   let showAlert = false;
 
-  function toggleErrorAlert(messageObject) {
-    errorAlert = messageObject;
-    showAlert = true;
-  }
-
   const days = [
+    { name: "Domingo", checked: false },
     { name: "Segunda-feira", checked: false },
     { name: "Terça-feira", checked: false },
     { name: "Quarta-feira", checked: false },
     { name: "Quinta-feira", checked: false },
     { name: "Sexta-feira", checked: false },
     { name: "Sabado", checked: false },
-    { name: "Domingo", checked: false },
   ];
 
   let business = {
@@ -55,21 +46,27 @@
     ],
   };
 
-  const addHours = () => {
-    business?.hours?.push({ id: uuid(), start: null, end: null });
-    business.hours = business?.hours;
-  };
-  function onRemoveClick(id) {
-    business.hours = business?.hours?.filter(
-      (businessHour) => businessHour.id !== id
-    );
-  }
-
   let passwordObject = {
     oldPass: null,
     newPass: null,
     reNewPass: null,
   };
+
+  function toggleErrorAlert(messageObject) {
+    errorAlert = messageObject;
+    showAlert = true;
+  }
+
+  const addHours = () => {
+    business?.hours?.push({ id: uuid(), start: null, end: null });
+    business.hours = business?.hours;
+  };
+
+  function onRemoveClick(id) {
+    business.hours = business?.hours?.filter(
+      (businessHour) => businessHour.id !== id
+    );
+  }
 
   async function editPassword() {
     if (passwordObject.oldPass === null || passwordObject.oldPass.length < 6) {
@@ -96,6 +93,7 @@
     }
     isLoading = false;
   }
+
   async function updateHours() {
     isLoading = true;
     for (const businessHour of business?.hours) {
@@ -131,6 +129,24 @@
     isLoading = false;
   }
 
+  async function setPaymentGateway() {
+    isLoading = true;
+    const response = await updatePaymentGateway(paymentGateway);
+    if (!response?.success) {
+      toggleErrorAlert(response?.data);
+    }
+    isLoading = false;
+  }
+
+  async function updateDelivery() {
+    isLoading = true;
+    const response = await setDelivery(delivery);
+    if (!response?.success) {
+      toggleErrorAlert(response?.data);
+    }
+    isLoading = false;
+  }
+
   onMount(async () => {
     const response = await getSettings();
     paymentGateway = response?.paymentGateway;
@@ -150,24 +166,6 @@
     delivery = { ...delivery, ...response?.delivery };
   });
 
-  async function setPaymentGateway() {
-    isLoading = true;
-    const response = await updatePaymentGateway(paymentGateway);
-    if (!response?.success) {
-      toggleErrorAlert(response?.data);
-    }
-    isLoading = false;
-  }
-
-  async function updateDelivery() {
-    isLoading = true;
-    const response = await setDelivery(delivery);
-    if (!response?.success) {
-      toggleErrorAlert(response?.data);
-    }
-    isLoading = false;
-  }
-
   Title.set("Ajustes");
 </script>
 
@@ -182,7 +180,7 @@
         <div class="twoCells">
           <Views.TextEdit
             name="Abertura:"
-            mask="__/__"
+            mask="__:__"
             bind:rawValue={businessHour.start}
             bind:value={businessHour.start}
             placeHolder=""
@@ -194,7 +192,7 @@
             bind:rawValue={businessHour.end}
             bind:value={businessHour.end}
             placeHolder=""
-            mask="__/__"
+            mask="__:__"
             type="number"
             leftPadding="10px"
           />
@@ -234,20 +232,22 @@
     <Views.Divider />
     <h2>Delivery</h2>
     <Views.Switch name="Frete grátis:" bind:checked={delivery.free} />
-    <Views.TextEdit
-      type="currency"
-      bind:rawValue={delivery.value}
-      bind:value={delivery.value}
-      icon={faAt}
-      name="Valor por KM:"
-    />
-    <Views.TextEdit
-      type="currency"
-      bind:rawValue={delivery.min}
-      bind:value={delivery.min}
-      icon={faAt}
-      name="Valor mínimo:"
-    />
+    {#if !(delivery?.free || false)}
+      <Views.TextEdit
+        type="currency"
+        bind:rawValue={delivery.value}
+        bind:value={delivery.value}
+        icon={faAt}
+        name="Valor por KM:"
+      />
+      <Views.TextEdit
+        type="currency"
+        bind:rawValue={delivery.min}
+        bind:value={delivery.min}
+        icon={faAt}
+        name="Valor mínimo:"
+      />
+    {/if}
     <Views.Divider />
     <Views.Button on:click={updateDelivery}>Atualizar delivery</Views.Button>
     <Views.Divider />
