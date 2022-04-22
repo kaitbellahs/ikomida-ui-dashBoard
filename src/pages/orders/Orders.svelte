@@ -13,7 +13,7 @@
   import { StatusBar } from "../../stores/Setup";
   import { faHistory } from "@fortawesome/free-solid-svg-icons";
 
-  const orderFinishedOptions = ["delivered", "canceled"];
+  const orderFinishedOptions = ["waitingPayment", "delivered", "canceled"];
   let isLoading = false;
   let orders = [];
   let selected = null;
@@ -50,6 +50,8 @@
       if (!response?.success) {
         toggleErrorAlert(response?.data);
       }
+    }).catch(exception => {
+      toggleErrorAlert(exception);
     });
     isLoading = false;
   }

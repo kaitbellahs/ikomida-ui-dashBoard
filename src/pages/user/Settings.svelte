@@ -181,16 +181,16 @@
           <Views.TextEdit
             name="Abertura:"
             mask="__:__"
-            bind:rawValue={businessHour.start}
             bind:value={businessHour.start}
+            bind:rawValue={businessHour.start}
             placeHolder=""
             type="number"
             rightPadding="10px"
           />
           <Views.TextEdit
             name="Fechamento:"
-            bind:rawValue={businessHour.end}
             bind:value={businessHour.end}
+            bind:rawValue={businessHour.end}
             placeHolder=""
             mask="__:__"
             type="number"
@@ -216,14 +216,14 @@
     <Views.Divider />
     <h2>Gateway de pagament</h2>
     <Views.TextEdit
+    bind:value={paymentGateway.publicKey}
       bind:rawValue={paymentGateway.publicKey}
-      bind:value={paymentGateway.publicKey}
       icon={faAt}
       placeHolder="Pagseguro email:"
     />
     <Views.TextEdit
+    bind:value={paymentGateway.privateKey}
       bind:rawValue={paymentGateway.privateKey}
-      bind:value={paymentGateway.privateKey}
       icon={faKey}
       placeHolder="Pagseguro token de acesso:"
     />
@@ -235,15 +235,15 @@
     {#if !(delivery?.free || false)}
       <Views.TextEdit
         type="currency"
-        bind:rawValue={delivery.value}
         bind:value={delivery.value}
+        bind:rawValue={delivery.value}
         icon={faAt}
         name="Valor por KM:"
       />
       <Views.TextEdit
         type="currency"
-        bind:rawValue={delivery.min}
         bind:value={delivery.min}
+        bind:rawValue={delivery.min}
         icon={faAt}
         name="Valor mínimo:"
       />

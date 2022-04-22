@@ -8,14 +8,16 @@ import {
     Auth
 } from '../stores/Auth';
 
+const openOrdersStatus = ["waitingPayment", "open", "accepted", "waitingDelivery", "delivery"];
+
 export async function GetOrders(showHistory) {
     let response = await Network.instance.get("/orders", get(Auth));
     let orders = [];
     if (response?.success) {
         if (showHistory) {
-            orders = response?.data.filter(item => !["open", "accepted", "waitingDelivery", "delivery"].includes(item.status));
+            orders = response?.data.filter(item => !openOrdersStatus.includes(item.status));
         } else {
-            orders = response?.data.filter(item => ["open", "accepted", "waitingDelivery", "delivery"].includes(item.status));
+            orders = response?.data.filter(item => openOrdersStatus.includes(item.status));
         }
     }
     return orders;
@@ -35,6 +37,8 @@ export async function countOrders() {
 
 export function OrderStatus(status) {
     switch (status) {
+        case "waitingPayment":
+            return "aguardando pagamento";
         case "open":
         case "accepted":
         case "waitingDelivery":
@@ -49,6 +53,8 @@ export function OrderStatus(status) {
 
 export function OrderStage(status) {
     switch (status) {
+        case "waitingPayment":
+            return "aguardando pagamento";
         case "open":
             return "aguardando aprovação";
         case "accepted":
