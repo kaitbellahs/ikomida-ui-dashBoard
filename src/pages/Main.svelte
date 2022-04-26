@@ -13,6 +13,7 @@
   import Order from "./Orders/Order.svelte";
   import Profile from "./user/Profile.svelte";
   import Settings from "./user/Settings.svelte";
+  import Subscription from "./user/Subscription.svelte";
   import Product from "./products/Product.svelte";
   import Products from "./products/Products.svelte";
   import Layout from "./user/Layout.svelte";
@@ -61,6 +62,11 @@
       icon: faUser,
     },
     {
+      name: "Cobranças",
+      callback: () => Navigation.goTo(Routes.subscription),
+      icon: faUser,
+    },
+    {
       name: "Configurações",
       callback: () => Navigation.goTo(Routes.settings),
       icon: faSlidersH,
@@ -106,6 +112,8 @@
     <NewCoupon />
   {:else if route == Routes.layout}
     <Layout />
+  {:else if route == Routes.subscription}
+    <Subscription />
   {:else}
     <Home />
   {/if}

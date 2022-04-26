@@ -24,7 +24,8 @@ export const Routes = {
     newCoupon: Symbol("/newCoupon"),
     tac: Symbol("/tac"),
     profile: Symbol("/profile"),
-    layout: Symbol("/layout")
+    layout: Symbol("/layout"),
+    subscription: Symbol("/subscription")
 };
 
 function createTitle() {

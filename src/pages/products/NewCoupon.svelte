@@ -27,6 +27,11 @@
     item.value = 0;
     oldSelectedDiscountType = selectedDiscountType;
   }
+  $: canContinue =
+  item?.name && (item?.name?.length || 0) <= 255 &&
+  item?.validity &&
+  ((selectedDiscountType && selectedDiscountType.name !== Types.DiscountTypes.NO) ? (item?.value && (Number(item?.value || 0)) <= 99999999.99) : true) &&
+  item?.quantity && (Number(item?.quantity || 0)) <= 2147483647;
 
   function toggleErrorAlert(messageObject) {
     errorAlert = messageObject;
@@ -89,7 +94,7 @@
     {/if}
   {/if}
   <Views.Divider />
-  <Views.Button on:click={submit} bottomPadding={$StatusBar.bottomPadding}
+  <Views.Button disabled={!canContinue} on:click={submit} bottomPadding={$StatusBar.bottomPadding}
     ><Fa icon={faEdit} /> <span>Salvar</span></Views.Button
   >
 </div>

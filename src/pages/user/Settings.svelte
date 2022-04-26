@@ -1,5 +1,4 @@
 <script>
-  import { Auth } from "../../stores/Auth";
   import { Title } from "../../stores/Navigation";
   import { Views } from "@tian/components";
   import {
@@ -8,7 +7,6 @@
     updateBusinessHours,
     setDelivery,
   } from "../../network/Settings";
-  import { updatePassword } from "../../network/Auth";
   import { StatusBar } from "../../stores/Setup";
   import Fa from "svelte-fa";
   import {
@@ -19,7 +17,7 @@
   } from "@fortawesome/free-solid-svg-icons";
   import { onMount } from "svelte";
   import { v4 as uuid } from "uuid";
-  let paymentGateway = {};
+  let paymentGateway = { publicKey: null, privateKey: null };
   let delivery = { value: 0, min: 0, free: false };
   let isLoading = false;
   let errorAlert;
@@ -46,12 +44,6 @@
     ],
   };
 
-  let passwordObject = {
-    oldPass: null,
-    newPass: null,
-    reNewPass: null,
-  };
-
   function toggleErrorAlert(messageObject) {
     errorAlert = messageObject;
     showAlert = true;
@@ -66,32 +58,6 @@
     business.hours = business?.hours?.filter(
       (businessHour) => businessHour.id !== id
     );
-  }
-
-  async function editPassword() {
-    if (passwordObject.oldPass === null || passwordObject.oldPass.length < 6) {
-      toggleErrorAlert("Senha atual invalida!");
-      return;
-    } else if (
-      passwordObject.newPass === null ||
-      passwordObject.newPass.length < 6
-    ) {
-      toggleErrorAlert("A nova senha invalida!");
-      return;
-    } else if (passwordObject.newPass !== passwordObject.reNewPass) {
-      toggleErrorAlert("Senha nova e verifição não confirem");
-      return;
-    }
-    isLoading = true;
-    let response = await updatePassword(passwordObject);
-    if (response.success) {
-      toggleErrorAlert("Senha atualizada com sucesso!");
-    } else {
-      toggleErrorAlert(response?.data);
-      isLoading = false;
-      return;
-    }
-    isLoading = false;
   }
 
   async function updateHours() {
@@ -149,18 +115,9 @@
 
   onMount(async () => {
     const response = await getSettings();
-    paymentGateway = response?.paymentGateway;
-    business = response?.business || {
-      days: [],
-      hours: [
-        {
-          id: uuid(),
-          start: null,
-          end: null,
-        },
-      ],
-    };
-    for (const index of business.days) {
+    paymentGateway = { ...paymentGateway, ...response?.paymentGateway };
+    business = { ...business, ...response?.business };
+    for (const index of business?.days || []) {
       days[index].checked = true;
     }
     delivery = { ...delivery, ...response?.delivery };
@@ -172,7 +129,7 @@
 <div class="settings">
   <div class="data">
     <h2>horário de funcionamento</h2>
-    {#each business?.hours as businessHour}
+    {#each business?.hours || [] as businessHour}
       <div class="busninessHours">
         <span on:click={onRemoveClick(businessHour.id)} class="remove"
           ><Fa icon={faTrashAlt} /></span
@@ -216,13 +173,13 @@
     <Views.Divider />
     <h2>Gateway de pagament</h2>
     <Views.TextEdit
-    bind:value={paymentGateway.publicKey}
+      bind:value={paymentGateway.publicKey}
       bind:rawValue={paymentGateway.publicKey}
       icon={faAt}
       placeHolder="Pagseguro email:"
     />
     <Views.TextEdit
-    bind:value={paymentGateway.privateKey}
+      bind:value={paymentGateway.privateKey}
       bind:rawValue={paymentGateway.privateKey}
       icon={faKey}
       placeHolder="Pagseguro token de acesso:"
@@ -250,28 +207,6 @@
     {/if}
     <Views.Divider />
     <Views.Button on:click={updateDelivery}>Atualizar delivery</Views.Button>
-    <Views.Divider />
-    <h2>Senha</h2>
-    <Views.TextEdit
-      name="Senha atual:"
-      bind:value={passwordObject.oldPass}
-      secret={true}
-      placeHolder=""
-    />
-    <Views.TextEdit
-      name="Nova senha:"
-      bind:value={passwordObject.newPass}
-      secret={true}
-      placeHolder=""
-    />
-    <Views.TextEdit
-      name="Confirmação:"
-      bind:value={passwordObject.reNewPass}
-      secret={true}
-      placeHolder=""
-    />
-    <Views.Divider />
-    <Views.Button on:click={editPassword}>Atualizar senha</Views.Button>
   </div>
 </div>
 

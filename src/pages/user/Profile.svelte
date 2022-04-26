@@ -1,5 +1,6 @@
 <script>
   import { Auth } from "../../stores/Auth";
+  import { updatePassword } from "../../network/Auth";
   import { Title } from "../../stores/Navigation";
   import { Views } from "@tian/components";
   import { getSettings, setSettings } from "../../network/Settings";
@@ -12,12 +13,18 @@
     faEnvelope,
   } from "@fortawesome/free-solid-svg-icons";
   import { onMount } from "svelte";
-  let profile = {};
+  let profile = {phone: null, email: null};
   let validPhone = false;
 
   let isLoading = false;
   let errorAlert;
   let showAlert = false;
+
+let passwordObject = {
+  oldPass: null,
+  newPass: null,
+  reNewPass: null,
+};
 
   function toggleErrorAlert(messageObject) {
     errorAlert = messageObject;
@@ -26,7 +33,7 @@
 
   onMount(async () => {
     const response = await getSettings();
-    profile = response?.profile;
+    profile = {...profile, ...response?.profile};
   });
 
   function logout() {
@@ -42,11 +49,37 @@
     isLoading = false;
   }
 
+async function editPassword() {
+  if (passwordObject.oldPass === null || passwordObject.oldPass.length < 6) {
+    toggleErrorAlert("Senha atual invalida!");
+    return;
+  } else if (
+    passwordObject.newPass === null ||
+    passwordObject.newPass.length < 6
+  ) {
+    toggleErrorAlert("A nova senha invalida!");
+    return;
+  } else if (passwordObject.newPass !== passwordObject.reNewPass) {
+    toggleErrorAlert("Senha nova e verifição não confirem");
+    return;
+  }
+  isLoading = true;
+  let response = await updatePassword(passwordObject);
+  if (response.success) {
+    toggleErrorAlert("Senha atualizada com sucesso!");
+  } else {
+    toggleErrorAlert(response?.data);
+    isLoading = false;
+    return;
+  }
+  isLoading = false;
+}
+
   Title.set("Perfil");
 </script>
 
   <div class="profile">
-    {#if profile.mainPicture}
+    {#if profile?.mainPicture}
       <img
         class="avatarCircle"
         src={profile?.mainPicture}
@@ -85,6 +118,28 @@
       />
       <Views.Divider />
       <Views.Button on:click={update}>Atualizar os dados</Views.Button>
+      <Views.Divider />
+      <h2>Senha</h2>
+      <Views.TextEdit
+        name="Senha atual:"
+        bind:value={passwordObject.oldPass}
+        secret={true}
+        placeHolder=""
+      />
+      <Views.TextEdit
+        name="Nova senha:"
+        bind:value={passwordObject.newPass}
+        secret={true}
+        placeHolder=""
+      />
+      <Views.TextEdit
+        name="Confirmação:"
+        bind:value={passwordObject.reNewPass}
+        secret={true}
+        placeHolder=""
+      />
+      <Views.Divider />
+      <Views.Button on:click={editPassword}>Atualizar senha</Views.Button>
     </div>
     <Views.Button type="transparent" on:click={logout}>Logout</Views.Button>
   </div>

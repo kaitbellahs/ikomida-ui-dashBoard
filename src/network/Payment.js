@@ -48,3 +48,11 @@ export async function countCoupons() {
 export async function deleteCoupon(id) {
     return Network.instance.remove(`/coupon/${id}`, get(Auth));
 }
+
+export async function getSubscription() {
+    let response = await Network.instance.get("/vendor/subscription", get(Auth));
+    if (response?.success) {
+        return response?.data
+    }
+    return null;
+}

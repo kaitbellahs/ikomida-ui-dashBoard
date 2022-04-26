@@ -7,7 +7,7 @@
   import {
     newProduct,
     updateProduct,
-    getCategories,
+    getCategories
   } from "../../network/Products";
   import { onMount } from "svelte";
 
@@ -32,6 +32,15 @@
     item.discount = item.discount;
     oldSelectedDiscountType = selectedDiscountType;
   }
+  $: canContinue =
+  item?.category &&
+  item?.title && (item?.title?.length || 0) <= 255 &&
+  item?.description && (item?.lastName?.length || 0) <= 1000 &&
+  item?.weight && (Number(item?.weight || 0)) <= 99999999.99 &&
+  item?.price && (Utils.Numbers.toFinanceNumber(item?.price || 0)) <= 99999999.99 &&
+  ((selectedDiscountType && selectedDiscountType.name !== Types.DiscountTypes.NO) ? (item?.discount && (Utils.Numbers.toFinanceNumber(item?.discount || 0)) <= 99999999.99) : true) &&
+  item?.serves && (Number(item?.serves || 0)) <= 2147483647 &&
+  item?.quantity && (Number(item?.quantity || 0)) <= 2147483647;
 
   function toggleErrorAlert(messageObject) {
     errorAlert = messageObject;
@@ -134,7 +143,7 @@
 <div class="product">
   {#if categoriesOptions.length > 0}
     <div class="imageContainer">
-      <img src={imageSrc} alt={item.title} />
+      <img src={imageSrc} alt={item?.title} />
       <img
         class="upload"
         src="/Assets/Images/upload.png"
@@ -179,6 +188,7 @@
       placeHolder=""
     />
     <Views.TextEdit
+    type="number"
       name="Quantos itens você tem?"
       bind:value={item.quantity}
       bind:rawValue={item.quantity}
@@ -216,7 +226,7 @@
       {/if}
     {/if}
     <Views.Divider />
-    <Views.Button on:click={submit} bottomPadding={$StatusBar.bottomPadding}
+    <Views.Button on:click={submit} disabled={!canContinue} bottomPadding={$StatusBar.bottomPadding}
       ><Fa icon={faEdit} /> <span>Salvar</span></Views.Button
     >
   {:else}

@@ -11,6 +11,9 @@
 
   let errorAlert;
   let showAlert = false;
+  $: canContinue =
+  item?.title && (item?.title?.length || 0) <= 255 &&
+  item?.description && (item?.lastName?.length || 0) <= 1000;
 
   function toggleErrorAlert(messageObject) {
     errorAlert = messageObject;
@@ -53,7 +56,7 @@
     placeHolder=""
   />
   <Views.Divider />
-  <Views.Button on:click={submit} bottomPadding={$StatusBar.bottomPadding}
+  <Views.Button disabled={!canContinue} on:click={submit} bottomPadding={$StatusBar.bottomPadding}
     ><Fa icon={faEdit} /> <span>Salvar</span></Views.Button
   >
 </div>

@@ -9,7 +9,7 @@ import {
 } from "@tian/components";
 
 export async function getSettings() {
-    let response = await Network.instance.get("/vendorsettings", get(Auth));
+    let response = await Network.instance.get("/vendor/settings", get(Auth));
     if (response?.success) {
         return response?.data
     }
@@ -17,17 +17,17 @@ export async function getSettings() {
 }
 
 export async function setSettings(object) {
-    return Network.instance.put("/vendorsettings", get(Auth), object);
+    return Network.instance.put("/vendor/settings", get(Auth), object);
 }
 
 export async function updatePaymentGateway(object) {
-    return Network.instance.put("/updatePaymentGateway", get(Auth), object);
+    return Network.instance.put("/vendor/updatePaymentGateway", get(Auth), object);
 }
 
 export async function updateBusinessHours(object) {
-    return Network.instance.put("/businessHours", get(Auth), object);
+    return Network.instance.put("/vendor/businessHours", get(Auth), object);
 }
 
 export async function setDelivery(object) {
-    return Network.instance.put("/delivery", get(Auth), object);
+    return Network.instance.put("/vendor/delivery", get(Auth), object);
 }
