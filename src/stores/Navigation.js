@@ -24,6 +24,7 @@ export const Routes = {
     newCoupon: Symbol("/newCoupon"),
     tac: Symbol("/tac"),
     profile: Symbol("/profile"),
+    forgotPassword: Symbol("/forgotPassword"),
     layout: Symbol("/layout"),
     subscription: Symbol("/subscription")
 };

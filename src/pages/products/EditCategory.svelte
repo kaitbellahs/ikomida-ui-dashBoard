@@ -8,12 +8,14 @@
 
   let { item, edit } = $Router.options;
   let isLoading = false;
-
   let errorAlert;
   let showAlert = false;
+
   $: canContinue =
-  item?.title && (item?.title?.length || 0) <= 255 &&
-  item?.description && (item?.lastName?.length || 0) <= 1000;
+    item?.title &&
+    (item?.title?.length || 0) <= 255 &&
+    item?.description &&
+    (item?.lastName?.length || 0) <= 1000;
 
   function toggleErrorAlert(messageObject) {
     errorAlert = messageObject;
@@ -35,6 +37,7 @@
     }
     isLoading = false;
   };
+
   Title.set(edit ? "Editar categoria" : "Novo categoria");
 </script>
 
@@ -45,18 +48,18 @@
   />
 {/if}
 <div class="category">
+  <Views.TextEdit name="Nome da categoria" bind:value={item.title} />
   <Views.TextEdit
-    name="Nome da categoria"
-    bind:value={item.title}
-    placeHolder=""
-  />
-  <Views.TextEdit
+    type="text"
     name="Descrição da categoria"
     bind:value={item.description}
-    placeHolder=""
   />
   <Views.Divider />
-  <Views.Button disabled={!canContinue} on:click={submit} bottomPadding={$StatusBar.bottomPadding}
+  <Views.Divider />
+  <Views.Button
+    disabled={!canContinue}
+    on:click={submit}
+    bottomPadding={$StatusBar.bottomPadding}
     ><Fa icon={faEdit} /> <span>Salvar</span></Views.Button
   >
 </div>

@@ -7,58 +7,88 @@
     Routes,
   } from "../../stores/Navigation";
   import { GetOrders, OrderStatus } from "../../network/Orders";
-  import { Views, Utils } from "@tian/components";
+  import { Views, Utils, Types } from "@tian/components";
   import { PaymentType } from "../../network/Payment";
   import { ChangeOrderStatus } from "../../network/Orders";
   import { StatusBar } from "../../stores/Setup";
   import { faHistory } from "@fortawesome/free-solid-svg-icons";
 
   const orderFinishedOptions = ["waitingPayment", "delivered", "canceled"];
+
   let isLoading = false;
   let orders = [];
-  let selected = null;
-  let oldSelected = null;
-  const orderOptions = (orderID) => [
-    { id: "accepted", name: "1. Aceitar o pedido", orderID },
-    { id: "waitingDelivery", name: "2. Esperando o entregador", orderID },
-    { id: "delivery", name: "3. Saiu para entrega", orderID },
-    { id: "delivered", name: "4. Pedido entrege", orderID },
-    { id: "canceled", name: "5. Cancelar o pedido", orderID },
-  ];
-
   let errorAlert;
   let showAlert = false;
+  const orderOptions = (orderID) => [
+    new Types.SelectorOptions({
+      id: "accepted",
+      name: "1. Aceitar o pedido",
+      orderID,
+    }),
+    new Types.SelectorOptions({
+      id: "waitingDelivery",
+      name: "2. Esperando o entregador",
+      orderID,
+    }),
+    new Types.SelectorOptions({
+      id: "delivery",
+      name: "3. Saiu para entrega",
+      orderID,
+    }),
+    new Types.SelectorOptions({
+      id: "delivered",
+      name: "4. Pedido entrege",
+      orderID,
+    }),
+    new Types.SelectorOptions({
+      id: "canceled",
+      name: "5. Cancelar o pedido",
+      orderID,
+    }),
+  ];
+
+  $: if ($Router.options === null || $Router.options !== null) {
+    if ($Router.options === null || !$Router.options) {
+      Menu.addItem({
+        icon: faHistory,
+        name: "Históricos",
+        callback: goToOrdersHistory,
+      });
+    }
+    update();
+  }
+
+  $: orders.forEach((order) => {
+    if (order?.selected && order?.selected?.id !== order?.oldSelected?.id) {
+      isLoading = true;
+      ChangeOrderStatus(order?.selected?.orderID, order?.selected?.id)
+        .then((response) => {
+          if (!response?.success) {
+            toggleErrorAlert(response?.data);
+          } else {
+            order.status = order?.selected.id;
+            order.oldSelected = order?.selected;
+          }
+        })
+        .catch((exception) => {
+          toggleErrorAlert(exception);
+        });
+      isLoading = false;
+    }
+  });
 
   function toggleErrorAlert(messageObject) {
     errorAlert = messageObject;
     showAlert = true;
   }
 
-  $: if ($Router.options === null || $Router.options !== null) {
-    if ($Router.options === null || !$Router.options) {
-      Menu.addItem({
-        icon: faHistory,
-        name: "Mostrar finalizados",
-        callback: goToOrdersHistory,
-      });
-    }
-    update();
-  }
-  $: if (selected !== oldSelected) {
-    isLoading = true;
-    ChangeOrderStatus(selected.orderID, selected.id).then((response) => {
-      if (!response?.success) {
-        toggleErrorAlert(response?.data);
-      }
-    }).catch(exception => {
-      toggleErrorAlert(exception);
-    });
-    isLoading = false;
-  }
-
   async function update() {
     isLoading = true;
-    orders = await GetOrders($Router.options);
+    orders = (await GetOrders($Router.options))?.map((order) => {
+      order.selected = orderOptions(order?.id)?.filter((option) => option.id === order?.status)?.[0];
+      order.oldSelected = order.selected;
+      return order;
+    });
     isLoading = false;
   }
 
@@ -84,30 +114,34 @@
 {/if}
 <div>
   {#if orders.length > 0}
-    {#each orders as { id, status, stage, products, address, payment, createdAt, finishedAt, subtotal, coupon, delivery }}
+    {#each orders as order}
       <div class="leftShadow orderContainer">
-        <div on:click={goToOrder(id)}>
-          <h3>#{id}: pedido {OrderStatus(status)}</h3>
-          {#if products.length > 0}
-            <div class="product">1. {products[0].title}</div>
+        <div on:click={goToOrder(order?.id)}>
+          <h3>#{order?.id}: pedido {OrderStatus(order?.status)}</h3>
+          {#if order?.products?.length > 0}
+            <div class="product">1. {order?.products?.[0].title}</div>
           {/if}
-          {#if products.length > 1}
+          {#if order?.products?.length > 1}
             <div class="product">
-              e mais {products.length - 1}
-              {products.length - 1 == 1 ? "item" : "itens"}
+              e mais {order?.products?.length - 1}
+              {order?.products?.length - 1 == 1 ? "item" : "itens"}
             </div>
           {/if}
-          <div class="address">Entregue em: <b>{address.street}</b></div>
-          <div class="paymentMethod">
-            Forma de pagamento: <b>{PaymentType(payment.type)}</b>
+          <div class="address">
+            Entregue em: <b>{order?.address?.street}</b>
           </div>
-          <div class="time">{Utils.Strings.timestampToString(createdAt)}</div>
+          <div class="paymentMethod">
+            Forma de pagamento: <b>{PaymentType(order?.payment?.type)}</b>
+          </div>
+          <div class="time">
+            {Utils.Strings.timestampToString(order?.createdAt)}
+          </div>
         </div>
-        {#if !orderFinishedOptions.includes(status)}
+        {#if !orderFinishedOptions.includes(order?.status)}
           <Views.Selector
-            bind:selected
+            options={orderOptions(order?.id)}
+            bind:selected={order.selected}
             name="Seleciona uma opção!"
-            options={orderOptions(id)}
           />
         {/if}
       </div>

@@ -80,7 +80,6 @@
 
   $: styleHeight = `${Number($StatusBar.height) + 60}px`;
   $: route = $Router.route;
-  Menu.addItem({ icon: null, name: "name", callback: null });
 </script>
 
 <main

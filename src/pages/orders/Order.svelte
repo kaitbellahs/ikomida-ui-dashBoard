@@ -1,10 +1,11 @@
 <script>
   import { Title, Router } from "../../stores/Navigation";
   import { OrderStatus } from "../../network/Orders";
-  import { Views, Utils } from "@tian/components";
+  import { Views, Utils, Types } from "@tian/components";
   import { PaymentType } from "../../network/Payment";
   import { ChangeOrderStatus } from "../../network/Orders";
   import { StatusBar } from "../../stores/Setup";
+  import { beforeUpdate } from "svelte";
 
   const orderFinishedOptions = ["delivered", "canceled"];
   const order = $Router.options;
@@ -12,31 +13,60 @@
   let oldSelected = null;
   let isLoading = false;
   const orderOptions = (orderID) => [
-    { id: "accepted", name: "1. Aceitar o pedido", orderID },
-    { id: "waitingDelivery", name: "2. Esperando o entregador", orderID },
-    { id: "delivery", name: "3. Saiu para entrega", orderID },
-    { id: "delivered", name: "4. Pedido entrege", orderID },
-    { id: "canceled", name: "5. Cancelar o pedido", orderID },
+    new Types.SelectorOptions({
+      id: "accepted",
+      name: "1. Aceitar o pedido",
+      orderID,
+    }),
+    new Types.SelectorOptions({
+      id: "waitingDelivery",
+      name: "2. Esperando o entregador",
+      orderID,
+    }),
+    new Types.SelectorOptions({
+      id: "delivery",
+      name: "3. Saiu para entrega",
+      orderID,
+    }),
+    new Types.SelectorOptions({
+      id: "delivered",
+      name: "4. Pedido entrege",
+      orderID,
+    }),
+    new Types.SelectorOptions({
+      id: "canceled",
+      name: "5. Cancelar o pedido",
+      orderID,
+    }),
   ];
 
   let errorAlert;
   let showAlert = false;
+  $: total = order.subtotal + order.delivery - order.discount;
+
+  $: if (selected !== oldSelected) {
+    isLoading = true;
+    ChangeOrderStatus(selected.orderID, selected.id).then((response) => {
+      if (!response?.success) {
+        toggleErrorAlert(response?.data);
+      } else {
+        order.status = order?.selected.id;
+      }
+    });
+    isLoading = false;
+  }
 
   function toggleErrorAlert(messageObject) {
     errorAlert = messageObject;
     showAlert = true;
   }
 
-  $: total = order.subtotal + order.delivery - order.discount;
-  $: if (selected !== oldSelected) {
-    isLoading = true;
-    ChangeOrderStatus(selected.orderID, selected.id).then((response) => {
-      if (!response?.success) {
-        toggleErrorAlert(response?.data);
-      }
-    });
-    isLoading = false;
-  }
+  beforeUpdate(() => {
+    selected = orderOptions(order?.id)?.filter(
+      (option) => option.id === order?.status
+    )?.[0];
+    oldSelected = selected;
+  });
 
   Title.set("Detalhes do predido");
 </script>
@@ -64,7 +94,11 @@
 {#each order.products as { title, price, quantity, discount, discountType }, index}
   <div class="product">
     <span class="quantity">{quantity}</span><span class="title">{title}</span
-    ><span class="price">{Utils.Strings.currency(quantity * Utils.Numbers.calcDiscount(price, discount, discountType))}</span>
+    ><span class="price"
+      >{Utils.Strings.currency(
+        quantity * Utils.Numbers.calcDiscount(price, discount, discountType)
+      )}</span
+    >
   </div>
 {/each}
 <div class="address">Entregue em: <b>{order.address.street}</b></div>
@@ -78,6 +112,7 @@
     options={orderOptions(order.id)}
   />
 {/if}
+<Views.Divider />
 <table>
   <thead>
     <tr>
@@ -89,11 +124,13 @@
       <td class="resumeText">Subtotal</td>
       <td class="resumeValue">{Utils.Strings.currency(order.subtotal)}</td>
     </tr>
-    {#if order.coupon}
+    {#if Number(order.discount) > 0}
       <tr>
         <td class="resumeText">Desconto</td>
         <td class="resumeValue"
-          ><span class="deliveryFree">- {Utils.Strings.currency(order.discount)}</span></td
+          ><span class="deliveryFree"
+            >- {Utils.Strings.currency(order.discount)}</span
+          ></td
         >
       </tr>
     {/if}

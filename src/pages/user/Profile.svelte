@@ -2,7 +2,7 @@
   import { Auth } from "../../stores/Auth";
   import { updatePassword } from "../../network/Auth";
   import { Title } from "../../stores/Navigation";
-  import { Views } from "@tian/components";
+  import { Views, Image, Utils } from "@tian/components";
   import { getSettings, setSettings } from "../../network/Settings";
   import { StatusBar } from "../../stores/Setup";
   import { faPhone, faEnvelope } from "@fortawesome/free-solid-svg-icons";
@@ -19,6 +19,10 @@
     newPass: null,
     reNewPass: null,
   };
+  let imageSrc = "/Assets/Images/food-plate.svg";
+  let fileinput;
+
+  $: console.log(profile);
 
   function toggleErrorAlert(messageObject) {
     errorAlert = messageObject;
@@ -64,6 +68,34 @@
     isLoading = false;
   }
 
+  async function onFileSelected(e) {
+    isLoading = true;
+    let imageSrcFile = e.target.files[0];
+    isLoading = false;
+    let reader = new FileReader();
+    reader.readAsDataURL(imageSrcFile);
+    reader.onload = async (e) => {
+      const [dataType, data] = e.target.result.split(";");
+      let imageType = "jpeg";
+      switch (dataType) {
+        case "image/jpeg":
+        case "image/jpg":
+          imageType = "jpeg";
+          break;
+        case "image/png":
+          imageType = "png";
+          break;
+      }
+      profile.mainPicture = await Image.resizeImage(
+        imageSrcFile,
+        400,
+        400,
+        imageType
+      );
+      imageSrc = profile?.mainPicture;
+    };
+  }
+
   onMount(async () => {
     const response = await getSettings();
     profile = { ...profile, ...response?.profile };
@@ -73,24 +105,57 @@
 </script>
 
 <div class="profile">
-  {#if profile?.mainPicture}
+  <div class="imageContainer">
+    {#if profile?.mainPicture}
+      <img
+        class="avatarCircle"
+        src={profile?.mainPicture}
+        alt={profile?.restaurantName}
+      />
+    {:else}
+      <div class="avatarCircle">
+        {profile?.restaurantName?.[0]}{profile?.restaurantName?.[1]}
+      </div>
+    {/if}
     <img
-      class="avatarCircle"
-      src={profile?.mainPicture}
-      alt={profile?.restaurantName}
+      class="upload"
+      src="/Assets/Images/upload.png"
+      alt=""
+      on:click={fileinput.click()}
     />
-  {:else}
-    <div class="avatarCircle">
-      {profile?.restaurantName?.[0]}{profile?.restaurantName?.[1]}
-    </div>
-  {/if}
+    <input
+      style="display:none"
+      type="file"
+      accept=".jpg, .jpeg, .png"
+      on:change={onFileSelected}
+      bind:this={fileinput}
+    />
+  </div>
   <div class="data">
+    <h2>{profile?.restaurantName}</h2>
+    <Views.Divider />
     <Views.TextValue
-      text="Nome:"
-      value={profile?.restaurantName}
+      text="CNPJ:"
+      value={Utils?.Strings?.formatString(
+        /\d/gi,
+        "__.___.___/____-__",
+        "_",
+        profile?.cnpj
+      )}
       fontSize="1.5em"
+      leftMargin="30"
     />
-    <Views.TextValue text="CNPJ:" value={profile?.identity} fontSize="1.5em" />
+    <Views.TextValue
+      text="CPF:"
+      value={Utils?.Strings?.formatString(
+        /\d/gi,
+        "___.___.___-__",
+        "_",
+        profile?.identity
+      )}
+      fontSize="1.5em"
+      leftMargin="30"
+    />
     <Views.TextEdit
       bind:rawValue={profile.phone}
       bind:value={profile.phone}
@@ -129,6 +194,7 @@
       placeHolder=""
     />
     <Views.Divider />
+    <Views.Divider />
     <Views.Button on:click={editPassword}>Atualizar senha</Views.Button>
   </div>
   <Views.Button type="transparent" on:click={logout}>Logout</Views.Button>
@@ -149,6 +215,15 @@
   .profile > div {
     width: 100%;
   }
+  .imageContainer {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    position: relative;
+    border-radius: 4px;
+    width: 100%;
+    overflow: hidden;
+  }
   .profile > div > h2 {
     margin-left: 20px;
   }
@@ -156,6 +231,10 @@
     width: 100%;
     float: left;
     margin-top: 20px;
+  }
+
+  .profile > .data > h2 {
+    text-align: center;
   }
   .avatarCircle {
     font-size: 3em;
@@ -170,5 +249,17 @@
     display: table-cell;
     overflow: hidden;
     margin-right: 10px;
+  }
+  .imageContainer > img {
+    max-width: 100%;
+    /* max-height: 200px; */
+    width: 100%;
+  }
+  .imageContainer > img.upload {
+    width: 60px;
+    position: absolute;
+    left: 0;
+    background: #00000077;
+    border-radius: 4px;
   }
 </style>

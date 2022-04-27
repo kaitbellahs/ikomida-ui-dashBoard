@@ -10,26 +10,25 @@ import {
 
 const openOrdersStatus = ["waitingPayment", "open", "accepted", "waitingDelivery", "delivery"];
 
-export async function GetOrders(showHistory) {
-    let response = await Network.instance.get("/orders", get(Auth));
+export async function GetOrders(history) {
+    let response = await Network.instance.get(`/orders${history ? '/history' : ''}`, get(Auth));
     let orders = [];
     if (response?.success) {
-        if (showHistory) {
-            orders = response?.data.filter(item => !openOrdersStatus.includes(item.status));
-        } else {
-            orders = response?.data.filter(item => openOrdersStatus.includes(item.status));
-        }
+        orders = response?.data || [];
     }
     return orders;
 }
 
 export async function ChangeOrderStatus(id, status) {
-    return Network.instance.put("/order", get(Auth), {id, status});
+    return Network.instance.put("/order", get(Auth), {
+        id,
+        status
+    });
 }
 
 export async function countOrders() {
     let response = await Network.instance.get("/ordersCount", get(Auth));
-    if(response?.success){
+    if (response?.success) {
         return response?.data
     }
     return 0;

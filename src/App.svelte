@@ -9,12 +9,17 @@
   import { Router, Routes } from "./stores/Navigation";
   import { StatusBar as _StatusBar } from "./stores/Setup";
   import { StatusBar } from "@capacitor/status-bar";
-  import { PushNotification } from "@tian/components";
-  import {registerPushNotificationToken} from "./network/PushNotification";
+  import { PushNotification, Utils } from "@tian/components";
+  import { registerPushNotificationToken } from "./network/PushNotification";
+  import ForgotPassword from "./pages/user/ForgotPassword.svelte";
 
   let networkStatus = null;
-
-  $: route = $Router.route;
+  let logedIn = false;
+  let pushNotification = new PushNotification(
+    hasRegisteredCallBack,
+    pushNotificationReceivedCallBack,
+    pushNotificationActionPerformedCallBack
+  );
 
   const checkAppLaunchUrl = async () => {
     const { url } = await App.getLaunchUrl();
@@ -22,22 +27,31 @@
     alert("App opened with URL: " + url);
   };
 
-async function hasRegisteredCallBack(token, platform){
-  CAPNativeLog.log({ level: 'info', message: JSON.stringify(token) });
-  const tokenObject = {platform, token}
-  PushNotificationToken.setToken(tokenObject);
-  await registerPushNotificationToken(tokenObject);
-}
+  $: route = $Router.route;
 
-function pushNotificationReceivedCallBack(notification){
-  CAPNativeLog.log({ level: 'info', message: JSON.stringify(notification) });
-}
+  $: if ($Auth) {
+    logedIn = false;
+    Utils.Jws.extractToken($Auth).then((token) => {
+      logedIn = token !== null;
+    });
+  } else {
+    logedIn = false;
+  }
 
-function pushNotificationActionPerformedCallBack(notification){
-  CAPNativeLog.log({ level: 'info', message: JSON.stringify(notification) });
-}
+  async function hasRegisteredCallBack(token, platform) {
+    CAPNativeLog.log({ level: "info", message: JSON.stringify(token) });
+    const tokenObject = { platform, token };
+    PushNotificationToken.setToken(tokenObject);
+    await registerPushNotificationToken(tokenObject);
+  }
 
-let pushNotification = new PushNotification(hasRegisteredCallBack, pushNotificationReceivedCallBack, pushNotificationActionPerformedCallBack);
+  function pushNotificationReceivedCallBack(notification) {
+    CAPNativeLog.log({ level: "info", message: JSON.stringify(notification) });
+  }
+
+  function pushNotificationActionPerformedCallBack(notification) {
+    CAPNativeLog.log({ level: "info", message: JSON.stringify(notification) });
+  }
 
   onMount(async () => {
     networkStatus = await Network.getStatus();
@@ -67,10 +81,12 @@ let pushNotification = new PushNotification(hasRegisteredCallBack, pushNotificat
   <div id="internetError">Esperando por conexão a internet...</div>
 {/if}
 
-{#if $Auth}
+{#if logedIn}
   <Main />
 {:else if route == Routes.Auth}
   <Login />
+{:else if route == Routes.forgotPassword}
+  <ForgotPassword />
 {:else if route == Routes.tac}
   <Tac />
 {:else}

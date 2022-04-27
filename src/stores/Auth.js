@@ -6,11 +6,12 @@ import {
 } from '@capacitor/storage';
 
 const authToken = 'AuthToken';
+const projxIDKey = 'projXID';
 
 function createAuth() {
 	const {
 		subscribe,
-        set
+		set
 	} = writable(null, async (setter) => {
 		let token = null;
 		try {
@@ -22,7 +23,7 @@ function createAuth() {
 			token = null;
 			//TODO: -- report errors
 		}
-		if(token === "" || token === null) token = null;
+		if (token === "" || token === null) token = null;
 		setter(token);
 	});
 
@@ -43,6 +44,15 @@ function createAuth() {
 }
 
 export const Auth = createAuth();
+export const projXID = {
+	set: async (id) => await Storage.set({
+		key: projxIDKey,
+		value: id
+	}),
+	get: async () => (await Storage.get({
+		key: projxIDKey
+	})).value
+};
 
 function createUserInfo() {
 	const {

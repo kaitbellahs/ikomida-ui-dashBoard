@@ -7,7 +7,7 @@
   import {
     newProduct,
     updateProduct,
-    getCategories
+    getCategories,
   } from "../../network/Products";
   import { onMount } from "svelte";
 
@@ -16,13 +16,12 @@
   let fileinput;
   let categoriesOptions = [];
   let firstLaunch = true;
-  let imageSrc =
-    "/Assets/Images/food-plate.svg";
-
+  let imageSrc = "/Assets/Images/food-plate.svg";
   let errorAlert;
   let showAlert = false;
   let selectedDiscountType;
   let oldSelectedDiscountType = null;
+
   $: if (
     selectedDiscountType &&
     (oldSelectedDiscountType === null ||
@@ -32,22 +31,50 @@
     item.discount = item.discount;
     oldSelectedDiscountType = selectedDiscountType;
   }
+
   $: canContinue =
-  item?.category &&
-  item?.title && (item?.title?.length || 0) <= 255 &&
-  item?.description && (item?.lastName?.length || 0) <= 1000 &&
-  item?.weight && (Number(item?.weight || 0)) <= 99999999.99 &&
-  item?.price && (Utils.Numbers.toFinanceNumber(item?.price || 0)) <= 99999999.99 &&
-  ((selectedDiscountType && selectedDiscountType.name !== Types.DiscountTypes.NO) ? (item?.discount && (Utils.Numbers.toFinanceNumber(item?.discount || 0)) <= 99999999.99) : true) &&
-  item?.serves && (Number(item?.serves || 0)) <= 2147483647 &&
-  item?.quantity && (Number(item?.quantity || 0)) <= 2147483647;
+    item?.category &&
+    item?.title &&
+    (item?.title?.length || 0) <= 255 &&
+    item?.description &&
+    (item?.lastName?.length || 0) <= 1000 &&
+    item?.weight &&
+    Number(item?.weight || 0) <= 99999999.99 &&
+    item?.price &&
+    Utils.Numbers.toFinanceNumber(item?.price || 0) <= 99999999.99 &&
+    (selectedDiscountType &&
+    selectedDiscountType.name !== Types.DiscountTypes.NO
+      ? item?.discount &&
+        Utils.Numbers.toFinanceNumber(item?.discount || 0) <= 99999999.99
+      : true) &&
+    item?.serves &&
+    Number(item?.serves || 0) <= 2147483647 &&
+    item?.quantity &&
+    Number(item?.quantity || 0) <= 2147483647;
+
+  $: if (firstLaunch) {
+    if (categoriesOptions.length > 0) {
+      const result = categoriesOptions.filter(
+        (option) => option.id == item.categoryID
+      );
+
+      item.category = result.length > 0 ? result[0] : null;
+    }
+
+    if (Types.DiscountTypes.list.length > 0) {
+      const result = Types.DiscountTypes.list.filter(
+        (option) => option.id == item.discountType
+      );
+
+      selectedDiscountType = result.length > 0 ? result[0] : null;
+    }
+    firstLaunch = false;
+  }
 
   function toggleErrorAlert(messageObject) {
     errorAlert = messageObject;
     showAlert = true;
   }
-
-  Title.set(edit ? "Editar produto" : "Novo produto");
 
   async function submit() {
     isLoading = true;
@@ -66,7 +93,9 @@
   }
 
   async function onFileSelected(e) {
+    isLoading = true;
     let imageSrcFile = e.target.files[0];
+    isLoading = false;
     let reader = new FileReader();
     reader.readAsDataURL(imageSrcFile);
     reader.onload = async (e) => {
@@ -102,26 +131,6 @@
     }
   }
 
-  $: if (firstLaunch) {
-    if (categoriesOptions.length > 0) {
-      const result = categoriesOptions.filter(
-        (option) => option.id == item.categoryID
-      );
-
-      item.category = result.length > 0 ? result[0] : null;
-    }
-
-    if (Types.DiscountTypes.list.length > 0) {
-      const result = Types.DiscountTypes.list.filter(
-        (option) => option.id == item.discountType
-      );
-
-      selectedDiscountType =
-        result.length > 0 ? result[0] : null;
-    }
-    firstLaunch = false;
-  }
-
   onMount(async () => {
     if (!item.category) {
       item.category = null;
@@ -132,6 +141,8 @@
   });
 
   generateOptions();
+
+  Title.set(edit ? "Editar produto" : "Novo produto");
 </script>
 
 {#if isLoading}
@@ -154,7 +165,7 @@
         style="display:none"
         type="file"
         accept=".jpg, .jpeg, .png"
-        on:change={(e) => onFileSelected(e)}
+        on:change={onFileSelected}
         bind:this={fileinput}
       />
     </div>
@@ -169,6 +180,7 @@
       placeHolder=""
     />
     <Views.TextEdit
+      type="text"
       name="Descrição do produto"
       bind:value={item.description}
       placeHolder=""
@@ -188,7 +200,7 @@
       placeHolder=""
     />
     <Views.TextEdit
-    type="number"
+      type="number"
       name="Quantos itens você tem?"
       bind:value={item.quantity}
       bind:rawValue={item.quantity}
@@ -201,6 +213,7 @@
       bind:rawValue={item.price}
       placeHolder=""
     />
+    <Views.Divider />
     <Views.Selector
       bind:selected={selectedDiscountType}
       name="seleciona uma opção"
@@ -215,6 +228,7 @@
           bind:rawValue={item.discount}
           placeHolder=""
         />
+        <Views.Divider />
       {:else if selectedDiscountType.name === Types.DiscountTypes.VALUE}
         <Views.TextEdit
           name="Disconto:"
@@ -223,10 +237,14 @@
           type="currency"
           placeHolder=""
         />
+        <Views.Divider />
       {/if}
     {/if}
     <Views.Divider />
-    <Views.Button on:click={submit} disabled={!canContinue} bottomPadding={$StatusBar.bottomPadding}
+    <Views.Button
+      on:click={submit}
+      disabled={!canContinue}
+      bottomPadding={$StatusBar.bottomPadding}
       ><Fa icon={faEdit} /> <span>Salvar</span></Views.Button
     >
   {:else}

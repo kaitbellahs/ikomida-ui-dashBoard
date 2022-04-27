@@ -9,7 +9,7 @@ import {
 } from "@tian/components";
 
 export async function getLayout() {
-    return Network.instance.get("/layout", get(Auth));
+    return Network.instance.get("/layout");
 }
 
 export async function updateLayout(object) {
