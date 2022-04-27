@@ -3,7 +3,7 @@
   import Fa from "svelte-fa";
   import { faEdit } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
-  import { Views, Network, Image, Types, Utils } from "@tian/components";
+  import { Views, Image, Types, Utils } from "@tian/components";
   import {
     newProduct,
     updateProduct,

@@ -30,8 +30,6 @@
     faIdCard,
     faSlidersH,
   } from "@fortawesome/free-solid-svg-icons";
-  import { get } from "svelte/store";
-  import { onMount } from "svelte";
 
   const tabs = [
     {

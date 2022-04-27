@@ -1,5 +1,5 @@
 <script>
-  import { Title, Navigation, Router, Menu, Routes } from "../../stores/Navigation";
+  import { Title, Navigation, Menu, Routes } from "../../stores/Navigation";
   import { Views } from "@tian/components";
   import { StatusBar } from "../../stores/Setup";
   import {

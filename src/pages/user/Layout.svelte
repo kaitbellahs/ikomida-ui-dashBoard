@@ -3,17 +3,7 @@
   import { Title } from "../../stores/Navigation";
   import { Views } from "@tian/components";
   import { getLayout, updateLayout } from "../../network/Layout";
-  import { updatePassword } from "../../network/Auth";
   import { StatusBar } from "../../stores/Setup";
-  import Fa from "svelte-fa";
-  import {
-    faPhone,
-    faAt,
-    faKey,
-    faEnvelope,
-    faClock,
-    faTrashAlt,
-  } from "@fortawesome/free-solid-svg-icons";
   import { HsvPicker } from "svelte-color-picker";
   import { onMount } from "svelte";
 
@@ -23,20 +13,6 @@
   let showAlert = false;
   let pickerTop = 0;
   let currentItem;
-  function onFocus(event, item) {
-    const elementRect = event.target?.getBoundingClientRect();
-    pickerTop = elementRect.top - 280;
-    showPicker = true;
-    currentItem = item;
-  }
-  function onBlur() {
-    showPicker = false;
-  }
-
-  function toggleErrorAlert(messageObject) {
-    errorAlert = messageObject;
-    showAlert = true;
-  }
 
   let layout = {
     background: "#ffffff",
@@ -51,12 +27,10 @@
     dialog: { background: "#ffffffdf", color: "#ffffff" },
   };
 
-  onMount(async () => {
-    let response = await getLayout();
-    if (response?.success && response?.data) {
-      layout = {...layout, ...response?.data};
-    }
-  });
+  function toggleErrorAlert(messageObject) {
+    errorAlert = messageObject;
+    showAlert = true;
+  }
 
   async function setLaout() {
     isLoading = true;
@@ -66,6 +40,7 @@
     }
     isLoading = false;
   }
+
   function colorCallback(rgba) {
     rgba = rgba.detail;
     var a,
@@ -90,6 +65,7 @@
     getSetDescendantProp(layout, currentItem, `#${hex}`);
     layout = layout;
   }
+
   function getSetDescendantProp(obj, desc, value) {
     var arr = desc ? desc.split(".") : [];
 
@@ -97,7 +73,6 @@
       var comp = arr.shift();
       var match = new RegExp("(.+)\\[([0-9]*)\\]").exec(comp);
 
-      // handle arrays
       if (match !== null && match.length == 3) {
         var arrayData = {
           arrName: match[1],
@@ -114,8 +89,6 @@
 
         continue;
       }
-
-      // handle regular things
       if (typeof value !== "undefined") {
         if (obj[comp] === undefined) {
           obj[comp] = {};
@@ -131,6 +104,13 @@
 
     return obj;
   }
+
+  onMount(async () => {
+    let response = await getLayout();
+    if (response?.success && response?.data) {
+      layout = { ...layout, ...response?.data };
+    }
+  });
 
   Title.set("Ajustes");
 </script>
@@ -157,8 +137,9 @@
           industry. Lorem Ipsum has been the industry's standard dummy text ever
           since the 1500s
         </div>
-        <button style="background: {layout.button.background};color: {layout.button.color}"
-          >button text</button
+        <button
+          style="background: {layout.button.background};color: {layout.button
+            .color}">button text</button
         >
       </div>
       <div class="tabs">

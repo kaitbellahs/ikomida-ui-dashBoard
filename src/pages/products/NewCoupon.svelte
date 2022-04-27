@@ -1,5 +1,5 @@
 <script>
-  import { Title, Navigation, Router, Routes } from "../../stores/Navigation";
+  import { Title, Navigation, Routes } from "../../stores/Navigation";
   import Fa from "svelte-fa";
   import { faEdit } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";

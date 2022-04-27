@@ -2,7 +2,7 @@
   import { Title, Navigation, Router, Routes } from "../../stores/Navigation";
   import Fa from "svelte-fa";
   import { faEdit, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
-  import { Views, Utils, Network, Types } from "@tian/components";
+  import { Views, Utils, Types } from "@tian/components";
   import { deleteProduct } from "../../network/Products";
   import { StatusBar } from "../../stores/Setup";
 

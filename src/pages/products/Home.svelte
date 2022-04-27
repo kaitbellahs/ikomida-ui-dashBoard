@@ -5,7 +5,6 @@
   import { countUsers } from "../../network/User";
   import { countCoupons } from "../../network/Payment";
   import { Views } from "@tian/components";
-  import { StatusBar } from "../../stores/Setup";
 
   Title.set("Home");
 </script>
