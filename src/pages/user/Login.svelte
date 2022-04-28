@@ -48,6 +48,7 @@
         if ($PushNotificationToken && $PushNotificationToken !== {}) {
           await registerPushNotificationToken($PushNotificationToken);
         }
+        Navigation.reset(Routes.home);
       } else {
         toggleErrorAlert("Token não é valido");
       }

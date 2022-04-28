@@ -142,7 +142,7 @@
         "_",
         profile?.cnpj
       )}
-      fontSize="1.5em"
+      fontSize="1.3em"
       leftMargin="30"
     />
     <Views.TextValue
@@ -153,7 +153,7 @@
         "_",
         profile?.identity
       )}
-      fontSize="1.5em"
+      fontSize="1.3em"
       leftMargin="30"
     />
     <Views.TextEdit
@@ -172,8 +172,9 @@
       bind:isValid={validPhone}
     />
     <Views.Divider />
+    </div>
     <Views.Button on:click={update}>Atualizar os dados</Views.Button>
-    <Views.Divider />
+    <div class="data">
     <h2>Senha</h2>
     <Views.TextEdit
       name="Senha atual:"
@@ -194,9 +195,8 @@
       placeHolder=""
     />
     <Views.Divider />
-    <Views.Divider />
-    <Views.Button on:click={editPassword}>Atualizar senha</Views.Button>
   </div>
+  <Views.Button on:click={editPassword}>Atualizar senha</Views.Button>
   <Views.Button type="transparent" on:click={logout}>Logout</Views.Button>
 </div>
 

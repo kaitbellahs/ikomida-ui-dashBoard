@@ -66,43 +66,43 @@
     layout = layout;
   }
 
-  function getSetDescendantProp(obj, desc, value) {
-    var arr = desc ? desc.split(".") : [];
+  function getSetDescendantProp(object, description, value) {
+    var array = description ? description.split(".") : [];
 
-    while (arr.length && obj) {
-      var comp = arr.shift();
-      var match = new RegExp("(.+)\\[([0-9]*)\\]").exec(comp);
+    while (array.length && object) {
+      var comparation = array.shift();
+      var match = new RegExp("(.+)\\[([0-9]*)\\]").exec(comparation);
 
-      if (match !== null && match.length == 3) {
+      if ((match?.length || 0) == 3) {
         var arrayData = {
-          arrName: match[1],
-          arrIndex: match[2],
+          arrayName: match[1],
+          arrayIndex: match[2],
         };
-        if (obj[arrayData.arrName] !== undefined) {
-          if (typeof value !== "undefined" && arr.length === 0) {
-            obj[arrayData.arrName][arrayData.arrIndex] = value;
+        if (object[arrayData.arrayName] !== undefined) {
+          if (typeof value !== "undefined" && array.length === 0) {
+            object[arrayData.arrayName][arrayData.arrayIndex] = value;
           }
-          obj = obj[arrayData.arrName][arrayData.arrIndex];
+          object = object[arrayData.arrayName][arrayData.arrayIndex];
         } else {
-          obj = undefined;
+          object = undefined;
         }
 
         continue;
       }
       if (typeof value !== "undefined") {
-        if (obj[comp] === undefined) {
-          obj[comp] = {};
+        if (object[comparation] === undefined) {
+          object[comparation] = {};
         }
 
-        if (arr.length === 0) {
-          obj[comp] = value;
+        if (array.length === 0) {
+          object[comparation] = value;
         }
       }
 
-      obj = obj[comp];
+      object = object[comparation];
     }
 
-    return obj;
+    return object;
   }
 
   onMount(async () => {
