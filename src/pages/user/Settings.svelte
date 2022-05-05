@@ -1,11 +1,13 @@
 <script>
-  import { Title } from "../../stores/Navigation";
-  import { Views } from "@tian/components";
+  import { Title, Router } from "../../stores/Navigation";
+  import { Views, Utils } from "@tian/components";
   import {
     getSettings,
     updatePaymentGateway,
     updateBusinessHours,
     setDelivery,
+    getPagSeguroUrl,
+    revokePaymentGateway,
   } from "../../network/Settings";
   import { StatusBar } from "../../stores/Setup";
   import Fa from "svelte-fa";
@@ -15,10 +17,15 @@
     faClock,
     faTrashAlt,
   } from "@fortawesome/free-solid-svg-icons";
+  import { AppLauncher } from "@capacitor/app-launcher";
+  import { Clipboard } from "@capacitor/clipboard";
   import { onMount } from "svelte";
   import { v4 as uuid } from "uuid";
-  let paymentGateway = { publicKey: null, privateKey: null };
+  import { CAPNativeLog } from "capacitor-native-log";
+
+  let paymentGateway = { type: null, data: null };
   let delivery = { value: 0, min: 0, free: false };
+  let preparation = { min: 0, max: 0 };
   let isLoading = false;
   let errorAlert;
   let showAlert = false;
@@ -43,6 +50,55 @@
       },
     ],
   };
+
+  let integratePagSeguro = { callback: false, url: null };
+
+  $: if ($Router.options) {
+    integratePagSeguro = { ...integratePagSeguro, ...$Router.options };
+    CAPNativeLog.log({
+      level: "info",
+      message: `$Router.options: ${JSON.stringify($Router.options)}`,
+    });
+  }
+
+  $: if (integratePagSeguro?.callback && !paymentGateway?.type) {
+    integratePagSeguro.callback = false;
+    CAPNativeLog.log({
+      level: "info",
+      message: `integratePagSeguro?.url: ${
+        integratePagSeguro?.url
+      }, typeof:${typeof integratePagSeguro}`,
+    });
+    console.log(integratePagSeguro);
+    if (integratePagSeguro?.url) {
+      isLoading = true;
+      const url = new URL(integratePagSeguro?.url);
+      const code = url.searchParams.get("code");
+      const state = url.searchParams.get("state");
+      const payload = { code, state };
+      CAPNativeLog.log({
+        level: "info",
+        message: `updatePaymentGateway: ${JSON.stringify(payload)}`,
+      });
+      updatePaymentGateway(payload).then((response) => {
+        CAPNativeLog.log({
+          level: "info",
+          message: `response: ${JSON.stringify(response)}`,
+        });
+        if (!response?.success) {
+          toggleErrorAlert(response?.data);
+        } else {
+          paymentGateway = { ...paymentGateway, ...response?.data };
+          toggleErrorAlert(`${response?.data?.type} foi integrado com sucesso`);
+        }
+        isLoading = false;
+      });
+    }
+  }
+
+  $: integrateButtonName = paymentGateway?.type
+    ? "Cancelar a integgração com pagseguro"
+    : "Integrar sua conta pagseguro";
 
   function toggleErrorAlert(messageObject) {
     errorAlert = messageObject;
@@ -95,22 +151,60 @@
     isLoading = false;
   }
 
-  async function setPaymentGateway() {
+  // async function setPaymentGateway() {
+  //   isLoading = true;
+  //   const response = await updatePaymentGateway(paymentGateway);
+  //   if (!response?.success) {
+  //     toggleErrorAlert(response?.data);
+  //   }
+  //   isLoading = false;
+  // }
+
+  async function updateDelivery() {
     isLoading = true;
-    const response = await updatePaymentGateway(paymentGateway);
+    const response = await setDelivery(preparation, delivery);
     if (!response?.success) {
       toggleErrorAlert(response?.data);
     }
     isLoading = false;
   }
 
-  async function updateDelivery() {
+  async function requestPagSeguroIntegration() {
     isLoading = true;
-    const response = await setDelivery(delivery);
-    if (!response?.success) {
-      toggleErrorAlert(response?.data);
+    if (paymentGateway?.type) {
+      const response = await revokePaymentGateway;
+      if (response?.success) {
+        toggleErrorAlert(
+          `a integração do pagseguro com nossos sistemas foi revogado com sucesso!`
+        );
+      } else {
+        toggleErrorAlert(
+          `Não foi possível revogar a integração, tente novamente mais tarde!`
+        );
+      }
+    } else {
+      const response = await getPagSeguroUrl();
+      if (response?.success) {
+        const url = response?.data?.url;
+        if (!url) {
+          toggleErrorAlert(
+            `Não foi possível obter url de integração, tente novamente mais tarde!`
+          );
+          return;
+        }
+        const { value } = await AppLauncher.canOpenUrl({ url });
+        if (value) {
+          await AppLauncher.openUrl({ url });
+        } else {
+          await Clipboard.write({ string: url });
+          toggleErrorAlert(
+            `Não foi possível abrir navigador externo: por favor abrir o seu navigaro e digitar esa URL: ${url}, também foi copiado para sua área de transferência!`
+          );
+        }
+      }
     }
     isLoading = false;
+    return null;
   }
 
   onMount(async () => {
@@ -121,6 +215,7 @@
       days[index].checked = true;
     }
     delivery = { ...delivery, ...response?.delivery };
+    preparation = { ...preparation, ...response?.preparation };
   });
 
   Title.set("Ajustes");
@@ -170,24 +265,38 @@
     <Views.Button on:click={updateHours}
       ><Fa icon={faClock} /><span>Atualizar horarios</span></Views.Button
     >
+    <!-- <Views.Divider />
+    <Views.Button on:click={setPaymentGateway}>Atualizar os dados</Views.Button> -->
     <Views.Divider />
     <h2>Gateway de pagament</h2>
-    <Views.TextEdit
-      bind:value={paymentGateway.publicKey}
-      bind:rawValue={paymentGateway.publicKey}
-      icon={faAt}
-      placeHolder="Pagseguro email:"
-    />
-    <Views.TextEdit
-      bind:value={paymentGateway.privateKey}
-      bind:rawValue={paymentGateway.privateKey}
-      icon={faKey}
-      placeHolder="Pagseguro token de acesso:"
-    />
-    <Views.Divider />
-    <Views.Button on:click={setPaymentGateway}>Atualizar os dados</Views.Button>
+    <Views.Button on:click={requestPagSeguroIntegration}
+      >{integrateButtonName}</Views.Button
+    >
+
     <Views.Divider />
     <h2>Delivery</h2>
+    <Views.Divider />
+    <h3>Tempo de preparação em minutos</h3>
+    <div class="twoCells">
+      <Views.TextEdit
+        name="Tempo mínimo:"
+        bind:value={preparation.min}
+        bind:rawValue={preparation.min}
+        placeHolder=""
+        type="number"
+        rightPadding="10px"
+      />
+      <Views.TextEdit
+        name="Tempo máximo:"
+        bind:value={preparation.max}
+        bind:rawValue={preparation.max}
+        placeHolder=""
+        type="number"
+        leftPadding="10px"
+      />
+    </div>
+    <Views.Divider />
+    <h3>Valor de entrega</h3>
     <Views.Switch name="Frete grátis:" bind:checked={delivery.free} />
     {#if !(delivery?.free || false)}
       <Views.TextEdit

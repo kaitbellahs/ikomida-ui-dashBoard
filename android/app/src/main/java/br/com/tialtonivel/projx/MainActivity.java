@@ -1,4 +1,4 @@
-package com.deluxe.restaurant;
+package br.com.tialtonivel.vendor;
 
 import com.getcapacitor.BridgeActivity;
 

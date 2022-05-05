@@ -22,8 +22,6 @@
   let imageSrc = "/Assets/Images/food-plate.svg";
   let fileinput;
 
-  $: console.log(profile);
-
   function toggleErrorAlert(messageObject) {
     errorAlert = messageObject;
     showAlert = true;

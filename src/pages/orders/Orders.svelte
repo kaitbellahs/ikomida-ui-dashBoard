@@ -23,26 +23,31 @@
     new Types.SelectorOptions({
       id: "accepted",
       name: "1. Aceitar o pedido",
+      selectedName: "Pedido aceito",
       orderID,
     }),
     new Types.SelectorOptions({
       id: "waitingDelivery",
       name: "2. Esperando o entregador",
+      selectedName: "Pedido a Espera do entregador",
       orderID,
     }),
     new Types.SelectorOptions({
       id: "delivery",
       name: "3. Saiu para entrega",
+      selectedName: "Pedido a caminho",
       orderID,
     }),
     new Types.SelectorOptions({
       id: "delivered",
       name: "4. Pedido entrege",
+      selectedName: "Pedido entrege",
       orderID,
     }),
     new Types.SelectorOptions({
       id: "canceled",
       name: "5. Cancelar o pedido",
+      selectedName: "Pedido cancelado",
       orderID,
     }),
   ];
@@ -85,16 +90,18 @@
   async function update() {
     isLoading = true;
     orders = (await GetOrders($Router.options))?.map((order) => {
-      order.selected = orderOptions(order?.id)?.filter((option) => option.id === order?.status)?.[0];
-      order.oldSelected = order.selected;
+      order.selected = orderOptions(order?.id)?.filter(
+        (option) => option?.id === order?.status
+      )?.[0];
+      order.oldSelected = order?.selected;
       return order;
     });
     isLoading = false;
   }
 
   function goToOrder(id) {
-    const order = orders.find((order) => {
-      return order.id === id;
+    const order = orders?.find((order) => {
+      return order?.id === id;
     });
     Navigation.goTo(Routes.order, order);
   }
@@ -117,9 +124,21 @@
     {#each orders as order}
       <div class="leftShadow orderContainer">
         <div on:click={goToOrder(order?.id)}>
-          <h3>#{order?.id}: pedido {OrderStatus(order?.status)}</h3>
+          <h3>#{order?.customID}: pedido {OrderStatus(order?.status)}</h3>
+          {#if ["waitingPayment", "open", "accepted", "waitingDelivery", "delivery"].includes(order?.status)}
+            {#if new Date(new Date(order?.createdAt).getTime() + (order?.preparation?.max) * 1000) < new Date()}
+              <span class="lateOrder">Pedido atrasado</span>
+            {/if}
+            <span class="deliveryForecast">Preparar o pedido antes de </span>
+            <span class="deliveryForecastValue">
+              {Utils.Strings.dateToString(
+                new Date(order?.createdAt).getTime() +
+                  (order?.preparation?.max) * 1000
+              )}</span
+            >
+          {/if}
           {#if order?.products?.length > 0}
-            <div class="product">1. {order?.products?.[0].title}</div>
+            <div class="product">1. {order?.products?.[0]?.title}</div>
           {/if}
           {#if order?.products?.length > 1}
             <div class="product">
@@ -160,6 +179,12 @@
     margin-bottom: 10px;
     margin-top: 10px;
     background: #eeeeee33;
+    display: flex;
+    flex-direction: column;
+  }
+  .orderContainer > div{
+    display: flex;
+    flex-direction: column;
   }
   .orderContainer > div > h3 {
     padding: 0;
@@ -185,5 +210,21 @@
   .orderContainer > div > .time {
     font-family: RobotoThin;
     font-size: 0.6em;
+  }
+  .orderContainer > div > .deliveryForecast {
+    font-size: 1.1em;
+    color: #00000099;
+  }
+  .orderContainer > div > .deliveryForecastValue {
+    color: rgb(0, 177, 0);
+    margin-bottom: 10px;
+  }
+  .orderContainer > div > .lateOrder {
+    background-color: red;
+    border-radius: 6px;
+    color: white;
+    padding: 4px 20px;
+    align-self: center;
+    margin-bottom: 10px;
   }
 </style>

@@ -30,6 +30,7 @@
     faIdCard,
     faSlidersH,
   } from "@fortawesome/free-solid-svg-icons";
+  import { onMount } from "svelte";
 
   const tabs = [
     {
@@ -75,15 +76,27 @@
       icon: faIdCard,
     },
   ];
-  MenuHamburger.reset();
-  menuHamburgerItems.forEach((page) => MenuHamburger.addItem(page));
 
   $: styleHeight = `${Number($StatusBar.height) + 60}px`;
   $: route = $Router.route;
+
+  onMount(() => {
+    const style = document.createElement("style");
+    style.innerHTML = `
+    body {
+      --paddingTop: ${styleHeight};
+      --paddingBottom: 60px;
+    }
+  `;
+    document.head.appendChild(style);
+  });
+
+  MenuHamburger.reset();
+  menuHamburgerItems.forEach((page) => MenuHamburger.addItem(page));
 </script>
 
 <main
-  style="margin-top:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 60px; overflow: hidden;max-width: 100%;position: relative;"
+  style="padding: 20px; padding-top: 0; overflow: hidden;max-width: 100%;position: relative;"
 >
   {#if route == Routes.home}
     <Home />
@@ -133,5 +146,10 @@
     margin: 0;
     padding: 0;
     font-weight: normal;
+    box-sizing: border-box;
+  }
+  body {
+    padding-top: var(--paddingTop);
+    padding-bottom: var(--paddingBottom);
   }
 </style>

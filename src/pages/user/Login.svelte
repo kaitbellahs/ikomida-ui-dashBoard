@@ -20,12 +20,10 @@
 
   let errorAlert;
   let showAlert = false;
+  let isValidPassword = false;
+  let isValidPhone = false;
 
-  $: canLogin =
-    phone &&
-    (phone?.length || 0) === 11 &&
-    password &&
-    (password?.length || 0) > 5;
+  $: canLogin = isValidPhone && isValidPassword;
 
   async function forgotPassword() {
     Navigation.goTo(Routes.forgotPassword);
@@ -83,6 +81,7 @@
     icon={faPhone}
     type="phone"
     placeHolder="Numero de celular"
+    bind:isValid={isValidPhone}
   />
   <Views.TextEdit
     bind:value={password}
@@ -90,6 +89,7 @@
     placeHolder="Senha"
     secret={true}
     type="password"
+    bind:isValid={isValidPassword}
   />
   <div />
   <Views.Button on:click={doLogin} disabled={!canLogin}>Entrar</Views.Button>

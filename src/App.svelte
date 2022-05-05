@@ -6,12 +6,13 @@
   import Tac from "./pages/user/Tac.svelte";
   import { Network } from "@capacitor/network";
   import { onMount } from "svelte";
-  import { Router, Routes } from "./stores/Navigation";
+  import { Navigation, Router, Routes } from "./stores/Navigation";
   import { StatusBar as _StatusBar } from "./stores/Setup";
   import { StatusBar } from "@capacitor/status-bar";
   import { PushNotification, Utils } from "@tian/components";
   import { registerPushNotificationToken } from "./network/PushNotification";
   import ForgotPassword from "./pages/user/ForgotPassword.svelte";
+  import { CAPNativeLog } from "capacitor-native-log";
 
   let networkStatus = null;
   let logedIn = false;
@@ -68,9 +69,14 @@
   //   console.log("App state changed. Is active?", isActive);
   // });
 
-  // App.addListener("appUrlOpen", (data) => {
-  //   console.log("App opened with URL:", data);
-  // });
+  App.addListener("appUrlOpen", (data) => {
+    console.log("App opened with URL:", data);
+    CAPNativeLog.log({
+      level: "info",
+      message: `App opened with URL: ${JSON.stringify(data)}`,
+    });
+    Navigation.goTo(Routes.settings, { callback: true, ...data });
+  });
 
   // App.addListener("appRestoredResult", (data) => {
   //   console.log("Restored state:", data);
