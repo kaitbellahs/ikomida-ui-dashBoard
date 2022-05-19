@@ -1,4 +1,4 @@
-package br.com.tialtonivel.vendor;
+package com.ikomida.vendor;
 
 import com.getcapacitor.BridgeActivity;
 

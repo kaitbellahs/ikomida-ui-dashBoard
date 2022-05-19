@@ -6,7 +6,7 @@
     deleteProduct,
     deleteCategory,
   } from "../../network/Products";
-  import { Views } from "@tian/components";
+  import { Views } from "@ikomida/components";
   import { faSearch, faEdit, faGift } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
   import { onMount } from "svelte";

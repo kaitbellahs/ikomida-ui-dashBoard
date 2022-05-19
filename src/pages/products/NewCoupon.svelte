@@ -3,7 +3,7 @@
   import Fa from "svelte-fa";
   import { faEdit } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
-  import { Views, Types } from "@tian/components";
+  import { Views, Types } from "@ikomida/components";
   import { newCoupon } from "../../network/Payment";
 
   let item = {

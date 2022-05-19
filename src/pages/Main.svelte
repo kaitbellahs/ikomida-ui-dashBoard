@@ -7,7 +7,7 @@
     Menu,
     MenuHamburger,
   } from "../stores/Navigation";
-  import { Views } from "@tian/components";
+  import { Views } from "@ikomida/components";
   import Home from "./products/Home.svelte";
   import Orders from "./Orders/Orders.svelte";
   import Order from "./Orders/Order.svelte";
@@ -130,7 +130,7 @@
 </main>
 <Views.NavigationBar
   {MenuHamburger}
-  logo="/Assets/Icons/logo.png"
+  logo="/Assets/Icons/logo.svg"
   {Menu}
   {Title}
   paddingTop={$StatusBar.height}

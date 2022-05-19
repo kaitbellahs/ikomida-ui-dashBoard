@@ -2,7 +2,7 @@
   import { Title, Navigation, Router, Routes } from "../../stores/Navigation";
   import Fa from "svelte-fa";
   import { faEdit, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
-  import { Views, Utils } from "@tian/components";
+  import { Views, Utils } from "@ikomida/components";
   import { getCoupon, deleteCoupon } from "../../network/Payment";
   import { StatusBar } from "../../stores/Setup";
   import { onMount } from "svelte";
@@ -88,8 +88,8 @@
     font-size: 0.9em;
     color: white;
     font-family: RobotoBold;
-    border: 1px solid red;
-    background: red;
+    border: 1px solid #b52124;
+    background: #b52124;
     border-radius: 20px;
     width: 25px;
     height: 25px;

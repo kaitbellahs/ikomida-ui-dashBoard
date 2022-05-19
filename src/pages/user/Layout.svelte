@@ -1,7 +1,7 @@
 <script>
   import { Auth } from "../../stores/Auth";
   import { Title } from "../../stores/Navigation";
-  import { Views } from "@tian/components";
+  import { Views } from "@ikomida/components";
   import { getLayout, updateLayout } from "../../network/Layout";
   import { StatusBar } from "../../stores/Setup";
   import { HsvPicker } from "svelte-color-picker";

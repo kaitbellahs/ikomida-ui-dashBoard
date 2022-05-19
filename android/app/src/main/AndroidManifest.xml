@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="br.com.tialtonivel.vendor">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
         android:allowBackup="true"
@@ -13,7 +12,7 @@
 
         <activity
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode"
-            android:name="br.com.tialtonivel.vendor.MainActivity"
+            android:name="com.ikomida.vendor.MainActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBarLaunch"
             android:launchMode="singleTask">
@@ -33,7 +32,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <!-- Accepts URI br.com.tialtonivel.vendor://pagseguro.integration.callback” -->
+                <!-- Accepts URI com.ikomida.br.vendor://pagseguro.integration.callback” -->
                 <data android:scheme="@string/url_scheme"
                     android:host="@string/url_host" />
             </intent-filter>

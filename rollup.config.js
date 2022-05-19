@@ -11,7 +11,7 @@ import sveltePreprocess from 'svelte-preprocess';
 import {
 	asMarkupPreprocessor
 } from 'svelte-as-markup-preprocessor';
-import obfuscatorPlugin from 'rollup-plugin-javascript-obfuscator';
+// import obfuscatorPlugin from 'rollup-plugin-javascript-obfuscator';
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -48,16 +48,16 @@ export default {
 	plugins: [
 		svelte({
 			preprocess: [
-				obfuscatorPlugin({
-					compact: true,
-					controlFlowFlattening: true,
-					deadCodeInjection: true,
-					debugProtection: true,
-					identifierNamesGenerator: 'mangled-shuffled',
-					log: false,
-					numbersToExpressions: true,
-					optionsPreset: 'medium-obfuscation',
-				}),
+				// obfuscatorPlugin({
+				// 	compact: true,
+				// 	controlFlowFlattening: true,
+				// 	deadCodeInjection: true,
+				// 	debugProtection: true,
+				// 	identifierNamesGenerator: 'mangled-shuffled',
+				// 	log: false,
+				// 	numbersToExpressions: true,
+				// 	optionsPreset: 'medium-obfuscation',
+				// }),
 				asMarkupPreprocessor([
 					sveltePreprocess()
 				]),

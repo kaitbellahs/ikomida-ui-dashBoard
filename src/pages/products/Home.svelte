@@ -4,7 +4,7 @@
   import { countOrders } from "../../network/Orders";
   import { countUsers } from "../../network/User";
   import { countCoupons } from "../../network/Payment";
-  import { Views } from "@tian/components";
+  import { Views } from "@ikomida/components";
 
   Title.set("Home");
 </script>
@@ -71,7 +71,7 @@
   section > article > .count {
     width: 100%;
     font-size: 3em;
-    color: red;
+    color: #b52124;
     text-align: center;
   }
 </style>

@@ -9,7 +9,7 @@
   import { Navigation, Router, Routes } from "./stores/Navigation";
   import { StatusBar as _StatusBar } from "./stores/Setup";
   import { StatusBar } from "@capacitor/status-bar";
-  import { PushNotification, Utils } from "@tian/components";
+  import { PushNotification, Utils } from "@ikomida/components";
   import { registerPushNotificationToken } from "./network/PushNotification";
   import ForgotPassword from "./pages/user/ForgotPassword.svelte";
   import { CAPNativeLog } from "capacitor-native-log";
@@ -101,7 +101,7 @@
 
 <style>
   #internetError {
-    background-color: red;
+    background-color: #b52124;
     color: white;
   }
 </style>

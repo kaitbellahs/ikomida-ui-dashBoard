@@ -7,7 +7,7 @@
     Routes,
   } from "../../stores/Navigation";
   import { GetOrders, OrderStatus } from "../../network/Orders";
-  import { Views, Utils, Types } from "@tian/components";
+  import { Views, Utils, Types } from "@ikomida/components";
   import { PaymentType } from "../../network/Payment";
   import { ChangeOrderStatus } from "../../network/Orders";
   import { StatusBar } from "../../stores/Setup";
@@ -220,7 +220,7 @@
     margin-bottom: 10px;
   }
   .orderContainer > div > .lateOrder {
-    background-color: red;
+    background-color: #b52124;
     border-radius: 6px;
     color: white;
     padding: 4px 20px;

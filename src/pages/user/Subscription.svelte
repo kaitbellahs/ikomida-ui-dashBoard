@@ -1,6 +1,6 @@
 <script>
   import { Title } from "../../stores/Navigation";
-  import { Views, Utils } from "@tian/components";
+  import { Views, Utils } from "@ikomida/components";
   import { StatusBar } from "../../stores/Setup";
   import { getSubscription } from "../../network/Payment";
   import { onMount } from "svelte";
@@ -108,7 +108,7 @@
     font-size: 1.6em;
     color: white;
     font-family: RobotoBold;
-    /* border: 1px solid red; */
+    /* border: 1px solid #b52124; */
     background: #1e1c1c;
     border-radius: 20px;
     width: 40px;
@@ -124,7 +124,7 @@
     font-size: 1.6em;
     color: white;
     font-family: RobotoBold;
-    /* border: 1px solid red; */
+    /* border: 1px solid #b52124; */
     background: #1e1c1c;
     border-radius: 20px;
     width: 40px;

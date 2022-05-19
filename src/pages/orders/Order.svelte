@@ -1,7 +1,7 @@
 <script>
   import { Title, Router } from "../../stores/Navigation";
   import { OrderStatus } from "../../network/Orders";
-  import { Views, Utils, Types } from "@tian/components";
+  import { Views, Utils, Types } from "@ikomida/components";
   import { PaymentType } from "../../network/Payment";
   import { ChangeOrderStatus } from "../../network/Orders";
   import { StatusBar } from "../../stores/Setup";
@@ -255,7 +255,7 @@
     margin-bottom: 10px;
   }
   .lateOrder {
-    background-color: red;
+    background-color: #b52124;
     border-radius: 6px;
     color: white;
     padding: 4px 20px;

@@ -1,19 +1,19 @@
 <script>
-  import { Auth, projXID, PushNotificationToken } from "../../stores/Auth";
+  import { Auth, ikomidaID, PushNotificationToken } from "../../stores/Auth";
   import * as AuthNetwork from "../../network/Auth";
   import { Routes, Navigation } from "../../stores/Navigation";
-  import { Views } from "@tian/components";
+  import { Views } from "@ikomida/components";
   import {
     faPhone,
     faUnlock,
     faIdCardAlt,
   } from "@fortawesome/free-solid-svg-icons";
-  import { Utils, Network } from "@tian/components";
+  import { Utils, Network } from "@ikomida/components";
   import { registerPushNotificationToken } from "../../network/PushNotification";
   import { onMount } from "svelte";
 
   let isLoading = false;
-  let projxid = "com.deluxeApp.test";
+  let ikomidaid = "com.ikomida.br.default";
   let phone = "11953635016";
   let initialValue = "(11) 95363-5016";
   let password = "123456";
@@ -36,8 +36,8 @@
 
   async function doLogin() {
     isLoading = true;
-    await projXID.set(projxid);
-    Network.instance.setProjxID(projxid);
+    await ikomidaID.set(ikomidaid);
+    Network.instance.setIkomidaID(ikomidaid);
     const response = await AuthNetwork.doLogin(55, phone, password);
     if (response?.success) {
       const token = await Utils.Jws.extractToken(response?.data);
@@ -57,7 +57,7 @@
   }
 
   onMount(async () => {
-    projxid = (await projXID.get()) || projxid;
+    ikomidaid = (await ikomidaID.get()) || ikomidaid;
   });
 </script>
 
@@ -66,11 +66,11 @@
 {/if}
 <main>
   <div class="avatar">
-    <img src="/Assets/Icons/logo.png" alt="TI Alto Nivel" />
+    <img src="/Assets/Icons/logo.svg" alt="iKomida" />
   </div>
   <Views.TextEdit
-    bind:value={projxid}
-    bind:rawValue={projxid}
+    bind:value={ikomidaid}
+    bind:rawValue={ikomidaid}
     icon={faIdCardAlt}
     type="slug"
     placeHolder="Id do estabelecimento"

@@ -1,6 +1,6 @@
 <script>
   import { Title, Router } from "../../stores/Navigation";
-  import { Views, Utils } from "@tian/components";
+  import { Views, Utils } from "@ikomida/components";
   import {
     getSettings,
     updatePaymentGateway,
@@ -366,8 +366,8 @@
     font-size: 0.9em;
     color: white;
     font-family: RobotoBold;
-    border: 1px solid red;
-    background: red;
+    border: 1px solid #b52124;
+    background: #b52124;
     border-radius: 16px;
     width: 28px;
     height: 28px;

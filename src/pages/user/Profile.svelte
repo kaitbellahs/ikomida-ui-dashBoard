@@ -2,7 +2,7 @@
   import { Auth } from "../../stores/Auth";
   import { updatePassword } from "../../network/Auth";
   import { Title } from "../../stores/Navigation";
-  import { Views, Image, Utils } from "@tian/components";
+  import { Views, Image, Utils } from "@ikomida/components";
   import { getSettings, setSettings } from "../../network/Settings";
   import { StatusBar } from "../../stores/Setup";
   import { faPhone, faEnvelope } from "@fortawesome/free-solid-svg-icons";

@@ -1,9 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
+
+    namespace 'com.ikomida.vendor'
     compileSdkVersion rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "br.com.tialtonivel.vendor"
+        applicationId "com.ikomida.br.vendor"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

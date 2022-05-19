@@ -6,7 +6,7 @@ import {
 } from '@capacitor/storage';
 
 const authToken = 'AuthToken';
-const projxIDKey = 'projXID';
+const ikomidaIDKey = 'ikomidaID';
 
 function createAuth() {
 	const {
@@ -44,13 +44,13 @@ function createAuth() {
 }
 
 export const Auth = createAuth();
-export const projXID = {
+export const ikomidaID = {
 	set: async (id) => await Storage.set({
-		key: projxIDKey,
+		key: ikomidaIDKey,
 		value: id
 	}),
 	get: async () => (await Storage.get({
-		key: projxIDKey
+		key: ikomidaIDKey
 	})).value
 };
 

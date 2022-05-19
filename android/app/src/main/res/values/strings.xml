@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">projx</string>
-    <string name="title_activity_main">projx</string>
-    <string name="package_name">br.com.tialtonivel.vendor</string>
-    <string name="custom_url_scheme">projx</string>
-    <string name="filter_view">projx</string>
-    <string name="url_scheme">br.com.tialtonivel.vendor</string>
+    <string name="app_name">iKomida</string>
+    <string name="title_activity_main">iKomida</string>
+    <string name="package_name">com.ikomida.br.vendor</string>
+    <string name="custom_url_scheme">iKomida</string>
+    <string name="filter_view">iKomida</string>
+    <string name="url_scheme">com.ikomida.br.vendor</string>
     <string name="url_host">pagseguro.integration.callback</string>
 </resources>

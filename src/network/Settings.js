@@ -6,7 +6,7 @@ import {
 } from '../stores/Auth';
 import {
     Network
-} from "@tian/components";
+} from "@ikomida/components";
 
 export async function getSettings() {
     let response = await Network.instance.get("/vendor/settings", get(Auth));

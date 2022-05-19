@@ -9,7 +9,7 @@ import {
 } from '../stores/Auth';
 import {
     Network
-} from "@tian/components";
+} from "@ikomida/components";
 
 export async function all() {
     let products = get(Store);
