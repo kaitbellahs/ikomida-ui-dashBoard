@@ -6,6 +6,7 @@
   import { onMount } from "svelte";
   import Fa from "svelte-fa";
   import { faReceipt, faFileInvoice } from "@fortawesome/free-solid-svg-icons";
+  import { AppLauncher } from "@capacitor/app-launcher";
 
   let subscription;
   let isLoading = false;
@@ -17,20 +18,61 @@
     showAlert = true;
   }
 
-  function openReceipt(url) {}
+  async function open(url) {
+    const { value } = await AppLauncher.canOpenUrl({ url });
+    await AppLauncher.openUrl({ url });
+    if (!value) {
+      await Clipboard.write({ string: url });
+      toggleErrorAlert(
+        `Se o navigador externo nao abriu: abra o e digitar essa URL: ${url}, também foi copiado para sua área de transferência para colar-lo!`
+      );
+    }
+  }
 
-  function openInvoice(url) {}
+  // function openInvoice(url) {}
 
   onMount(async () => {
     subscription = await getSubscription();
   });
 
-  Title.set("Inscrição");
+  function subscriptionStatus(status) {
+    console.log(typeof status);
+    if (typeof status === "string") {
+      switch (status.toUpperCase()) {
+        case "ACTIVE":
+          return "Ativo";
+        case "CANCELED":
+          return "Cancelado";
+        default:
+          return "-";
+      }
+    }
+    return "-";
+  }
+  function paymentStatus(status) {
+    if (typeof status === "string") {
+      switch (status.toUpperCase()) {
+        case "CONFIRMED":
+          return "Confirmado";
+        case "PENDING":
+          return "Aguardando";
+        default:
+          return "-";
+      }
+    }
+    return "-";
+  }
+
+  Title.set("Cobranças");
 </script>
 
 <Views.TextValue text="plano:" value={subscription?.plan} fontSize="1.2em" />
 <Views.TextValue text="Valor:" value={subscription?.value} fontSize="1.2em" />
-<Views.TextValue text="Estado:" value={subscription?.status} fontSize="1.2em" />
+<Views.TextValue
+  text="Estado:"
+  value={subscriptionStatus(subscription?.status)}
+  fontSize="1.2em"
+/>
 <Views.TextValue
   text="inscrição:"
   value={Utils.Strings.dateToDateString(subscription?.subscription)}
@@ -45,11 +87,14 @@
   {#each subscription?.charges as charges}
     <div class="charge">
       <span
-        on:click={openReceipt(charges?.transactionReceiptUrl)}
+        alt="Abrir a nota fiscal"
+        on:click={open(charges?.transactionReceiptUrl)}
         class="receipt"><Fa icon={faReceipt} /></span
       >
-      <span on:click={openInvoice(charges?.invoiceUrl)} class="invoice"
-        ><Fa icon={faFileInvoice} /></span
+      <span
+        alt="Abrir comprovante de pagamento"
+        on:click={open(charges?.invoiceUrl)}
+        class="invoice"><Fa icon={faFileInvoice} /></span
       >
       <Views.TextValue
         text="value:"
@@ -77,7 +122,7 @@
       />
       <Views.TextValue
         text="Status de pagamento:"
-        value={charges?.status}
+        value={paymentStatus(charges?.status)}
         fontSize="0.9em"
         leftMargin="50"
       />
@@ -108,7 +153,7 @@
     font-size: 1.6em;
     color: white;
     font-family: RobotoBold;
-    /* border: 1px solid #b52124; */
+    /* border: 1px solid #4c0708; */
     background: #1e1c1c;
     border-radius: 20px;
     width: 40px;
@@ -124,7 +169,7 @@
     font-size: 1.6em;
     color: white;
     font-family: RobotoBold;
-    /* border: 1px solid #b52124; */
+    /* border: 1px solid #4c0708; */
     background: #1e1c1c;
     border-radius: 20px;
     width: 40px;

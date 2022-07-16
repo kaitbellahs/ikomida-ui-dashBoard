@@ -207,9 +207,6 @@
 <Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 
 <style>
-  .profile {
-    padding-bottom: 50px;
-  }
   .profile > div {
     width: 100%;
   }

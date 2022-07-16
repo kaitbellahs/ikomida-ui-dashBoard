@@ -171,7 +171,7 @@
     </div>
     <Views.Selector
       bind:selected={item.category}
-      name="Seleciona uma opção"
+      name="Selecione uma opção"
       options={categoriesOptions}
     />
     <Views.TextEdit
@@ -187,7 +187,7 @@
     />
     <Views.TextEdit
       type="number"
-      name="Peso do produto em KG"
+      name="Peso do produto em gramas (g)"
       bind:value={item.weight}
       bind:rawValue={item.weight}
       placeHolder=""
@@ -216,7 +216,7 @@
     <Views.Divider />
     <Views.Selector
       bind:selected={selectedDiscountType}
-      name="seleciona uma opção"
+      name="selecione uma opção"
       options={Types.DiscountTypes.list}
     />
     {#if selectedDiscountType}

@@ -1,5 +1,5 @@
 {
-  "appId": "com.ikomida.br.vendor",
+  "appId": "br.com.ikomida.vendor",
   "appName": "iKomida",
   "webDir": "public",
   "bundledWebRuntime": false,

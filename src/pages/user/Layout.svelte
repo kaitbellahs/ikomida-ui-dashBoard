@@ -15,16 +15,17 @@
   let currentItem;
 
   let layout = {
-    background: "#ffffff",
+    link: "#e8d130",
+    background: "#dfdfdf",
     color: "#000000",
     header: {
-      background: "#ffe4c4",
-      color: "#a52a2a",
-      menuHamburger: "#000000",
+      color: "#ffffff",
+      background: "#4c0708",
+      menuHamburger: "#ffffff",
     },
-    tabs: { background: "#ffe4c4" },
-    button: { background: "#a52a2a", color: "#ffffff" },
-    dialog: { background: "#ffffffdf", color: "#ffffff" },
+    tabs: { background: "#ffe4c4", color: "#4c0708" },
+    button: { background: "#4c0708", color: "#ffffff" },
+    dialog: { background: "#ffffffdf", color: "#4c0708" },
   };
 
   function toggleErrorAlert(messageObject) {
@@ -135,81 +136,105 @@
         <div class="box">
           Lorem Ipsum is simply dummy text of the printing and typesetting
           industry. Lorem Ipsum has been the industry's standard dummy text ever
-          since the 1500s
+          since the 1500s.<br />
+          <span style="color: {layout.link};">Isso e um link</span>
         </div>
         <button
           style="background: {layout.button.background};color: {layout.button
             .color}">button text</button
         >
       </div>
-      <div class="tabs">
-        <div style="background-color: {layout.tabs.background};">Home</div>
+      <div
+        style="background-color: {layout.tabs.background};color: {layout.tabs
+          .color};"
+        class="tabs"
+      >
+        <div
+          style="color: {layout.tabs.background};background-color: {layout.tabs
+            .color};"
+        >
+          Home
+        </div>
         <div>produtos</div>
         <div>pedidos</div>
       </div>
     </div>
     <Views.Divider />
     <h2>Layout</h2>
-    <Views.TextEdit
-      type="color"
-      name="A cor do fundo:"
-      bind:value={layout.background}
-      placeHolder=""
-    />
-    <Views.TextEdit
-      type="color"
-      name="A cor do texto:"
-      bind:value={layout.color}
-      placeHolder=""
-    />
-    <Views.TextEdit
-      type="color"
-      name="A cor do cabeçalho:"
-      bind:value={layout.header.background}
-      placeHolder=""
-    />
-    <Views.TextEdit
-      type="color"
-      name="A cor do texto do cabeçalho:"
-      bind:value={layout.header.color}
-      placeHolder=""
-    />
-    <Views.TextEdit
-      type="color"
-      name="A cor do menu hamburger:"
-      bind:value={layout.header.menuHamburger}
-      placeHolder=""
-    />
-    <Views.TextEdit
-      type="color"
-      name="A cor do fundo do tabs:"
-      bind:value={layout.tabs.background}
-      placeHolder=""
-    />
-    <Views.TextEdit
-      type="color"
-      name="A cor do fundo do button:"
-      bind:value={layout.button.background}
-      placeHolder=""
-    />
-    <Views.TextEdit
-      type="color"
-      name="A cor do button:"
-      bind:value={layout.button.color}
-      placeHolder=""
-    />
-    <Views.TextEdit
-      type="color"
-      name="A cor do fundo do alerta:"
-      bind:value={layout.dialog.background}
-      placeHolder=""
-    />
-    <Views.TextEdit
-      type="color"
-      name="A cor do alerta:"
-      bind:value={layout.dialog.color}
-      placeHolder=""
-    />
+    <div id="options">
+      <Views.TextEdit
+        type="color"
+        name="A cor do link:"
+        bind:value={layout.link}
+        placeHolder=""
+      />
+      <Views.TextEdit
+        type="color"
+        name="A cor do fundo:"
+        bind:value={layout.background}
+        placeHolder=""
+      />
+      <Views.TextEdit
+        type="color"
+        name="A cor do texto:"
+        bind:value={layout.color}
+        placeHolder=""
+      />
+      <Views.TextEdit
+        type="color"
+        name="A cor do cabeçalho:"
+        bind:value={layout.header.background}
+        placeHolder=""
+      />
+      <Views.TextEdit
+        type="color"
+        name="A cor do texto do cabeçalho:"
+        bind:value={layout.header.color}
+        placeHolder=""
+      />
+      <Views.TextEdit
+        type="color"
+        name="A cor do menu hamburger:"
+        bind:value={layout.header.menuHamburger}
+        placeHolder=""
+      />
+      <Views.TextEdit
+        type="color"
+        name="A cor do fundo do tabs:"
+        bind:value={layout.tabs.background}
+        placeHolder=""
+      />
+      <Views.TextEdit
+        type="color"
+        name="A cor do texto do tabs:"
+        bind:value={layout.tabs.color}
+        placeHolder=""
+      />
+      <Views.TextEdit
+        type="color"
+        name="A cor do fundo do button:"
+        bind:value={layout.button.background}
+        placeHolder=""
+      />
+      <Views.TextEdit
+        type="color"
+        name="A cor do button:"
+        bind:value={layout.button.color}
+        placeHolder=""
+      />
+      <Views.TextEdit
+        type="color"
+        name="A cor do fundo do alerta:"
+        bind:value={layout.dialog.background}
+        placeHolder=""
+      />
+      <Views.TextEdit
+        type="color"
+        name="A cor do alerta:"
+        bind:value={layout.dialog.color}
+        placeHolder=""
+      />
+    </div>
     <Views.Divider />
     <Views.Button on:click={setLaout}>Atualizar layout</Views.Button>
   </div>
@@ -300,5 +325,9 @@
     text-align: center;
     justify-content: center;
     flex-direction: column;
+  }
+  #options{
+    height: 100%;
+    overflow-y: scroll;
   }
 </style>

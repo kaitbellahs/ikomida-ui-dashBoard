@@ -126,14 +126,14 @@
         <div on:click={goToOrder(order?.id)}>
           <h3>#{order?.customID}: pedido {OrderStatus(order?.status)}</h3>
           {#if ["waitingPayment", "open", "accepted", "waitingDelivery", "delivery"].includes(order?.status)}
-            {#if new Date(new Date(order?.createdAt).getTime() + (order?.preparation?.max) * 1000) < new Date()}
+            {#if new Date(new Date(order?.createdAt).getTime() + order?.preparation?.max * 1000) < new Date()}
               <span class="lateOrder">Pedido atrasado</span>
             {/if}
             <span class="deliveryForecast">Preparar o pedido antes de </span>
             <span class="deliveryForecastValue">
               {Utils.Strings.dateToString(
                 new Date(order?.createdAt).getTime() +
-                  (order?.preparation?.max) * 1000
+                  order?.preparation?.max * 1000
               )}</span
             >
           {/if}
@@ -160,18 +160,34 @@
           <Views.Selector
             options={orderOptions(order?.id)}
             bind:selected={order.selected}
-            name="Seleciona uma opção!"
+            name="Selecione uma opção!"
           />
         {/if}
       </div>
     {/each}
   {:else}
-    <h2>Não ha pedidos por enquanto!</h2>
+    <div id="noOrders">
+      <h2>
+        Não há pedido para exiber por enquanto, aproveite e divulga ja seu app
+        com seus clientes!
+      </h2>
+    </div>
   {/if}
 </div>
 <Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 
 <style>
+  #noOrders {
+    display: flex;
+    flex-direction: row;
+    height: calc(100vh - 150px);
+  }
+  #noOrders > h2 {
+    place-self: center;
+    align-self: center;
+    justify-self: center;
+    text-align: center;
+  }
   .orderContainer {
     border-radius: 4px;
     border: 1px solid #ccc;
@@ -182,7 +198,7 @@
     display: flex;
     flex-direction: column;
   }
-  .orderContainer > div{
+  .orderContainer > div {
     display: flex;
     flex-direction: column;
   }
@@ -220,7 +236,7 @@
     margin-bottom: 10px;
   }
   .orderContainer > div > .lateOrder {
-    background-color: #b52124;
+    background-color: #4c0708;
     border-radius: 6px;
     color: white;
     padding: 4px 20px;

@@ -101,7 +101,7 @@
 
 <style>
   #internetError {
-    background-color: #b52124;
+    background-color: #4c0708;
     color: white;
   }
 </style>

@@ -52,7 +52,7 @@
   const menuHamburgerItems = [
     {
       name: "Home",
-      callback: () => Navigation.goTo(Routes.home),
+      callback: () => Navigation.reset(Routes.home),
       icon: faHome,
     },
     {
@@ -96,8 +96,7 @@
 </script>
 
 <main
-  style="padding: 20px; padding-top: 0; overflow: hidden;max-width: 100%;position: relative;"
->
+style="--paddingTop:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; --paddingBottom: 50px; overflow: scroll;max-width: 100%;height: 100%;">
   {#if route == Routes.home}
     <Home />
   {:else if route == Routes.orders}
@@ -130,7 +129,7 @@
 </main>
 <Views.NavigationBar
   {MenuHamburger}
-  logo="/Assets/Icons/logo.svg"
+  logo="/Assets/Icons/transparent-logo-1.svg"
   {Menu}
   {Title}
   paddingTop={$StatusBar.height}
@@ -139,16 +138,24 @@
 />
 <Views.Tabs {tabs} {Navigation} bottomPadding={$StatusBar.bottomPadding} />
 
-<style global>
-  *,
-  *:before,
-  *:after {
+<style>
+  main {
+    padding: 20px;
+    padding-top: 0;
+    overflow: hidden;
+    max-width: 100%;
+    position: relative;
+    padding-bottom: 55px;
+    display: flex;
+    flex-direction: column;
+  }
+  :global(*, *:before, *:after) {
     margin: 0;
     padding: 0;
     font-weight: normal;
     box-sizing: border-box;
   }
-  body {
+  :global(body) {
     padding-top: var(--paddingTop);
     padding-bottom: var(--paddingBottom);
   }

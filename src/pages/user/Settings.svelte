@@ -106,8 +106,11 @@
   }
 
   const addHours = () => {
-    business?.hours?.push({ id: uuid(), start: null, end: null });
-    business.hours = business?.hours;
+    if(!business?.hours){
+      business.hours = []
+    }
+    business.hours.push({ id: uuid(), start: null, end: null });
+    business.hours = business.hours;
   };
 
   function onRemoveClick(id) {
@@ -118,6 +121,11 @@
 
   async function updateHours() {
     isLoading = true;
+    if (business.hours === null || business.hours.length < 1) {
+      toggleErrorAlert("Precisa escolher pelo menos um horario de funcionamento!");
+      isLoading = false;
+      return;
+    }
     for (const businessHour of business?.hours) {
       if (businessHour?.start === null || businessHour?.start?.length < 4) {
         toggleErrorAlert("horario de abertura invalido!");
@@ -196,6 +204,7 @@
         if (value) {
           await AppLauncher.openUrl({ url });
         } else {
+          await AppLauncher.openUrl({ url });
           await Clipboard.write({ string: url });
           toggleErrorAlert(
             `Não foi possível abrir navigador externo: por favor abrir o seu navigaro e digitar esa URL: ${url}, também foi copiado para sua área de transferência!`
@@ -253,13 +262,11 @@
     {/each}
     <Views.Divider />
     <Views.Button on:click={addHours}
-      ><Fa icon={faClock} /><span>Addicionar horarios</span></Views.Button
+      ><Fa icon={faClock} /><span>Adicionar horarios</span></Views.Button
     >
     {#each days as day}
       <div class="address">
-        <span
-          ><input type="checkbox" bind:checked={day.checked} /> {day.name}</span
-        >
+          <Views.Checkbox bind:checked={day.checked} label={day.name} />
       </div>
     {/each}
     <Views.Button on:click={updateHours}
@@ -268,8 +275,8 @@
     <!-- <Views.Divider />
     <Views.Button on:click={setPaymentGateway}>Atualizar os dados</Views.Button> -->
     <Views.Divider />
-    <h2>Gateway de pagament</h2>
-    <Views.Button on:click={requestPagSeguroIntegration}
+    <h2>Gateway de pagamentos</h2>
+    <Views.Button on:click={requestPagSeguroIntegration} 
       >{integrateButtonName}</Views.Button
     >
 
@@ -366,8 +373,8 @@
     font-size: 0.9em;
     color: white;
     font-family: RobotoBold;
-    border: 1px solid #b52124;
-    background: #b52124;
+    border: 1px solid #4c0708;
+    background: #4c0708;
     border-radius: 16px;
     width: 28px;
     height: 28px;

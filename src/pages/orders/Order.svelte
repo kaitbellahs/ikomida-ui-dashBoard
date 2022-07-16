@@ -128,7 +128,7 @@
 {#if !orderFinishedOptions.includes(order?.status)}
   <Views.Selector
     bind:selected
-    name="seleciona uma opção"
+    name="selecione uma opção"
     options={orderOptions(order?.id)}
   />
 {/if}
@@ -255,7 +255,7 @@
     margin-bottom: 10px;
   }
   .lateOrder {
-    background-color: #b52124;
+    background-color: #4c0708;
     border-radius: 6px;
     color: white;
     padding: 4px 20px;

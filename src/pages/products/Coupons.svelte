@@ -88,8 +88,8 @@
     font-size: 0.9em;
     color: white;
     font-family: RobotoBold;
-    border: 1px solid #b52124;
-    background: #b52124;
+    border: 1px solid #4c0708;
+    background: #4c0708;
     border-radius: 20px;
     width: 25px;
     height: 25px;

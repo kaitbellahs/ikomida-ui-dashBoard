@@ -13,9 +13,9 @@
   import { onMount } from "svelte";
 
   let isLoading = false;
-  let ikomidaid = "com.ikomida.br.default";
-  let phone = "11953635016";
-  let initialValue = "(11) 95363-5016";
+  let ikomidaid = "br.com.ikomida.ikomida";
+  let phone = "11945930909";
+  let initialValue = "(11) 94593-0909";
   let password = "123456";
 
   let errorAlert;
@@ -66,7 +66,7 @@
 {/if}
 <main>
   <div class="avatar">
-    <img src="/Assets/Icons/logo.svg" alt="iKomida" />
+    <img src="/Assets/Icons/transparent-logo-1.svg" alt="iKomida" />
   </div>
   <Views.TextEdit
     bind:value={ikomidaid}
@@ -105,6 +105,11 @@
     padding: 1em;
     min-width: 90%;
     margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    place-content: center;
+    height: 100vh;
   }
 
   h1 {

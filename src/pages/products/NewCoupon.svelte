@@ -3,7 +3,7 @@
   import Fa from "svelte-fa";
   import { faEdit } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
-  import { Views, Types } from "@ikomida/components";
+  import { Views, Types, Utils } from "@ikomida/components";
   import { newCoupon } from "../../network/Payment";
 
   let item = {
@@ -28,10 +28,15 @@
     oldSelectedDiscountType = selectedDiscountType;
   }
   $: canContinue =
-  item?.name && (item?.name?.length || 0) <= 255 &&
-  item?.validity &&
-  ((selectedDiscountType && selectedDiscountType.name !== Types.DiscountTypes.NO) ? (item?.value && (Number(item?.value || 0)) <= 99999999.99) : true) &&
-  item?.quantity && (Number(item?.quantity || 0)) <= 2147483647;
+    item?.name &&
+    (item?.name?.length ?? 0) <= 255 &&
+    item?.validity &&
+    selectedDiscountType &&
+    selectedDiscountType.name !== Types.DiscountTypes.NO &&
+    item?.value &&
+    Utils.Numbers.toFinanceNumber(item?.value ?? 0) <= 99999999.99 &&
+    item?.quantity &&
+    Utils.Numbers.toFinanceNumber(item?.quantity ?? 0) <= 2147483647;
 
   function toggleErrorAlert(messageObject) {
     errorAlert = messageObject;
@@ -73,7 +78,7 @@
   />
   <Views.Selector
     bind:selected={selectedDiscountType}
-    name="seleciona uma opção"
+    name="selecione uma opção"
     options={Types.DiscountTypes.list}
   />
   {#if selectedDiscountType}
@@ -94,7 +99,10 @@
     {/if}
   {/if}
   <Views.Divider />
-  <Views.Button disabled={!canContinue} on:click={submit} bottomPadding={$StatusBar.bottomPadding}
+  <Views.Button
+    disabled={!canContinue}
+    on:click={submit}
+    bottomPadding={$StatusBar.bottomPadding}
     ><Fa icon={faEdit} /> <span>Salvar</span></Views.Button
   >
 </div>
