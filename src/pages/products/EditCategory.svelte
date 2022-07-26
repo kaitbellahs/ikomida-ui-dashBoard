@@ -13,9 +13,9 @@
 
   $: canContinue =
     item?.title &&
-    (item?.title?.length || 0) <= 255 &&
+    (item?.title?.length ?? 0) <= 255 &&
     item?.description &&
-    (item?.lastName?.length || 0) <= 1000;
+    (item?.lastName?.length ?? 0) <= 1000;
 
   function toggleErrorAlert(messageObject) {
     errorAlert = messageObject;

@@ -23,7 +23,7 @@ function createAuth() {
 			token = null;
 			//TODO: -- report errors
 		}
-		if (token === "" || token === null) token = null;
+		if (token === "" || !token) token = null;
 		setter(token);
 	});
 
@@ -60,7 +60,7 @@ function createUserInfo() {
 		set
 	} = writable({
 		avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAArHbV6gqS70hTQBiPnvI-mRMZw85ItexDw&usqp=CAU",
-		name: "Folano de Santos e Diabos"
+		name: ""
 	});
 
 	return {

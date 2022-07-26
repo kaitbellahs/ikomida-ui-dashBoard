@@ -55,36 +55,17 @@
 
   $: if ($Router.options) {
     integratePagSeguro = { ...integratePagSeguro, ...$Router.options };
-    CAPNativeLog.log({
-      level: "info",
-      message: `$Router.options: ${JSON.stringify($Router.options)}`,
-    });
   }
 
   $: if (integratePagSeguro?.callback && !paymentGateway?.type) {
     integratePagSeguro.callback = false;
-    CAPNativeLog.log({
-      level: "info",
-      message: `integratePagSeguro?.url: ${
-        integratePagSeguro?.url
-      }, typeof:${typeof integratePagSeguro}`,
-    });
-    console.log(integratePagSeguro);
     if (integratePagSeguro?.url) {
       isLoading = true;
       const url = new URL(integratePagSeguro?.url);
       const code = url.searchParams.get("code");
       const state = url.searchParams.get("state");
       const payload = { code, state };
-      CAPNativeLog.log({
-        level: "info",
-        message: `updatePaymentGateway: ${JSON.stringify(payload)}`,
-      });
       updatePaymentGateway(payload).then((response) => {
-        CAPNativeLog.log({
-          level: "info",
-          message: `response: ${JSON.stringify(response)}`,
-        });
         if (!response?.success) {
           toggleErrorAlert(response?.data);
         } else {
@@ -109,7 +90,7 @@
     if(!business?.hours){
       business.hours = []
     }
-    business.hours.push({ id: uuid(), start: null, end: null });
+    business.hours.push({ id: uuid(), start: '08:00', end: '23:59' });
     business.hours = business.hours;
   };
 
@@ -119,20 +100,31 @@
     );
   }
 
+  function validateTime(timeString){
+    const timeArray = timeString?.split(":") ?? []
+    if((timeArray?.length ?? 0) !== 2){
+      return false
+    }
+    if(Number(Utils.Numbers.toNumber(timeArray?.[0])) >= 24 || Number(Utils.Numbers.toNumber(timeArray?.[1])) >= 60){
+      return false
+    }
+    return true;
+  }
+
   async function updateHours() {
     isLoading = true;
     if (business.hours === null || business.hours.length < 1) {
-      toggleErrorAlert("Precisa escolher pelo menos um horario de funcionamento!");
+      toggleErrorAlert("Precisa escolher pelo menos um horário de funcionamento!");
       isLoading = false;
       return;
     }
     for (const businessHour of business?.hours) {
-      if (businessHour?.start === null || businessHour?.start?.length < 4) {
-        toggleErrorAlert("horario de abertura invalido!");
+      if (!validateTime(businessHour?.start)) {
+        toggleErrorAlert("O horário de abertura é inválida, o formato deve ser HH:mm e entre 00:00 e 23:59!");
         isLoading = false;
         return;
-      } else if (businessHour?.end === null || businessHour?.end?.length < 4) {
-        toggleErrorAlert("horario de fechamento invalido!");
+      } else if (!validateTime(businessHour?.end)) {
+        toggleErrorAlert("O horário de fechamento é inválida, o formato deve ser HH:mm e entre 00:00 e 23:59!");
         isLoading = false;
         return;
       }
@@ -150,7 +142,7 @@
     }
     let response = await updateBusinessHours(business);
     if (response.success) {
-      toggleErrorAlert("horario de funcionamento atualizado com sucesso!");
+      toggleErrorAlert("O horário de funcionamento atualizado com sucesso!");
     } else {
       toggleErrorAlert(response?.data);
       isLoading = false;
@@ -158,15 +150,6 @@
     }
     isLoading = false;
   }
-
-  // async function setPaymentGateway() {
-  //   isLoading = true;
-  //   const response = await updatePaymentGateway(paymentGateway);
-  //   if (!response?.success) {
-  //     toggleErrorAlert(response?.data);
-  //   }
-  //   isLoading = false;
-  // }
 
   async function updateDelivery() {
     isLoading = true;
@@ -183,7 +166,7 @@
       const response = await revokePaymentGateway;
       if (response?.success) {
         toggleErrorAlert(
-          `a integração do pagseguro com nossos sistemas foi revogado com sucesso!`
+          `A integração dos nossos nossos sistemas com o pagseguro foi revogado com sucesso!`
         );
       } else {
         toggleErrorAlert(
@@ -196,7 +179,7 @@
         const url = response?.data?.url;
         if (!url) {
           toggleErrorAlert(
-            `Não foi possível obter url de integração, tente novamente mais tarde!`
+            `Não foi possível obter a url de integração, tente novamente mais tarde!`
           );
           return;
         }
@@ -207,7 +190,7 @@
           await AppLauncher.openUrl({ url });
           await Clipboard.write({ string: url });
           toggleErrorAlert(
-            `Não foi possível abrir navigador externo: por favor abrir o seu navigaro e digitar esa URL: ${url}, também foi copiado para sua área de transferência!`
+            `Se o navegador externo no for aberto automaticamente, por favor o abra e digita esa URL: ${url}, que também foi copiado para sua área de transferência!`
           );
         }
       }
@@ -227,13 +210,14 @@
     preparation = { ...preparation, ...response?.preparation };
   });
 
-  Title.set("Ajustes");
+  Title.set("Seus ajustes");
 </script>
 
 <div class="settings">
   <div class="data">
     <h2>horário de funcionamento</h2>
-    {#each business?.hours || [] as businessHour}
+    {#if business?.hours}
+    {#each business?.hours ?? [] as businessHour}
       <div class="busninessHours">
         <span on:click={onRemoveClick(businessHour.id)} class="remove"
           ><Fa icon={faTrashAlt} /></span
@@ -260,30 +244,36 @@
         </div>
       </div>
     {/each}
+    {:else}
+    <Views.Divider />
+    <span>Você precisa definir seus horários de funcionamento</span>
+    {/if}
     <Views.Divider />
     <Views.Button on:click={addHours}
-      ><Fa icon={faClock} /><span>Adicionar horarios</span></Views.Button
+      ><Fa icon={faClock} /><span>Adicionar horários</span></Views.Button
     >
+    <div class="days">
     {#each days as day}
-      <div class="address">
-          <Views.Checkbox bind:checked={day.checked} label={day.name} />
+      <div class="day">
+          <Views.Checkbox marginTop=0 bind:checked={day.checked} label={day.name} />
       </div>
     {/each}
+  </div>
     <Views.Button on:click={updateHours}
-      ><Fa icon={faClock} /><span>Atualizar horarios</span></Views.Button
+      ><Fa icon={faClock} /><span>Atualizar horários</span></Views.Button
     >
-    <!-- <Views.Divider />
-    <Views.Button on:click={setPaymentGateway}>Atualizar os dados</Views.Button> -->
     <Views.Divider />
-    <h2>Gateway de pagamentos</h2>
+    <h2>Portais de pagamentos</h2>
+    <Views.Divider />
     <Views.Button on:click={requestPagSeguroIntegration} 
       >{integrateButtonName}</Views.Button
     >
 
     <Views.Divider />
-    <h2>Delivery</h2>
+    <h2>A entrega</h2>
     <Views.Divider />
     <h3>Tempo de preparação em minutos</h3>
+    <small>Quanto tempo você vai precisar para preparar seus pedidos em média?</small>
     <div class="twoCells">
       <Views.TextEdit
         name="Tempo mínimo:"
@@ -304,6 +294,7 @@
     </div>
     <Views.Divider />
     <h3>Valor de entrega</h3>
+    <small>Vai querer pagar seus entregador quanto por entrega por Km? (o quanto mais você paga seus entregadores ficaram felizes e seus clientes tristes e vice versa)</small>
     <Views.Switch name="Frete grátis:" bind:checked={delivery.free} />
     {#if !(delivery?.free || false)}
       <Views.TextEdit
@@ -322,7 +313,7 @@
       />
     {/if}
     <Views.Divider />
-    <Views.Button on:click={updateDelivery}>Atualizar delivery</Views.Button>
+    <Views.Button on:click={updateDelivery}>Atualizar a entrega</Views.Button>
   </div>
 </div>
 
@@ -349,20 +340,6 @@
     float: left;
     margin-top: 20px;
   }
-  .avatarCircle {
-    font-size: 3em;
-    height: 90px;
-    width: 90px;
-    background: #ccc;
-    border-radius: 45px;
-    float: left;
-    line-height: 90px;
-    text-align: center;
-    vertical-align: middle;
-    display: table-cell;
-    overflow: hidden;
-    margin-right: 10px;
-  }
   .busninessHours {
     position: relative;
   }
@@ -384,5 +361,23 @@
   }
   .twoCells {
     display: flex;
+  }
+  .settings > .data > .days {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .settings > .data > .days > .day {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin: 5px;
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    flex-basis: 40%;
+    text-shadow: 0.5px 1px #18056b66;
+    box-shadow: 1px 1.5px #00000099;
   }
 </style>

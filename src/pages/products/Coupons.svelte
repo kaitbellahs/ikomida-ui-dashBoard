@@ -1,15 +1,67 @@
 <script>
-  import { Title, Navigation, Router, Routes } from "../../stores/Navigation";
+  import {
+    Title,
+    Navigation,
+    Router,
+    Routes,
+    Menu,
+  } from "../../stores/Navigation";
   import Fa from "svelte-fa";
-  import { faEdit, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
+  import {
+    faEdit,
+    faTrashAlt,
+    faSync,
+  } from "@fortawesome/free-solid-svg-icons";
   import { Views, Utils } from "@ikomida/components";
-  import { getCoupon, deleteCoupon } from "../../network/Payment";
+  import { getCoupons, deleteCoupon } from "../../network/Payment";
   import { StatusBar } from "../../stores/Setup";
   import { onMount } from "svelte";
+  import Cache from "../../stores/Cache";
+  let coupons;
+
+  const CACHE_NAME = "COUPONS";
+  let hasMore = true;
+  let canGetMore = true;
+  let lastTimestamp = null;
+
+  async function getMore(e, refresh = false) {
+    if (refresh || (canGetMore && hasMore)) {
+      isLoading = true;
+      const timestamp = refresh
+        ? 0
+        : coupons?.[coupons.length - 1]?.timestamp ?? -1;
+      canGetMore = false;
+      coupons = Cache.getObject(CACHE_NAME);
+      const newCoupons = await getCoupons(timestamp);
+      hasMore = newCoupons.length > 0;
+      coupons = refresh
+        ? newCoupons
+        : coupons
+        ? [...coupons, ...newCoupons]
+        : newCoupons;
+      coupons.sort((item1, item2) => item2.timestamp - item1.timestamp);
+      Cache.setObject(CACHE_NAME, coupons);
+      canGetMore = refresh || lastTimestamp !== timestamp;
+      lastTimestamp = timestamp;
+      isLoading = false;
+    }
+  }
+
+  onMount(async () => {
+    coupons = Cache.getObject(CACHE_NAME);
+    if (!coupons) {
+      await getMore(null, true);
+    }
+  });
+
+  async function refresh() {
+    await getMore(null, true);
+  }
+
+  Menu.addItem({ name: "Atualizar", icon: faSync, callback: refresh });
 
   const item = $Router.options;
   let isLoading = false;
-  let coupons = [];
 
   let errorAlert;
   let showAlert = false;
@@ -18,12 +70,6 @@
     errorAlert = messageObject;
     showAlert = true;
   }
-
-  onMount(async () => {
-    isLoading = true;
-    coupons = await getCoupon();
-    isLoading = false;
-  });
 
   const newCoupon = async () => {
     Navigation.goTo(Routes.newCoupon, { item, edit: false });
@@ -54,7 +100,7 @@
       ><Fa icon={faEdit} /> <span>Novo cupom</span></Views.Button
     >
     <Views.Divider />
-    {#if coupons.length > 0}
+    {#if coupons && coupons.length > 0}
       {#each coupons as coupon}
         <article>
           <span on:click={removeCoupon(coupon.id)} class="remove"
@@ -65,8 +111,19 @@
           <div>{Utils.Strings.dateToDateString(coupon.validity)}</div>
         </article>
       {/each}
+      <Views.Divider />
+      {#if hasMore && !canGetMore}
+        <Views.LocalLoading />
+      {:else}
+        <Views.Button disabled={!hasMore || !canGetMore} on:click={getMore}
+          >carregar mais</Views.Button
+        >
+      {/if}
     {:else}
-      <h2>Não há cupons encontrados</h2>
+      <h2>
+        Não há cupons para exibir por enquanto, aproveite e cadastre novos
+        cupons para agradar seus clientes!
+      </h2>
     {/if}
   </section>
 {/if}

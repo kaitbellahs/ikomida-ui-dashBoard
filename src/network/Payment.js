@@ -13,13 +13,15 @@ export async function GetPaymentMethods() {
 }
 
 export function PaymentType(type) {
-    switch (type) {
-        case "creditCard":
+    switch (type?.toLowerCase()) {
+        case "creditcard":
             return "cartão de crédito";
         case "pix":
             return "PIX";
         case "boleto":
             return "boleto bancário";
+        case "cash":
+            return "Dinheiro";
         default:
             return "-";
     }
@@ -29,9 +31,9 @@ export async function newCoupon(coupon) {
     return Network.instance.post(`/coupon`, get(Auth), coupon);
 }
 
-export async function getCoupon() {
-    const response = await Network.instance.get(`/coupons`, get(Auth));
-    if(response?.success){
+export async function getCoupons(timestamp = 0) {
+    const response = await Network.instance.get(`/coupons/${timestamp}`, get(Auth));
+    if (response?.success) {
         return response?.data;
     }
     return [];
@@ -39,7 +41,7 @@ export async function getCoupon() {
 
 export async function countCoupons() {
     let response = await Network.instance.get("/couponsCount", get(Auth));
-    if(response?.success){
+    if (response?.success) {
         return response?.data
     }
     return 0;

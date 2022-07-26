@@ -6,17 +6,64 @@
     Menu,
     Routes,
   } from "../../stores/Navigation";
-  import { GetOrders, OrderStatus } from "../../network/Orders";
+  import { getOrders , OrderStatus } from "../../network/Orders";
   import { Views, Utils, Types } from "@ikomida/components";
   import { PaymentType } from "../../network/Payment";
   import { ChangeOrderStatus } from "../../network/Orders";
   import { StatusBar } from "../../stores/Setup";
-  import { faHistory } from "@fortawesome/free-solid-svg-icons";
+  import { faHistory, faSync } from "@fortawesome/free-solid-svg-icons";
+  import Cache from "../../stores/Cache";
+  let orders;
 
+  let hasMore = true;
+  let canGetMore = true;
+  let lastTimestamp = null;
+
+  async function getMore(e, refresh = false) {
+    if (refresh || (canGetMore && hasMore)) {
+      isLoading = true;
+      const timestamp = refresh
+        ? 0
+        : orders?.[orders.length - 1]?.timestamp ?? -1;
+      canGetMore = false;
+      orders = Cache.getObject(CACHE_NAME);
+      const newOrders = (await getOrders($Router.options, timestamp))?.map(
+        (order) => {
+          order.selected = orderOptions(order?.id)?.filter(
+            (option) => option?.id === order?.status
+          )?.[0];
+          order.oldSelected = order?.selected;
+          return order;
+        }
+      );
+      hasMore = newOrders.length > 0;
+      orders = refresh
+        ? newOrders
+        : orders
+        ? [...orders, ...newOrders]
+        : newOrders;
+      orders.sort((item1, item2) => item2.timestamp - item1.timestamp);
+      Cache.setObject(CACHE_NAME, orders);
+      canGetMore = refresh || lastTimestamp !== timestamp;
+      lastTimestamp = timestamp;
+      isLoading = false;
+    }
+  }
+
+async function update() {
+  orders = Cache.getObject(CACHE_NAME);
+  if (!orders) {
+    await getMore(null, true);
+  }
+}
+
+  async function refresh() {
+    await getMore(null, true);
+  }
+  
   const orderFinishedOptions = ["waitingPayment", "delivered", "canceled"];
 
   let isLoading = false;
-  let orders = [];
   let errorAlert;
   let showAlert = false;
   const orderOptions = (orderID) => [
@@ -52,19 +99,22 @@
     }),
   ];
 
-  $: if ($Router.options === null || $Router.options !== null) {
-    if ($Router.options === null || !$Router.options) {
+
+  $: CACHE_NAME = $Router?.options ? "ORDERS_HISTORY" : "ORDERS";
+  $: if ($Router?.options === null || $Router?.options !== null) {
+    if (!$Router?.options) {
       Menu.addItem({
         icon: faHistory,
         name: "Históricos",
         callback: goToOrdersHistory,
       });
     }
+    Menu.addItem({ name: "Atualizar", icon: faSync, callback: refresh });
     update();
   }
 
-  $: orders.forEach((order) => {
-    if (order?.selected && order?.selected?.id !== order?.oldSelected?.id) {
+  $: orders?.forEach((order) => {
+    if (order?.selected && order?.selected?.id && order?.selected?.id !== order?.oldSelected?.id) {
       isLoading = true;
       ChangeOrderStatus(order?.selected?.orderID, order?.selected?.id)
         .then((response) => {
@@ -85,18 +135,6 @@
   function toggleErrorAlert(messageObject) {
     errorAlert = messageObject;
     showAlert = true;
-  }
-
-  async function update() {
-    isLoading = true;
-    orders = (await GetOrders($Router.options))?.map((order) => {
-      order.selected = orderOptions(order?.id)?.filter(
-        (option) => option?.id === order?.status
-      )?.[0];
-      order.oldSelected = order?.selected;
-      return order;
-    });
-    isLoading = false;
   }
 
   function goToOrder(id) {
@@ -120,7 +158,7 @@
   />
 {/if}
 <div>
-  {#if orders.length > 0}
+  {#if orders && orders.length > 0}
     {#each orders as order}
       <div class="leftShadow orderContainer">
         <div on:click={goToOrder(order?.id)}>
@@ -165,10 +203,18 @@
         {/if}
       </div>
     {/each}
+    <Views.Divider />
+    {#if hasMore && !canGetMore}
+      <Views.LocalLoading />
+    {:else}
+      <Views.Button disabled={!hasMore || !canGetMore} on:click={getMore}
+        >carregar mais</Views.Button
+      >
+    {/if}
   {:else}
     <div id="noOrders">
       <h2>
-        Não há pedido para exiber por enquanto, aproveite e divulga ja seu app
+        Não há pedido para exibir por enquanto, aproveite e divulga ja seu app
         com seus clientes!
       </h2>
     </div>

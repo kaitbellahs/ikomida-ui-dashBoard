@@ -13,7 +13,6 @@
 
   onMount(async () => {
     isLoading = true;
-    console.log(1);
     term = await getTermsOfUse();
     if (term) {
       Title.set(term?.name);
@@ -61,7 +60,6 @@
   .jambtron {
     display: flex;
     flex-direction: column;
-    /* align-items: center; */
     place-content: center;
     margin-bottom: 30px;
     min-height: 20vh;

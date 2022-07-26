@@ -13,10 +13,10 @@
   import { onMount } from "svelte";
 
   let isLoading = false;
-  let ikomidaid = "br.com.ikomida.ikomida";
-  let phone = "11945930909";
-  let initialValue = "(11) 94593-0909";
-  let password = "123456";
+  let ikomidaid = "com.ikomida.br.";
+  let phone
+  let initialValue
+  let password
 
   let errorAlert;
   let showAlert = false;
@@ -48,7 +48,7 @@
         }
         Navigation.reset(Routes.home);
       } else {
-        toggleErrorAlert("Token não é valido");
+        toggleErrorAlert("O token de acesso não é válido");
       }
     } else {
       toggleErrorAlert(response?.data);
@@ -68,6 +68,7 @@
   <div class="avatar">
     <img src="/Assets/Icons/transparent-logo-1.svg" alt="iKomida" />
   </div>
+  <small>Digite aqui o ID do seu estabelecimento</small>
   <Views.TextEdit
     bind:value={ikomidaid}
     bind:rawValue={ikomidaid}
@@ -80,13 +81,13 @@
     bind:value={initialValue}
     icon={faPhone}
     type="phone"
-    placeHolder="Numero de celular"
+    placeHolder="Número de celular"
     bind:isValid={isValidPhone}
   />
   <Views.TextEdit
     bind:value={password}
     icon={faUnlock}
-    placeHolder="Senha"
+    placeHolder="Sua senha"
     secret={true}
     type="password"
     bind:isValid={isValidPassword}
@@ -94,7 +95,7 @@
   <div />
   <Views.Button on:click={doLogin} disabled={!canLogin}>Entrar</Views.Button>
   <Views.Button type="transparent" on:click={forgotPassword}
-    >Esqueci minha senha</Views.Button
+    >Recuperar a senha</Views.Button
   >
   <Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 </main>
@@ -111,14 +112,6 @@
     place-content: center;
     height: 100vh;
   }
-
-  h1 {
-    color: #ff3e00;
-    text-transform: uppercase;
-    font-size: 4em;
-    font-weight: 100;
-  }
-  main > p,
   main > div {
     margin-bottom: 30px;
   }

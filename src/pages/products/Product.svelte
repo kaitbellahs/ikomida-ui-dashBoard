@@ -55,7 +55,7 @@
   <h2>{item.title}</h2>
   <p>{item.description}</p>
   <span class="serves"
-    >Aproximadamente {Utils.Strings.formatNumber(item.weight)} Kg</span
+    >Aproximadamente {Utils.Numbers.formatWeight(item.weight)}</span
   >
 
   <div class="price">
@@ -69,7 +69,7 @@
     >
   </div>
   <div class="quantity">
-    Resta{item.quantity > 1 ? "m" : ""} <span>{item.quantity}</span> unidades
+    Resta{item.quantity > 1 ? "m" : ""} <span>{item.quantity}</span> unidade{item.quantity > 1 ? "s" : ""}
   </div>
   <Views.Divider />
   <Views.Button on:click={removeProduct}

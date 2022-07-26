@@ -1,7 +1,12 @@
 {
-  "appId": "br.com.ikomida.vendor",
+  "appId": "com.ikomida.br.vendor",
   "appName": "iKomida",
   "webDir": "public",
   "bundledWebRuntime": false,
-  "npmClient": "npm"
+  "npmClient": "npm",
+  "plugins": {
+    "PushNotifications": {
+      "presentationOptions": ["badge", "sound", "alert"]
+    }
+  }
 }

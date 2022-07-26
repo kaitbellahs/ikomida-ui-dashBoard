@@ -96,7 +96,8 @@
 </script>
 
 <main
-style="--paddingTop:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; --paddingBottom: 50px; overflow: scroll;max-width: 100%;height: 100%;">
+  style="--paddingTop:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; --paddingBottom: 50px; overflow: scroll;max-width: 100%;height: 100%;"
+>
   {#if route == Routes.home}
     <Home />
   {:else if route == Routes.orders}

@@ -42,22 +42,22 @@
 
   async function editPassword() {
     if (passwordObject.oldPass === null || passwordObject.oldPass.length < 6) {
-      toggleErrorAlert("Senha atual invalida!");
+      toggleErrorAlert("A senha atual não está correta!");
       return;
     } else if (
       passwordObject.newPass === null ||
       passwordObject.newPass.length < 6
     ) {
-      toggleErrorAlert("A nova senha invalida!");
+      toggleErrorAlert("A nova senha não está correta!");
       return;
     } else if (passwordObject.newPass !== passwordObject.reNewPass) {
-      toggleErrorAlert("Senha nova e verifição não confirem");
+      toggleErrorAlert("A confirmação da senha não está correta");
       return;
     }
     isLoading = true;
     let response = await updatePassword(passwordObject);
     if (response.success) {
-      toggleErrorAlert("Senha atualizada com sucesso!");
+      toggleErrorAlert("A sua senha foi atualizada com sucesso!");
     } else {
       toggleErrorAlert(response?.data);
       isLoading = false;
@@ -114,6 +114,9 @@
       <div class="avatarCircle">
         {profile?.restaurantName?.[0]}{profile?.restaurantName?.[1]}
       </div>
+      <Views.Divider />
+      <small>
+        Esse é o lugar da foto do logo do seu estabelecimento que vai aparecer no app dos seus clientes e para atualizá-la clica na câmera no canto superior esquerdo da foto</small>
     {/if}
     <img
       class="upload"
@@ -154,13 +157,13 @@
       fontSize="1.3em"
       leftMargin="30"
     />
-    <Views.TextEdit
-      bind:rawValue={profile.phone}
-      bind:value={profile.phone}
-      icon={faPhone}
-      type="phone"
-      placeHolder="Celular:"
-      bind:isValid={validPhone}
+    <Views.TextValue
+      text="Celular:"
+      value={Utils?.Strings?.formatAsPhone(
+        profile?.phone
+      )}
+      fontSize="1.3em"
+      leftMargin="30"
     />
     <Views.TextEdit
       bind:rawValue={profile.email}
@@ -171,7 +174,7 @@
     />
     <Views.Divider />
     </div>
-    <Views.Button on:click={update}>Atualizar os dados</Views.Button>
+    <Views.Button on:click={update}>Atualizar o email</Views.Button>
     <div class="data">
     <h2>Senha</h2>
     <Views.TextEdit
@@ -198,7 +201,7 @@
     />
     <Views.Divider />
   </div>
-  <Views.Button on:click={editPassword}>Atualizar senha</Views.Button>
+  <Views.Button on:click={editPassword}>Atualizar a senha</Views.Button>
   <Views.Button type="transparent" on:click={logout}>Logout</Views.Button>
 </div>
 

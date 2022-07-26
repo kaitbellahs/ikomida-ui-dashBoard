@@ -6,16 +6,18 @@
   import { countCoupons } from "../../network/Payment";
   import { Views } from "@ikomida/components";
 
-  Title.set("Home");
+  Title.set("Dashboard");
 </script>
 
+<h2>Essas são algumas estatísticas sobre seu estabelecimento</h2>
+<Views.Divider />
 <section>
   <article>
     {#await countProducts()}
       <Views.LocalLoading />
     {:then productsCount}
       <span class="count">{productsCount}</span>
-      <span class="name">produtos</span>
+      <span class="name">Produtos</span>
     {/await}
   </article>
   <article>
@@ -23,7 +25,7 @@
       <Views.LocalLoading />
     {:then ordersCount}
       <span class="count">{ordersCount}</span>
-      <span class="name">pedidos</span>
+      <span class="name">Pedidos</span>
     {/await}
   </article>
   <article>

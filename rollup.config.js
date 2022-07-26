@@ -11,6 +11,7 @@ import sveltePreprocess from 'svelte-preprocess';
 import {
 	asMarkupPreprocessor
 } from 'svelte-as-markup-preprocessor';
+import replace from "@rollup/plugin-replace";
 // import obfuscatorPlugin from 'rollup-plugin-javascript-obfuscator';
 
 const production = !process.env.ROLLUP_WATCH;
@@ -46,6 +47,10 @@ export default {
 		file: 'public/build/bundle.js'
 	},
 	plugins: [
+        replace({
+			preventAssignment: true,
+            isProduction: process.env.ENV === 'prod',
+        }),
 		svelte({
 			preprocess: [
 				// obfuscatorPlugin({

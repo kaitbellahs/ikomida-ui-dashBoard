@@ -39,19 +39,22 @@
     logedIn = false;
   }
 
+  $: Utils.Jws.extractToken($Auth).then((token) => {CAPNativeLog.log({level: "info", message: `Login info: ${logedIn}, token ${JSON.stringify(token)}`})
+    });
+  $: CAPNativeLog.log({level: "info", message: `Login info: ${logedIn}, $Auth: ${$Auth}`})
+
   async function hasRegisteredCallBack(token, platform) {
-    CAPNativeLog.log({ level: "info", message: JSON.stringify(token) });
     const tokenObject = { platform, token };
     PushNotificationToken.setToken(tokenObject);
     await registerPushNotificationToken(tokenObject);
   }
 
   function pushNotificationReceivedCallBack(notification) {
-    CAPNativeLog.log({ level: "info", message: JSON.stringify(notification) });
+    // CAPNativeLog.log({ level: "info", message: JSON.stringify(notification) });
   }
 
   function pushNotificationActionPerformedCallBack(notification) {
-    CAPNativeLog.log({ level: "info", message: JSON.stringify(notification) });
+    // CAPNativeLog.log({ level: "info", message: JSON.stringify(notification) });
   }
 
   onMount(async () => {
@@ -65,22 +68,14 @@
   Network.addListener("networkStatusChange", (status) => {
     networkStatus = status;
   });
-  // App.addListener("appStateChange", ({ isActive }) => {
-  //   console.log("App state changed. Is active?", isActive);
-  // });
-
+  
   App.addListener("appUrlOpen", (data) => {
-    console.log("App opened with URL:", data);
-    CAPNativeLog.log({
-      level: "info",
-      message: `App opened with URL: ${JSON.stringify(data)}`,
-    });
+    // CAPNativeLog.log({
+    //   level: "info",
+    //   message: `App opened with URL: ${JSON.stringify(data)}`,
+    // });
     Navigation.goTo(Routes.settings, { callback: true, ...data });
   });
-
-  // App.addListener("appRestoredResult", (data) => {
-  //   console.log("Restored state:", data);
-  // });
 </script>
 
 {#if networkStatus == null || !networkStatus.connected}

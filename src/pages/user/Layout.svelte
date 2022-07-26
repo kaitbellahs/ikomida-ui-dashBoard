@@ -74,7 +74,7 @@
       var comparation = array.shift();
       var match = new RegExp("(.+)\\[([0-9]*)\\]").exec(comparation);
 
-      if ((match?.length || 0) == 3) {
+      if ((match?.length ?? 0) == 3) {
         var arrayData = {
           arrayName: match[1],
           arrayIndex: match[2],
@@ -134,14 +134,12 @@
       </div>
       <div class="body">
         <div class="box">
-          Lorem Ipsum is simply dummy text of the printing and typesetting
-          industry. Lorem Ipsum has been the industry's standard dummy text ever
-          since the 1500s.<br />
-          <span style="color: {layout.link};">Isso e um link</span>
+          Aqui é uma simulação dos textos normais do seu app.<br />
+          <span style="color: {layout.link};">Aqui está um link</span>
         </div>
         <button
           style="background: {layout.button.background};color: {layout.button
-            .color}">button text</button
+            .color}">Aqui um texto dentro de um botão</button
         >
       </div>
       <div
@@ -161,6 +159,7 @@
     </div>
     <Views.Divider />
     <h2>Layout</h2>
+    <small>Aqui você pode alterar as cores do seu app como quiser</small>
     <div id="options">
       <Views.TextEdit
         type="color"
@@ -212,13 +211,13 @@
       />
       <Views.TextEdit
         type="color"
-        name="A cor do fundo do button:"
+        name="A cor do fundo do botão:"
         bind:value={layout.button.background}
         placeHolder=""
       />
       <Views.TextEdit
         type="color"
-        name="A cor do button:"
+        name="A cor do botão:"
         bind:value={layout.button.color}
         placeHolder=""
       />
@@ -236,7 +235,7 @@
       />
     </div>
     <Views.Divider />
-    <Views.Button on:click={setLaout}>Atualizar layout</Views.Button>
+    <Views.Button on:click={setLaout}>Atualizar o layout</Views.Button>
   </div>
 </div>
 
@@ -305,6 +304,9 @@
     margin-bottom: 4px;
     height: 8px;
     border-radius: 4px;
+  }
+  .sample > .body > .box {
+    margin-top: 30px;
   }
   .sample > .tabs {
     display: flex;

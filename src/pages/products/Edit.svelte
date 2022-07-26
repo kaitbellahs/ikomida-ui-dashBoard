@@ -35,9 +35,9 @@
   $: canContinue =
     item?.category &&
     item?.title &&
-    (item?.title?.length || 0) <= 255 &&
+    (item?.title?.length ?? 0) <= 255 &&
     item?.description &&
-    (item?.lastName?.length || 0) <= 1000 &&
+    (item?.lastName?.length ?? 0) <= 1000 &&
     item?.weight &&
     Number(item?.weight || 0) <= 99999999.99 &&
     item?.price &&

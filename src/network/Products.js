@@ -31,7 +31,7 @@ export async function all() {
 
 export async function countProducts() {
     let response = await Network.instance.get("/productsCount", get(Auth));
-    if(response?.success){
+    if (response?.success) {
         return response?.data
     }
     return 0;
