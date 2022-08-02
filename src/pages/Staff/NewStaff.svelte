@@ -5,6 +5,8 @@
   import { StatusBar } from "../../stores/Setup";
   import { Views, Utils } from "@ikomida/components";
   import { addStaff, GetAddressByCep } from "../../network/Staff";
+  import Cache from "../../stores/Cache";
+  const CACHE_NAME = "STAFF";
 
   let items = {
     name: null,
@@ -79,16 +81,7 @@
           const address = response?.data;
           currentPostalCode = address?.postalCode;
           items.address = { ...items?.address, ...address };
-          itemsInputs.address.street.updateValue(items?.address?.street);
-          itemsInputs.address.number.updateValue(items?.address?.number);
-          itemsInputs.address.complement.updateValue(
-            items?.address?.complement
-          );
-          itemsInputs.address.neighborhood.updateValue(
-            items?.address?.neighborhood
-          );
-          itemsInputs.address.city.updateValue(items?.address?.city);
-          itemsInputs.address.stat.updateValue(items?.address?.stat);
+          Utils?.Objects?.UpdateInputs(itemsInputs, items);
         } else {
           toggleErrorAlert(response?.data);
         }
@@ -109,6 +102,7 @@
     isLoading = true;
     let response = await addStaff(items);
     if (response.success) {
+      Cache.setObject(CACHE_NAME, null);
       Navigation.pop();
     } else {
       toggleErrorAlert(response?.data);

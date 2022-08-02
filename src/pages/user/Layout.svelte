@@ -1,18 +1,13 @@
 <script>
-  import { Auth } from "../../stores/Auth";
   import { Title } from "../../stores/Navigation";
-  import { Views } from "@ikomida/components";
+  import { Views, Utils } from "@ikomida/components";
   import { getLayout, updateLayout } from "../../network/Layout";
   import { StatusBar } from "../../stores/Setup";
-  import { HsvPicker } from "svelte-color-picker";
   import { onMount } from "svelte";
 
   let isLoading = false;
-  let showPicker = false;
   let errorAlert;
   let showAlert = false;
-  let pickerTop = 0;
-  let currentItem;
 
   let layout = {
     link: "#e8d130",
@@ -26,6 +21,19 @@
     tabs: { background: "#ffe4c4", color: "#4c0708" },
     button: { background: "#4c0708", color: "#ffffff" },
     dialog: { background: "#ffffffdf", color: "#4c0708" },
+  };
+  let layoutInputs = {
+    link: null,
+    background: null,
+    color: null,
+    header: {
+      color: null,
+      background: null,
+      menuHamburger: null,
+    },
+    tabs: { background: null, color: null },
+    button: { background: null, color: null },
+    dialog: { background: null, color: null },
   };
 
   function toggleErrorAlert(messageObject) {
@@ -42,74 +50,11 @@
     isLoading = false;
   }
 
-  function colorCallback(rgba) {
-    rgba = rgba.detail;
-    var a,
-      isPercent,
-      rgb = `rgba(${rgba.r}, ${rgba.g}, ${rgba.b}, ${rgba.a})`
-        .replace(/\s/g, "")
-        .match(/^rgba?\((\d+),(\d+),(\d+),?([^,\s)]+)?/i),
-      alpha = ((rgb && rgb[4]) || "").trim(),
-      hex = rgb
-        ? (rgb[1] | (1 << 8)).toString(16).slice(1) +
-          (rgb[2] | (1 << 8)).toString(16).slice(1) +
-          (rgb[3] | (1 << 8)).toString(16).slice(1)
-        : rgba;
-
-    if (alpha !== "") {
-      a = alpha;
-    } else {
-      a = 1;
-    }
-    a = ((a * 255) | (1 << 8)).toString(16).slice(1);
-    hex = hex + a;
-    getSetDescendantProp(layout, currentItem, `#${hex}`);
-    layout = layout;
-  }
-
-  function getSetDescendantProp(object, description, value) {
-    var array = description ? description.split(".") : [];
-
-    while (array.length && object) {
-      var comparation = array.shift();
-      var match = new RegExp("(.+)\\[([0-9]*)\\]").exec(comparation);
-
-      if ((match?.length ?? 0) == 3) {
-        var arrayData = {
-          arrayName: match[1],
-          arrayIndex: match[2],
-        };
-        if (object[arrayData.arrayName] !== undefined) {
-          if (typeof value !== "undefined" && array.length === 0) {
-            object[arrayData.arrayName][arrayData.arrayIndex] = value;
-          }
-          object = object[arrayData.arrayName][arrayData.arrayIndex];
-        } else {
-          object = undefined;
-        }
-
-        continue;
-      }
-      if (typeof value !== "undefined") {
-        if (object[comparation] === undefined) {
-          object[comparation] = {};
-        }
-
-        if (array.length === 0) {
-          object[comparation] = value;
-        }
-      }
-
-      object = object[comparation];
-    }
-
-    return object;
-  }
-
   onMount(async () => {
     let response = await getLayout();
     if (response?.success && response?.data) {
       layout = { ...layout, ...response?.data };
+      Utils?.Objects?.UpdateInputs(layoutInputs, layout)
     }
   });
 
@@ -165,97 +110,91 @@
         type="color"
         placeHolder="A cor do link"
         bind:value={layout.link}
-    initialValue={layout.link}
-       
+        bind:this={layoutInputs.link}
+        initialValue={layout.link}
       />
       <Views.TextEdit
         type="color"
         placeHolder="A cor do fundo"
         bind:value={layout.background}
-    initialValue={layout.background}
-       
+        bind:this={layoutInputs.background}
+        initialValue={layout.background}
       />
       <Views.TextEdit
         type="color"
         placeHolder="A cor do texto"
         bind:value={layout.color}
-    initialValue={layout.color}
-       
+        bind:this={layoutInputs.color}
+        initialValue={layout.color}
       />
       <Views.TextEdit
         type="color"
         placeHolder="A cor do cabeçalho"
         bind:value={layout.header.background}
-    initialValue={layout.header.background}
-       
+        bind:this={layoutInputs.header.background}
+        initialValue={layout.header.background}
       />
       <Views.TextEdit
         type="color"
         placeHolder="A cor do texto do cabeçalho"
         bind:value={layout.header.color}
-    initialValue={layout.header.color}
-       
+        bind:this={layoutInputs.header.color}
+        initialValue={layout.header.color}
       />
       <Views.TextEdit
         type="color"
         placeHolder="A cor do menu hamburger"
         bind:value={layout.header.menuHamburger}
-    initialValue={layout.header.menuHamburger}
-       
+        bind:this={layoutInputs.header.menuHamburger}
+        initialValue={layout.header.menuHamburger}
       />
       <Views.TextEdit
         type="color"
         placeHolder="A cor do fundo do tabs"
         bind:value={layout.tabs.background}
-    initialValue={layout.tabs.background}
-       
+        bind:this={layoutInputs.tabs.background}
+        initialValue={layout.tabs.background}
       />
       <Views.TextEdit
         type="color"
         placeHolder="A cor do texto do tabs"
         bind:value={layout.tabs.color}
-    initialValue={layout.tabs.color}
-       
+        bind:this={layoutInputs.tabs.color}
+        initialValue={layout.tabs.color}
       />
       <Views.TextEdit
         type="color"
         placeHolder="A cor do fundo do botão"
         bind:value={layout.button.background}
-    initialValue={layout.button.background}
-       
+        bind:this={layoutInputs.button.background}
+        initialValue={layout.button.background}
       />
       <Views.TextEdit
         type="color"
         placeHolder="A cor do botão"
         bind:value={layout.button.color}
-    initialValue={layout.button.color}
-       
+        bind:this={layoutInputs.button.color}
+        initialValue={layout.button.color}
       />
       <Views.TextEdit
         type="color"
         placeHolder="A cor do fundo do alerta"
         bind:value={layout.dialog.background}
-    initialValue={layout.dialog.background}
-       
+        bind:this={layoutInputs.dialog.background}
+        initialValue={layout.dialog.background}
       />
       <Views.TextEdit
         type="color"
         placeHolder="A cor do alerta"
         bind:value={layout.dialog.color}
-    initialValue={layout.dialog.color}
-       
+        bind:this={layoutInputs.dialog.color}
+        initialValue={layout.dialog.color}
       />
     </div>
     <Views.Divider />
     <Views.Button on:click={setLaout}>Atualizar o layout</Views.Button>
   </div>
 </div>
-
-{#if showPicker}
-  <div class="colorPicker" style="--pickerTop:{pickerTop}px">
-    <HsvPicker on:colorChange={colorCallback} startColor={"#FBFBFB"} />
-  </div>
-{/if}
 
 {#if !layout || isLoading}
   <Views.Loading
@@ -279,12 +218,6 @@
     width: 100%;
     float: left;
     margin-top: 20px;
-  }
-  .colorPicker {
-    display: block;
-    position: fixed;
-    top: var(--pickerTop);
-    right: 20px;
   }
   .sample {
     height: 300px;
@@ -340,7 +273,7 @@
     justify-content: center;
     flex-direction: column;
   }
-  #options{
+  #options {
     height: 100%;
     overflow-y: scroll;
   }

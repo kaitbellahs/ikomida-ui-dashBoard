@@ -90,7 +90,9 @@
     const response = await deleteCategory(id);
     if (!response?.success) {
       toggleErrorAlert(response?.data);
+      return;
     }
+    products = await all();
     isLoading = false;
   }
 

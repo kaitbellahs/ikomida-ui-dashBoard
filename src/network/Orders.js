@@ -23,7 +23,7 @@ export async function ChangeOrderStatus(id, status) {
     return Network.instance.put("/order", get(Auth), {
         id,
         status
-    }), "editOrder";
+    }, "editOrder");
 }
 
 export async function countOrders() {

@@ -5,6 +5,9 @@
   import { StatusBar } from "../../stores/Setup";
   import { Views, Types, Utils } from "@ikomida/components";
   import { newCoupon } from "../../network/Payment";
+  import Cache from "../../stores/Cache";
+
+  const CACHE_NAME = "COUPONS";
 
   let item = {
     name: null,
@@ -48,6 +51,7 @@
     let response;
     response = await newCoupon(item);
     if (response?.success) {
+      Cache.setObject(CACHE_NAME, null);
       Navigation.reset(Routes.coupons);
     } else {
       toggleErrorAlert(response?.data);
@@ -64,20 +68,23 @@
   />
 {/if}
 <div class="coupon">
-  <Views.TextEdit placeHolder="Nome" bind:value={item.name}
-    initialValue={item.name} />
+  <Views.TextEdit
+    type="alphanumeric"
+    upper={true}
+    placeHolder="Nome"
+    bind:value={item.name}
+    initialValue={item.name}
+  />
   <Views.TextEdit
     placeHolder="Quantidade"
     bind:value={item.quantity}
     initialValue={item.quantity}
-   
   />
   <Views.TextEdit
     type="date"
     placeHolder="Validade"
     bind:value={item.validity}
     initialValue={item.validity}
-   
   />
   <Views.Selector
     bind:selected={selectedDiscountType}
@@ -90,16 +97,14 @@
         type="percent"
         placeHolder="Valor"
         bind:value={item.value}
-    initialValue={item.value}
-       
+        initialValue={item.value}
       />
     {:else if selectedDiscountType.name === Types.DiscountTypes.VALUE}
       <Views.TextEdit
         placeHolder="Valor"
         bind:value={item.value}
-    initialValue={item.value}
+        initialValue={item.value}
         type="currency"
-       
       />
     {/if}
   {/if}

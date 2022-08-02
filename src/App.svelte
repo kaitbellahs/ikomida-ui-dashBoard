@@ -1,6 +1,6 @@
 <script>
   import { App } from "@capacitor/app";
-  import { Auth, PushNotificationToken } from "./stores/Auth";
+  import { Auth, ikomidaID, PushNotificationToken } from "./stores/Auth";
   import Login from "./pages/user/Login.svelte";
   import Main from "./pages/Main.svelte";
   import Tac from "./pages/user/Tac.svelte";
@@ -14,6 +14,7 @@
   import ForgotPassword from "./pages/user/ForgotPassword.svelte";
   import { CAPNativeLog } from "capacitor-native-log";
   import Cache from "./stores/Cache";
+  import { Network as iNetwork } from "@ikomida/components";
 
   let notificationIds = [];
   let networkStatus = null;
@@ -42,13 +43,23 @@
   };
 
   $: route = $Router.route;
-
+  $: if (logedIn) {
+    Utils.Jws.extractToken($Auth).then(async (token) => {
+      await ikomidaID.set(token?.ikomidaID);
+      iNetwork.instance.setIkomidaID(token?.ikomidaID);
+    });
+  }
   $: if ($Auth) {
     logedIn = false;
-    Utils.Jws.extractToken($Auth).then((token) => {
+    Utils.Jws.extractToken($Auth).then(async (token) => {
       logedIn = token !== null;
     });
   } else {
+    ikomidaID
+      .get()
+      .then((id) =>
+        id && id !== "undefined" ? iNetwork.instance.setIkomidaID(id) : null
+      );
     logedIn = false;
   }
 
@@ -75,7 +86,10 @@
 
   async function permissionStatus(permissionStatus) {
     //TODO: -- handle and report permissions
-    CAPNativeLog.log({ level: "info", message: `permissionStatusObject: ${JSON.stringify(permissionStatus)}` });
+    CAPNativeLog.log({
+      level: "info",
+      message: `permissionStatusObject: ${JSON.stringify(permissionStatus)}`,
+    });
   }
 
   function receivedCallBack(notification) {
@@ -116,10 +130,6 @@
   }
 
   onMount(async () => {
-    CAPNativeLog.log({
-      level: "info",
-      message: `DOMAIN: ${JSON.stringify(window.location.host)}`,
-    });
     networkStatus = await Network.getStatus();
     if (Capacitor.isNativePlatform()) {
       pushNotification.init();

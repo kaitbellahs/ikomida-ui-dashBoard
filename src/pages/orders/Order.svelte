@@ -47,7 +47,7 @@
 
   let errorAlert;
   let showAlert = false;
-  $: total = Number((order?.subtotal ?? 0)) + Number((order?.delivery ?? 0)) - Number((order?.discount ?? 0));
+  $: total = (Number((order?.subtotal ?? 0)) + Number((order?.delivery ?? 0)) - Number((order?.discount ?? 0)));
 
   $: if (selected !== oldSelected) {
     isLoading = true;
@@ -91,7 +91,7 @@
     {#if new Date(new Date(order?.createdAt).getTime() + order?.preparation?.max * 1000) < new Date()}
       <span class="lateOrder">Pedido atrasado</span>
     {/if}
-    <span class="deliveryForecast">Preparar o pedido antes de </span>
+    <span class="deliveryForecast">Prepare o pedido antes de </span>
     <span class="deliveryForecastValue">
       {Utils.Strings.dateToString(
         new Date(order?.createdAt).getTime() + order?.preparation?.max * 1000
@@ -102,8 +102,8 @@
   <h3>Pedido #{order?.customID}:</h3>
   <span class="status">
     {#if order?.status == "open"}
-      Seu pedido está
-      <span>{order?.stage}</span>
+      O pedido está
+      <span>{OrderStatus(order?.status)}</span>
     {:else}
       {OrderStatus(order?.status)} em
       <span class="time"

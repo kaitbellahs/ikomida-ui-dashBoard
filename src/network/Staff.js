@@ -24,8 +24,8 @@ export async function updateStaff(object) {
     return Network.instance.put("/vendor/staff", get(Auth), object);
 }
 
-export async function removeStaff(preparation, delivery) {
-    return Network.instance.remove("/vendor/staff", get(Auth), {preparation, delivery});
+export async function removeStaff(id) {
+    return Network.instance.remove(`/vendor/staff/${id}`, get(Auth));
 }
 
 export async function GetAddressByCep(cep) {

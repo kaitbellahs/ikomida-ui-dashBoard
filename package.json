@@ -51,11 +51,9 @@
     "@capacitor/storage": "^1.2.3",
     "@fortawesome/free-solid-svg-icons": "^6.1.1",
     "@ikomida/components": "github:TIAltoNivel/ikomida-components",
-    "@sveltejs/svelte-virtual-list": "^3.0.1",
     "capacitor-native-log": "^0.2.0",
     "react-image-file-resizer": "^0.4.8",
     "sirv-cli": "^2.0.0",
-    "svelte-color-picker": "^1.0.7",
     "uuid": "^8.3.2"
   }
 }

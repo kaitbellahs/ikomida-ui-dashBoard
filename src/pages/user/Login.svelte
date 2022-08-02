@@ -14,6 +14,7 @@
 
   let isLoading = false;
   let ikomidaid = "com.ikomida.br.";
+  let ikomidaidInput;
   let phone;
   let password;
 
@@ -55,7 +56,9 @@
   }
 
   onMount(async () => {
-    ikomidaid = (await ikomidaID.get()) || ikomidaid;
+    const value = await ikomidaID.get();
+    ikomidaid = value && value !== undefined ? value : ikomidaid;
+    ikomidaidInput.updateValue(ikomidaid);
   });
 </script>
 
@@ -69,6 +72,7 @@
   <small>Digite aqui o ID do seu estabelecimento</small>
   <Views.TextEdit
     bind:value={ikomidaid}
+    bind:this={ikomidaidInput}
     initialValue={ikomidaid}
     icon={faIdCardAlt}
     type="slug"

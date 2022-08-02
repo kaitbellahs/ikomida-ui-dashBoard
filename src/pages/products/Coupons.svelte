@@ -79,7 +79,7 @@
     isLoading = true;
     const response = await deleteCoupon(id);
     if (response?.success) {
-      coupons = await getCoupon();
+      await getMore(null, true);
     } else {
       toggleErrorAlert(response?.data);
     }

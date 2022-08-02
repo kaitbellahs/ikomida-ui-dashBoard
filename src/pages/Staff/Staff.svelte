@@ -1,11 +1,15 @@
 <script>
   import { Title, Navigation, Routes, Menu } from "../../stores/Navigation";
-  import { getStaff } from "../../network/Staff";
+  import { getStaff, removeStaff } from "../../network/Staff";
   import { Views, Utils } from "@ikomida/components";
   import { StatusBar } from "../../stores/Setup";
   import { onMount } from "svelte";
   import Fa from "svelte-fa";
-  import { faEdit, faSync } from "@fortawesome/free-solid-svg-icons";
+  import {
+    faEdit,
+    faSync,
+    faTrashAlt,
+  } from "@fortawesome/free-solid-svg-icons";
   import Cache from "../../stores/Cache";
   let staffs;
 
@@ -13,7 +17,27 @@
   let hasMore = true;
   let canGetMore = true;
   let lastTimestamp = null;
+  
+  let isLoading = false;
+  let errorAlert;
+  let showAlert = false;
+  function toggleErrorAlert(messageObject) {
+    errorAlert = messageObject;
+    showAlert = true;
+  }
 
+  async function onRemoveClick(id) {
+    isLoading = true;
+    let response = await removeStaff(id);
+    if (response.success) {
+      await getMore(null, true)
+    } else {
+      toggleErrorAlert(response?.data);
+      isLoading = false;
+      return;
+    }
+    isLoading = false;
+  }
   async function getMore(e, refresh = false) {
     if (refresh || (canGetMore && hasMore)) {
       const timestamp = refresh
@@ -79,6 +103,9 @@
     {#if staffs.length > 0}
       {#each staffs as staff}
         <article>
+          <span on:click={onRemoveClick(staff.id)} class="remove"
+            ><Fa icon={faTrashAlt} /></span
+          >
           <h2>{staff.name} {staff.lastName}</h2>
           <div>Telefone: {Utils.Strings.formatAsPhone(staff.phone)}</div>
           <div>Título: {roleName(staff.role)}</div>
@@ -98,12 +125,40 @@
   </section>
 {/if}
 
+<Views.MessageAlert object={errorAlert} bind:show={showAlert} />
+{#if isLoading || !staffs}
+  <Views.Loading
+    topPadding={$StatusBar.height}
+    bottomPadding={$StatusBar.bottomPadding}
+  />
+{/if}
+
 <style>
   section > article {
     position: relative;
     border: 1px solid #ccc;
     border-radius: 4px;
     margin-top: 10px;
-    padding: 10px;
+    box-shadow: 2px 3px #cccccc7a;
+    padding: 20px;
+  }
+  .remove {
+    position: absolute;
+    top: -8px;
+    right: -10px;
+    font-size: 0.9em;
+    color: white;
+    font-family: RobotoBold;
+    border: 1px solid #4c0708;
+    background: #4c0708;
+    border-radius: 20px;
+    width: 26px;
+    height: 26px;
+    vertical-align: middle;
+    text-align: center;
+    padding: 6px;
+    display: flex;
+    place-items: center;
+    place-content: center;
   }
 </style>

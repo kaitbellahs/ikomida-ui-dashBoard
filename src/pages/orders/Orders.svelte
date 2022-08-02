@@ -167,7 +167,7 @@ async function update() {
             {#if new Date(new Date(order?.createdAt).getTime() + order?.preparation?.max * 1000) < new Date()}
               <span class="lateOrder">Pedido atrasado</span>
             {/if}
-            <span class="deliveryForecast">Preparar o pedido antes de </span>
+            <span class="deliveryForecast">Prepare o pedido antes de </span>
             <span class="deliveryForecastValue">
               {Utils.Strings.dateToString(
                 new Date(order?.createdAt).getTime() +

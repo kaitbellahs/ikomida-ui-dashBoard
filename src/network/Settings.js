@@ -24,7 +24,7 @@ export async function getQuotas() {
 }
 
 export async function getPagSeguroUrl() {
-    return Network.instance.get("/vendor/pagSeguroUrl", get(Auth), "pagSeguroUrl");
+    return Network.instance.get("/vendor/pagSeguroUrl", get(Auth), null, "pagSeguroUrl");
 }
 
 export async function setSettings(object) {

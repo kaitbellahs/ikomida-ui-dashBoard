@@ -65,6 +65,7 @@
   }
 
   async function requestPhoneValidation() {
+    showRequestValidatingCodeAlert = false
     isLoading = true;
     requestPasswordObject.phone = requestPasswordObject.phone;
     const response = await requestPasswordPhoneValidation(
@@ -97,6 +98,9 @@
     );
     if (response?.success) {
       canRequestPassword = true;
+      toggleErrorAlert(
+        `O código inserido é correto!, agora é só clicar no botão “CONTINUAR” para gerar um nova senha aleatória!`
+      );
     } else {
       toggleErrorAlert(response?.data);
     }

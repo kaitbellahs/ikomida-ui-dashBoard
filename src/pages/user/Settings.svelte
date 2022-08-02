@@ -25,7 +25,9 @@
 
   let paymentGateway = { type: null, data: null };
   let delivery = { value: 0, min: 0, free: false };
+  let deliveryInputs = { value: null, min: null };
   let preparation = { min: 0, max: 0 };
+  let preparationInputs = { min: null, max: null };
   let isLoading = false;
   let errorAlert;
   let showAlert = false;
@@ -44,13 +46,7 @@
 
   let business = {
     days: [],
-    hours: [
-      {
-        id: uuid(),
-        start: null,
-        end: null,
-      },
-    ],
+    hours: [],
   };
 
   let integratePagSeguro = { callback: false, url: null };
@@ -230,7 +226,11 @@
       days[index].checked = true;
     }
     delivery = { ...delivery, ...response?.delivery };
+    deliveryInputs?.min?.updateValue(delivery?.min);
+    deliveryInputs?.value?.updateValue(delivery?.value);
     preparation = { ...preparation, ...response?.preparation };
+    preparationInputs?.min?.updateValue(preparation?.min);
+    preparationInputs?.max?.updateValue(preparation?.max);
     isLoading = false;
   });
 
@@ -240,7 +240,7 @@
 <div class="settings">
   <div class="data">
     <h2>horário de funcionamento</h2>
-    {#if business?.hours}
+    {#if (business?.hours?.length ?? 0) > 0}
       {#each business?.hours ?? [] as businessHour}
         <div class="busninessHours">
           <span on:click={onRemoveClick(businessHour.id)} class="remove"
@@ -250,8 +250,8 @@
             <Views.TextEdit
               placeHolder="Abertura"
               mask="__:__"
-              bind:value={businessHour.start}
               initialValue={businessHour.start}
+              bind:value={businessHour.start}
               type="number"
               rightPadding="10px"
             />
@@ -307,6 +307,7 @@
       <Views.TextEdit
         placeHolder="Tempo mínimo"
         bind:value={preparation.min}
+        bind:this={preparationInputs.min}
         initialValue={preparation.min}
         type="number"
         rightPadding="10px"
@@ -314,6 +315,7 @@
       <Views.TextEdit
         placeHolder="Tempo máximo"
         bind:value={preparation.max}
+        bind:this={preparationInputs.max}
         initialValue={preparation.max}
         type="number"
         leftPadding="10px"
@@ -331,12 +333,14 @@
       <Views.TextEdit
         type="currency"
         bind:value={delivery.value}
+        bind:this={deliveryInputs.value}
         initialValue={delivery.value}
         placeHolder="Valor por KM"
       />
       <Views.TextEdit
         type="currency"
         bind:value={delivery.min}
+        bind:this={deliveryInputs.min}
         initialValue={delivery.min}
         placeHolder="Valor mínimo"
       />
@@ -392,6 +396,7 @@
     vertical-align: middle;
     text-align: center;
     padding: 6px;
+    z-index: 9;
   }
   .twoCells {
     display: flex;

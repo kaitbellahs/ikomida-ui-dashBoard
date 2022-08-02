@@ -29,13 +29,15 @@
     }, 0)`;
   }
   function percent(limit, quota) {
-    return limit === 0 ? 0 : ((100 / (limit ?? 1)) * (limit === 0 ? 0 : (quota ?? 1))).toFixed(1);
+    return limit === 0
+      ? 0
+      : ((100 / (limit ?? 1)) * (limit === 0 ? 0 : quota ?? 1)).toFixed(1);
   }
-  function limit(limit){
-    return limit === 0 ? '∞' : (limit ?? 0)
+  function limit(limit) {
+    return limit === 0 ? "∞" : limit ?? 0;
   }
-  function limitCurrency(limit){
-    return limit === 0 ? '∞' : Utils.Strings.currency(limit ?? 0)
+  function limitCurrency(limit) {
+    return limit === 0 ? "∞" : Utils.Strings.currency(limit ?? 0);
   }
   $: staff = percent(quotas?.limits?.staff, quotas?.quotas?.staff);
   $: products = percent(quotas?.limits?.products, quotas?.quotas?.products);
@@ -49,46 +51,59 @@
 <section>
   {#if quotas}
     <Views.Divider />
-    <span
-      >{quotas?.quotas?.staff ?? 0} / {limit(quotas?.limits?.staff)} Colaboradores
-      ({staff}%) usado</span
-    >
-    <div class="chart">
-      <div style="--width: {staff}%; --color: {color(staff)};" />
-    </div>
+    <article>
+      <h4>Pedidos</h4>
+      <span><b>Usado:</b> {quotas?.quotas?.orders ?? 0} Pedidos este Mês</span
+      ><span>
+        <b>Limite:</b> {limit(quotas?.limits?.orders)} Pedidos por Mês</span
+      ><span><b>Percentagem:</b> {orders}% saturado</span>
+      <div class="chart">
+        <div style="--width: {orders}%; --color: {color(orders)};" />
+      </div>
+    </article>
     <Views.Divider />
-    <span
-      >{quotas?.quotas?.products ?? 0} / {limit(quotas?.limits?.products)} Produtos
-      ({products}%) usado</span
-    >
-    <div class="chart">
-      <div style="--width: {products}%; --color: {color(products)};" />
-    </div>
+    <article>
+      <h4>Faturamento</h4>
+      <span
+        ><b>Usado:</b>
+        {Utils.Strings.currency(quotas?.quotas?.billing) ?? 0} este Mês</span
+      ><span>
+        <b>Limite:</b> {limitCurrency(quotas?.limits?.billing)} por Mês</span
+      ><span><b>Percentagem:</b> {billing}% saturado</span>
+      <div class="chart">
+        <div style="--width: {billing}%; --color: {color(billing)};" />
+      </div>
+    </article>
     <Views.Divider />
-    <span
-      >{quotas?.quotas?.orders ?? 0} / {limit(quotas?.limits?.orders)} Pedidos por
-      Mês ({orders}%) usado</span
-    >
-    <div class="chart">
-      <div style="--width: {orders}%; --color: {color(orders)};" />
-    </div>
+    <article>
+      <h4>Produtos</h4>
+      <span><b>Usado:</b> {quotas?.quotas?.products ?? 0}</span><span>
+        <b>Limite:</b> {limit(quotas?.limits?.products)}</span
+      ><span><b>Percentagem:</b> {products}% saturado</span>
+      <div class="chart">
+        <div style="--width: {products}%; --color: {color(products)};" />
+      </div>
+    </article>
     <Views.Divider />
-    <span
-      >{quotas?.quotas?.coupons ?? 0} / {limit(quotas?.limits?.coupons)} Cupons ({coupons}%)
-      usado</span
-    >
-    <div class="chart">
-      <div style="--width: {coupons}%; --color: {color(coupons)};" />
-    </div>
+    <article>
+      <h4>Cupons</h4>
+      <span><b>Usado:</b> {quotas?.quotas?.coupons ?? 0}</span><span>
+        <b>Limite:</b> {limit(quotas?.limits?.coupons)}</span
+      ><span><b>Percentagem:</b> {coupons}% saturado</span>
+      <div class="chart">
+        <div style="--width: {coupons}%; --color: {color(coupons)};" />
+      </div>
+    </article>
     <Views.Divider />
-    <span
-      >Faturamento de {Utils.Strings.currency(quotas?.quotas?.billing) ?? 0} / {limitCurrency(
-        quotas?.limits?.billing
-      )} por Mês ({billing}%) usado</span
-    >
-    <div class="chart">
-      <div style="--width: {billing}%; --color: {color(billing)};" />
-    </div>
+    <article>
+      <h4>Colaboradores</h4>
+      <span><b>Usado:</b> {quotas?.quotas?.staff ?? 0}</span><span>
+        <b>Limite:</b> {limit(quotas?.limits?.staff)}</span
+      ><span><b>Percentagem:</b> {staff}% saturado</span>
+      <div class="chart">
+        <div style="--width: {staff}%; --color: {color(staff)};" />
+      </div>
+    </article>
   {/if}
 </section>
 
@@ -101,7 +116,7 @@
 <Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 
 <style>
-  section > .chart {
+  section > article > .chart {
     width: 100%;
     height: 6px;
     border-radius: 3px;
@@ -115,8 +130,19 @@
     place-items: center;
     align-items: center;
     justify-items: center;
+    margin-top: 10px;
   }
-  section > .chart > div {
+  section > article {
+    border: 1px solid #ccc;
+    box-shadow: 2px 3px #cccccc7a;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+  section > article > h4 {
+    margin-bottom: 10px;
+  }
+  section > article > .chart > div {
     position: absolute;
     top: 0;
     left: 0;
@@ -124,9 +150,8 @@
     width: var(--width);
     background: var(--color);
   }
-  section > span {
+  section > article > span {
     color: #4c0708;
     z-index: 999;
-    text-shadow: 1px 1px #000000cf;
   }
 </style>

@@ -5,11 +5,8 @@
   import { Views, Image, Utils } from "@ikomida/components";
   import { getSettings, setSettings } from "../../network/Settings";
   import { StatusBar } from "../../stores/Setup";
-  import { faPhone, faEnvelope } from "@fortawesome/free-solid-svg-icons";
   import { onMount } from "svelte";
   let profile = { phone: null, email: null };
-  let validPhone = false;
-
   let isLoading = false;
   let errorAlert;
   let showAlert = false;
@@ -19,7 +16,10 @@
     newPass: null,
     reNewPass: null,
   };
-  let imageSrc = "/Assets/Images/food-plate.svg";
+  let passwordValidationObject = {
+    newPass: false,
+    reNewPass: false,
+  };
   let fileinput;
 
   function toggleErrorAlert(messageObject) {
@@ -41,16 +41,10 @@
   }
 
   async function editPassword() {
-    if (passwordObject.oldPass === null || passwordObject.oldPass.length < 6) {
-      toggleErrorAlert("A senha atual não está correta!");
-      return;
-    } else if (
-      passwordObject.newPass === null ||
-      passwordObject.newPass.length < 6
-    ) {
+    if (!passwordValidationObject.newPass) {
       toggleErrorAlert("A nova senha não está correta!");
       return;
-    } else if (passwordObject.newPass !== passwordObject.reNewPass) {
+    } else if (!passwordValidationObject.reNewPass) {
       toggleErrorAlert("A confirmação da senha não está correta");
       return;
     }
@@ -91,12 +85,14 @@
         imageType
       );
       imageSrc = profile?.mainPicture;
+      await update();
     };
   }
 
   onMount(async () => {
     const response = await getSettings();
     profile = { ...profile, ...response?.profile };
+    // emailInput.updateValue(profile?.email);
   });
 
   Title.set("Perfil");
@@ -166,39 +162,45 @@
       fontSize="1.3em"
       leftMargin="30"
     />
-    <Views.TextEdit
+    <Views.TextValue
+      text="Email:"
+      value={profile?.email}
+      fontSize="1.3em"
+      leftMargin="30"
+    />
+    <!-- <Views.TextEdit
       bind:value={profile.email}
-      initialValue={profile.email}
+      initialValue={profile?.email}
       icon={faEnvelope}
       placeHolder="Email"
-      bind:isValid={validPhone}
-    />
+      bind:isValid={validEmail}
+      bind:this={emailInput}
+    /> -->
     <Views.Divider />
   </div>
-  <Views.Button on:click={update}>Atualizar o email</Views.Button>
+  <!-- <Views.Button on:click={update}>Atualizar o email</Views.Button> -->
   <div class="data">
     <h2>Senha</h2>
     <Views.TextEdit
+      type="password"
       placeHolder="Senha atual"
       bind:value={passwordObject.oldPass}
-      initialValue={passwordObject.oldPass}
-      secret={true}
     />
     <Views.TextEdit
+      type="password"
       placeHolder="Nova senha"
       bind:value={passwordObject.newPass}
-      initialValue={passwordObject.newPass}
-      secret={true}
+      bind:isValid={passwordValidationObject.newPass}
+      error="A senha deve ter um tamanho entre 8 e 40 caracteres e contendo no mínimo
+      uma letra maiúscula, uma letra minúscula, um número e um símbolo"
     />
-    <small
-      >A senha deve ter um tamanho entre 8 e 40 caracteres e contendo no mínimo
-      uma letra maiúscula, uma letra minúscula, um número e um símbolo</small
-    >
     <Views.TextEdit
+      type="password"
       placeHolder="Confirmação"
       bind:value={passwordObject.reNewPass}
-      initialValue={passwordObject.reNewPass}
-      secret={true}
+      bind:isValid={passwordValidationObject.reNewPass}
+      validation={(password) => passwordObject.newPass === password}
+      error="A confirmação da senha não é válida"
     />
     <Views.Divider />
   </div>
