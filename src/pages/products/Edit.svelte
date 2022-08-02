@@ -175,43 +175,39 @@
       options={categoriesOptions}
     />
     <Views.TextEdit
-      name="Nome do produto"
+      placeHolder="Nome do produto"
       bind:value={item.title}
-      placeHolder=""
+      initialValue={item.title}
     />
     <Views.TextEdit
       type="text"
-      name="Descrição do produto"
+      placeHolder="Descrição do produto"
       bind:value={item.description}
-      placeHolder=""
+      initialValue={item.description}
     />
     <Views.TextEdit
       type="number"
-      name="Peso do produto em gramas (g)"
+      placeHolder="Peso do produto em gramas (g)"
       bind:value={item.weight}
-      bind:rawValue={item.weight}
-      placeHolder=""
+      initialValue={item.weight}
     />
     <Views.TextEdit
       type="number"
-      name="Serve quantas pessoas?"
+      placeHolder="Serve quantas pessoas?"
       bind:value={item.serves}
-      bind:rawValue={item.serves}
-      placeHolder=""
+      initialValue={item.serves}
     />
     <Views.TextEdit
       type="number"
-      name="Quantos itens você tem?"
+      placeHolder="Quantos itens você tem?"
       bind:value={item.quantity}
-      bind:rawValue={item.quantity}
-      placeHolder=""
+      initialValue={item.quantity}
     />
     <Views.TextEdit
       type="currency"
-      name="Preço:"
+      placeHolder="Preço"
       bind:value={item.price}
-      bind:rawValue={item.price}
-      placeHolder=""
+      initialValue={item.price}
     />
     <Views.Divider />
     <Views.Selector
@@ -223,19 +219,17 @@
       {#if selectedDiscountType.name === Types.DiscountTypes.PERCENT}
         <Views.TextEdit
           type="percent"
-          name="Disconto:"
+          placeHolder="Disconto"
           bind:value={item.discount}
-          bind:rawValue={item.discount}
-          placeHolder=""
+          initialValue={item.discount}
         />
         <Views.Divider />
       {:else if selectedDiscountType.name === Types.DiscountTypes.VALUE}
         <Views.TextEdit
-          name="Disconto:"
+          placeHolder="Disconto"
           bind:value={item.discount}
-          bind:rawValue={item.discount}
+          initialValue={item.discount}
           type="currency"
-          placeHolder=""
         />
         <Views.Divider />
       {/if}

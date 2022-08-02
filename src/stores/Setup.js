@@ -10,7 +10,7 @@ function createStatusBar() {
 		style: null,
 		visible: true,
 		height: 0,
-		bottomPadding: 0
+		bottomPadding: 0,
 	});
 
 	return {
@@ -20,3 +20,22 @@ function createStatusBar() {
 }
 
 export const StatusBar = createStatusBar();
+
+function createSettings() {
+	const {
+		subscribe,
+		update
+	} = writable({
+		popups: {
+			newOrder: true,
+			paymentStatus: true
+		}
+	});
+
+	return {
+		subscribe,
+		set: (data) => update(old => { return { ...old, ...data } })
+	};
+}
+
+export const Settings = createSettings();

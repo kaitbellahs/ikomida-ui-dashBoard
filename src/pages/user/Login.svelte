@@ -14,16 +14,14 @@
 
   let isLoading = false;
   let ikomidaid = "com.ikomida.br.";
-  let phone
-  let initialValue
-  let password
+  let phone;
+  let password;
 
   let errorAlert;
   let showAlert = false;
-  let isValidPassword = false;
   let isValidPhone = false;
 
-  $: canLogin = isValidPhone && isValidPassword;
+  $: canLogin = isValidPhone;
 
   async function forgotPassword() {
     Navigation.goTo(Routes.forgotPassword);
@@ -71,14 +69,13 @@
   <small>Digite aqui o ID do seu estabelecimento</small>
   <Views.TextEdit
     bind:value={ikomidaid}
-    bind:rawValue={ikomidaid}
+    initialValue={ikomidaid}
     icon={faIdCardAlt}
     type="slug"
     placeHolder="Id do estabelecimento"
   />
   <Views.TextEdit
-    bind:rawValue={phone}
-    bind:value={initialValue}
+    bind:value={phone}
     icon={faPhone}
     type="phone"
     placeHolder="Número de celular"
@@ -90,13 +87,13 @@
     placeHolder="Sua senha"
     secret={true}
     type="password"
-    bind:isValid={isValidPassword}
   />
   <div />
   <Views.Button on:click={doLogin} disabled={!canLogin}>Entrar</Views.Button>
   <Views.Button type="transparent" on:click={forgotPassword}
     >Recuperar a senha</Views.Button
   >
+  <Views.GTerms />
   <Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 </main>
 

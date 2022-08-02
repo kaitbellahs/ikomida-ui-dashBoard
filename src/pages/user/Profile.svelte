@@ -116,7 +116,10 @@
       </div>
       <Views.Divider />
       <small>
-        Esse é o lugar da foto do logo do seu estabelecimento que vai aparecer no app dos seus clientes e para atualizá-la clica na câmera no canto superior esquerdo da foto</small>
+        Esse é o lugar da foto do logo do seu estabelecimento que vai aparecer
+        no app dos seus clientes e para atualizá-la clica na câmera no canto
+        superior esquerdo da foto</small
+      >
     {/if}
     <img
       class="upload"
@@ -159,51 +162,50 @@
     />
     <Views.TextValue
       text="Celular:"
-      value={Utils?.Strings?.formatAsPhone(
-        profile?.phone
-      )}
+      value={Utils?.Strings?.formatAsPhone(profile?.phone)}
       fontSize="1.3em"
       leftMargin="30"
     />
     <Views.TextEdit
-      bind:rawValue={profile.email}
       bind:value={profile.email}
+      initialValue={profile.email}
       icon={faEnvelope}
-      placeHolder="Email:"
+      placeHolder="Email"
       bind:isValid={validPhone}
     />
     <Views.Divider />
-    </div>
-    <Views.Button on:click={update}>Atualizar o email</Views.Button>
-    <div class="data">
+  </div>
+  <Views.Button on:click={update}>Atualizar o email</Views.Button>
+  <div class="data">
     <h2>Senha</h2>
     <Views.TextEdit
-      name="Senha atual:"
+      placeHolder="Senha atual"
       bind:value={passwordObject.oldPass}
+      initialValue={passwordObject.oldPass}
       secret={true}
-      placeHolder=""
     />
     <Views.TextEdit
-      name="Nova senha:"
+      placeHolder="Nova senha"
       bind:value={passwordObject.newPass}
+      initialValue={passwordObject.newPass}
       secret={true}
-      placeHolder=""
     />
     <small
       >A senha deve ter um tamanho entre 8 e 40 caracteres e contendo no mínimo
       uma letra maiúscula, uma letra minúscula, um número e um símbolo</small
     >
     <Views.TextEdit
-      name="Confirmação:"
+      placeHolder="Confirmação"
       bind:value={passwordObject.reNewPass}
+      initialValue={passwordObject.reNewPass}
       secret={true}
-      placeHolder=""
     />
     <Views.Divider />
   </div>
   <Views.Button on:click={editPassword}>Atualizar a senha</Views.Button>
   <Views.Button type="transparent" on:click={logout}>Logout</Views.Button>
 </div>
+<Views.GTerms />
 
 {#if profile === {} || isLoading}
   <Views.Loading

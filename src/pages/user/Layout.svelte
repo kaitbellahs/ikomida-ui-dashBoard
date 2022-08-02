@@ -163,75 +163,87 @@
     <div id="options">
       <Views.TextEdit
         type="color"
-        name="A cor do link:"
+        placeHolder="A cor do link"
         bind:value={layout.link}
-        placeHolder=""
+    initialValue={layout.link}
+       
       />
       <Views.TextEdit
         type="color"
-        name="A cor do fundo:"
+        placeHolder="A cor do fundo"
         bind:value={layout.background}
-        placeHolder=""
+    initialValue={layout.background}
+       
       />
       <Views.TextEdit
         type="color"
-        name="A cor do texto:"
+        placeHolder="A cor do texto"
         bind:value={layout.color}
-        placeHolder=""
+    initialValue={layout.color}
+       
       />
       <Views.TextEdit
         type="color"
-        name="A cor do cabeçalho:"
+        placeHolder="A cor do cabeçalho"
         bind:value={layout.header.background}
-        placeHolder=""
+    initialValue={layout.header.background}
+       
       />
       <Views.TextEdit
         type="color"
-        name="A cor do texto do cabeçalho:"
+        placeHolder="A cor do texto do cabeçalho"
         bind:value={layout.header.color}
-        placeHolder=""
+    initialValue={layout.header.color}
+       
       />
       <Views.TextEdit
         type="color"
-        name="A cor do menu hamburger:"
+        placeHolder="A cor do menu hamburger"
         bind:value={layout.header.menuHamburger}
-        placeHolder=""
+    initialValue={layout.header.menuHamburger}
+       
       />
       <Views.TextEdit
         type="color"
-        name="A cor do fundo do tabs:"
+        placeHolder="A cor do fundo do tabs"
         bind:value={layout.tabs.background}
-        placeHolder=""
+    initialValue={layout.tabs.background}
+       
       />
       <Views.TextEdit
         type="color"
-        name="A cor do texto do tabs:"
+        placeHolder="A cor do texto do tabs"
         bind:value={layout.tabs.color}
-        placeHolder=""
+    initialValue={layout.tabs.color}
+       
       />
       <Views.TextEdit
         type="color"
-        name="A cor do fundo do botão:"
+        placeHolder="A cor do fundo do botão"
         bind:value={layout.button.background}
-        placeHolder=""
+    initialValue={layout.button.background}
+       
       />
       <Views.TextEdit
         type="color"
-        name="A cor do botão:"
+        placeHolder="A cor do botão"
         bind:value={layout.button.color}
-        placeHolder=""
+    initialValue={layout.button.color}
+       
       />
       <Views.TextEdit
         type="color"
-        name="A cor do fundo do alerta:"
+        placeHolder="A cor do fundo do alerta"
         bind:value={layout.dialog.background}
-        placeHolder=""
+    initialValue={layout.dialog.background}
+       
       />
       <Views.TextEdit
         type="color"
-        name="A cor do alerta:"
+        placeHolder="A cor do alerta"
         bind:value={layout.dialog.color}
-        placeHolder=""
+    initialValue={layout.dialog.color}
+       
       />
     </div>
     <Views.Divider />

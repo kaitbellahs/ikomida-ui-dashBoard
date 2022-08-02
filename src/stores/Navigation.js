@@ -26,6 +26,9 @@ export const Routes = {
     profile: Symbol("/profile"),
     forgotPassword: Symbol("/forgotPassword"),
     layout: Symbol("/layout"),
+    quotas: Symbol("/quotas"),
+    newStaff: Symbol("/newStaff"),
+    staff: Symbol("/staff"),
     subscription: Symbol("/subscription")
 };
 

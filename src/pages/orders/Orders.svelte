@@ -61,7 +61,7 @@ async function update() {
     await getMore(null, true);
   }
   
-  const orderFinishedOptions = ["waitingPayment", "delivered", "canceled"];
+  const orderFinishedOptions = ["waitingPayment", "canceled"];
 
   let isLoading = false;
   let errorAlert;
@@ -211,6 +211,7 @@ async function update() {
         >carregar mais</Views.Button
       >
     {/if}
+    <Views.GTerms />
   {:else}
     <div id="noOrders">
       <h2>

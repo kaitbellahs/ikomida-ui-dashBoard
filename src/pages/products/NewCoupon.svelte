@@ -64,17 +64,20 @@
   />
 {/if}
 <div class="coupon">
-  <Views.TextEdit name="Nome:" bind:value={item.name} placeHolder="" />
+  <Views.TextEdit placeHolder="Nome" bind:value={item.name}
+    initialValue={item.name} />
   <Views.TextEdit
-    name="Quantidade:"
+    placeHolder="Quantidade"
     bind:value={item.quantity}
-    placeHolder=""
+    initialValue={item.quantity}
+   
   />
   <Views.TextEdit
     type="date"
-    name="Validade:"
+    placeHolder="Validade"
     bind:value={item.validity}
-    placeHolder=""
+    initialValue={item.validity}
+   
   />
   <Views.Selector
     bind:selected={selectedDiscountType}
@@ -85,16 +88,18 @@
     {#if selectedDiscountType.name === Types.DiscountTypes.PERCENT}
       <Views.TextEdit
         type="percent"
-        name="Valor:"
+        placeHolder="Valor"
         bind:value={item.value}
-        placeHolder=""
+    initialValue={item.value}
+       
       />
     {:else if selectedDiscountType.name === Types.DiscountTypes.VALUE}
       <Views.TextEdit
-        name="Valor:"
+        placeHolder="Valor"
         bind:value={item.value}
+    initialValue={item.value}
         type="currency"
-        placeHolder=""
+       
       />
     {/if}
   {/if}

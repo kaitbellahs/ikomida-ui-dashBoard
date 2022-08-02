@@ -9,7 +9,7 @@
     getPagSeguroUrl,
     revokePaymentGateway,
   } from "../../network/Settings";
-  import { StatusBar } from "../../stores/Setup";
+  import { StatusBar, Settings } from "../../stores/Setup";
   import Fa from "svelte-fa";
   import {
     faAt,
@@ -21,7 +21,7 @@
   import { Clipboard } from "@capacitor/clipboard";
   import { onMount } from "svelte";
   import { v4 as uuid } from "uuid";
-  import { CAPNativeLog } from "capacitor-native-log";
+  import { Auth } from "../../stores/Auth";
 
   let paymentGateway = { type: null, data: null };
   let delivery = { value: 0, min: 0, free: false };
@@ -29,6 +29,8 @@
   let isLoading = false;
   let errorAlert;
   let showAlert = false;
+  let popupNewOrder = $Settings?.popups?.newOrder;
+  let userInfo;
 
   const days = [
     { name: "Domingo", checked: false },
@@ -52,6 +54,11 @@
   };
 
   let integratePagSeguro = { callback: false, url: null };
+
+  $: if (popupNewOrder || !popupNewOrder) {
+    $Settings.popups.newOrder = popupNewOrder;
+    Settings.set($Settings);
+  }
 
   $: if ($Router.options) {
     integratePagSeguro = { ...integratePagSeguro, ...$Router.options };
@@ -87,10 +94,10 @@
   }
 
   const addHours = () => {
-    if(!business?.hours){
-      business.hours = []
+    if (!business?.hours) {
+      business.hours = [];
     }
-    business.hours.push({ id: uuid(), start: '08:00', end: '23:59' });
+    business.hours.push({ id: uuid(), start: "08:00", end: "23:59" });
     business.hours = business.hours;
   };
 
@@ -100,13 +107,21 @@
     );
   }
 
-  function validateTime(timeString){
-    const timeArray = timeString?.split(":") ?? []
-    if((timeArray?.length ?? 0) !== 2){
-      return false
+  function validateTime(timeString) {
+    if (timeString.length === 4 && !timeString?.includes(":")) {
+      timeString = timeString.slice(0, 2) + ":" + timeString.slice(2);
     }
-    if(Number(Utils.Numbers.toNumber(timeArray?.[0])) >= 24 || Number(Utils.Numbers.toNumber(timeArray?.[1])) >= 60){
-      return false
+    const timeArray = timeString?.split(":") ?? [];
+    if ((timeArray?.length ?? 0) !== 2) {
+      return false;
+    }
+    if (
+      Number(Utils.Numbers.toNumber(timeArray?.[0])) < 0 ||
+      Number(Utils.Numbers.toNumber(timeArray?.[0])) >= 24 ||
+      Number(Utils.Numbers.toNumber(timeArray?.[1])) >= 60 ||
+      Number(Utils.Numbers.toNumber(timeArray?.[1])) < 0
+    ) {
+      return false;
     }
     return true;
   }
@@ -114,17 +129,23 @@
   async function updateHours() {
     isLoading = true;
     if (business.hours === null || business.hours.length < 1) {
-      toggleErrorAlert("Precisa escolher pelo menos um horário de funcionamento!");
+      toggleErrorAlert(
+        "Precisa escolher pelo menos um horário de funcionamento!"
+      );
       isLoading = false;
       return;
     }
     for (const businessHour of business?.hours) {
       if (!validateTime(businessHour?.start)) {
-        toggleErrorAlert("O horário de abertura é inválida, o formato deve ser HH:mm e entre 00:00 e 23:59!");
+        toggleErrorAlert(
+          "O horário de abertura é inválida, o formato deve ser HH:mm e entre 00:00 e 23:59!"
+        );
         isLoading = false;
         return;
       } else if (!validateTime(businessHour?.end)) {
-        toggleErrorAlert("O horário de fechamento é inválida, o formato deve ser HH:mm e entre 00:00 e 23:59!");
+        toggleErrorAlert(
+          "O horário de fechamento é inválida, o formato deve ser HH:mm e entre 00:00 e 23:59!"
+        );
         isLoading = false;
         return;
       }
@@ -200,6 +221,8 @@
   }
 
   onMount(async () => {
+    isLoading = true;
+    userInfo = await Utils.Jws.extractToken($Auth);
     const response = await getSettings();
     paymentGateway = { ...paymentGateway, ...response?.paymentGateway };
     business = { ...business, ...response?.business };
@@ -208,6 +231,7 @@
     }
     delivery = { ...delivery, ...response?.delivery };
     preparation = { ...preparation, ...response?.preparation };
+    isLoading = false;
   });
 
   Title.set("Seus ajustes");
@@ -217,106 +241,116 @@
   <div class="data">
     <h2>horário de funcionamento</h2>
     {#if business?.hours}
-    {#each business?.hours ?? [] as businessHour}
-      <div class="busninessHours">
-        <span on:click={onRemoveClick(businessHour.id)} class="remove"
-          ><Fa icon={faTrashAlt} /></span
-        >
-        <div class="twoCells">
-          <Views.TextEdit
-            name="Abertura:"
-            mask="__:__"
-            bind:value={businessHour.start}
-            bind:rawValue={businessHour.start}
-            placeHolder=""
-            type="number"
-            rightPadding="10px"
-          />
-          <Views.TextEdit
-            name="Fechamento:"
-            bind:value={businessHour.end}
-            bind:rawValue={businessHour.end}
-            placeHolder=""
-            mask="__:__"
-            type="number"
-            leftPadding="10px"
-          />
+      {#each business?.hours ?? [] as businessHour}
+        <div class="busninessHours">
+          <span on:click={onRemoveClick(businessHour.id)} class="remove"
+            ><Fa icon={faTrashAlt} /></span
+          >
+          <div class="twoCells">
+            <Views.TextEdit
+              placeHolder="Abertura"
+              mask="__:__"
+              bind:value={businessHour.start}
+              initialValue={businessHour.start}
+              type="number"
+              rightPadding="10px"
+            />
+            <Views.TextEdit
+              placeHolder="Fechamento"
+              bind:value={businessHour.end}
+              initialValue={businessHour.end}
+              mask="__:__"
+              type="number"
+              leftPadding="10px"
+            />
+          </div>
         </div>
-      </div>
-    {/each}
+      {/each}
     {:else}
-    <Views.Divider />
-    <span>Você precisa definir seus horários de funcionamento</span>
+      <Views.Divider />
+      <span>Você precisa definir seus horários de funcionamento</span>
     {/if}
     <Views.Divider />
     <Views.Button on:click={addHours}
       ><Fa icon={faClock} /><span>Adicionar horários</span></Views.Button
     >
     <div class="days">
-    {#each days as day}
-      <div class="day">
-          <Views.Checkbox marginTop=0 bind:checked={day.checked} label={day.name} />
-      </div>
-    {/each}
-  </div>
+      {#each days as day}
+        <div class="day">
+          <Views.Checkbox
+            marginTop="0"
+            bind:checked={day.checked}
+            label={day.name}
+          />
+        </div>
+      {/each}
+    </div>
     <Views.Button on:click={updateHours}
       ><Fa icon={faClock} /><span>Atualizar horários</span></Views.Button
     >
-    <Views.Divider />
-    <h2>Portais de pagamentos</h2>
-    <Views.Divider />
-    <Views.Button on:click={requestPagSeguroIntegration} 
-      >{integrateButtonName}</Views.Button
-    >
-
+    {#if userInfo?.role === "vendor"}
+      <Views.Divider />
+      <h2>Portais de pagamentos</h2>
+      <Views.Divider />
+      <Views.Button on:click={requestPagSeguroIntegration}
+        >{integrateButtonName}</Views.Button
+      >
+    {/if}
     <Views.Divider />
     <h2>A entrega</h2>
     <Views.Divider />
     <h3>Tempo de preparação em minutos</h3>
-    <small>Quanto tempo você vai precisar para preparar seus pedidos em média?</small>
+    <small
+      >Quanto tempo você vai precisar para preparar seus pedidos em média?</small
+    >
     <div class="twoCells">
       <Views.TextEdit
-        name="Tempo mínimo:"
+        placeHolder="Tempo mínimo"
         bind:value={preparation.min}
-        bind:rawValue={preparation.min}
-        placeHolder=""
+        initialValue={preparation.min}
         type="number"
         rightPadding="10px"
       />
       <Views.TextEdit
-        name="Tempo máximo:"
+        placeHolder="Tempo máximo"
         bind:value={preparation.max}
-        bind:rawValue={preparation.max}
-        placeHolder=""
+        initialValue={preparation.max}
         type="number"
         leftPadding="10px"
       />
     </div>
     <Views.Divider />
     <h3>Valor de entrega</h3>
-    <small>Vai querer pagar seus entregador quanto por entrega por Km? (o quanto mais você paga seus entregadores ficaram felizes e seus clientes tristes e vice versa)</small>
-    <Views.Switch name="Frete grátis:" bind:checked={delivery.free} />
+    <small
+      >Vai querer pagar seus entregador quanto por entrega por Km? (o quanto
+      mais você paga seus entregadores ficaram felizes e seus clientes tristes e
+      vice versa)</small
+    >
+    <Views.Switch placeHolder="Frete grátis" bind:checked={delivery.free} />
     {#if !(delivery?.free || false)}
       <Views.TextEdit
         type="currency"
         bind:value={delivery.value}
-        bind:rawValue={delivery.value}
-        icon={faAt}
-        name="Valor por KM:"
+        initialValue={delivery.value}
+        placeHolder="Valor por KM"
       />
       <Views.TextEdit
         type="currency"
         bind:value={delivery.min}
-        bind:rawValue={delivery.min}
-        icon={faAt}
-        name="Valor mínimo:"
+        initialValue={delivery.min}
+        placeHolder="Valor mínimo"
       />
     {/if}
     <Views.Divider />
     <Views.Button on:click={updateDelivery}>Atualizar a entrega</Views.Button>
+    <Views.Divider />
+    <h3>Exibir popups</h3>
+    <small>Aqui você escolhe quais popups vão ser exibidos a você:</small>
+    <Views.Switch name="Mostrar novos pedidos:" bind:checked={popupNewOrder} />
   </div>
 </div>
 
+<Views.GTerms />
 {#if !paymentGateway || isLoading}
   <Views.Loading
     topPadding={$StatusBar.height}

@@ -7,19 +7,32 @@
   import { Network } from "@capacitor/network";
   import { onMount } from "svelte";
   import { Navigation, Router, Routes } from "./stores/Navigation";
-  import { StatusBar as _StatusBar } from "./stores/Setup";
+  import { StatusBar as _StatusBar, Settings } from "./stores/Setup";
   import { StatusBar } from "@capacitor/status-bar";
-  import { PushNotification, Utils } from "@ikomida/components";
+  import { PushNotification, Utils, Views } from "@ikomida/components";
   import { registerPushNotificationToken } from "./network/PushNotification";
   import ForgotPassword from "./pages/user/ForgotPassword.svelte";
   import { CAPNativeLog } from "capacitor-native-log";
+  import Cache from "./stores/Cache";
 
+  let notificationIds = [];
   let networkStatus = null;
   let logedIn = false;
+  let showNotificationPopup = false;
+  let notificationPopup = {
+    title: null,
+    body: null,
+    buttons: [],
+  };
+  function togglePushNotificationPopup() {
+    showNotificationPopup = !showNotificationPopup;
+  }
   let pushNotification = new PushNotification(
     hasRegisteredCallBack,
-    pushNotificationReceivedCallBack,
-    pushNotificationActionPerformedCallBack
+    receivedCallBack,
+    actionPerformedCallBack,
+    hasErrorCallBack,
+    permissionStatus
   );
 
   const checkAppLaunchUrl = async () => {
@@ -39,9 +52,15 @@
     logedIn = false;
   }
 
-  $: Utils.Jws.extractToken($Auth).then((token) => {CAPNativeLog.log({level: "info", message: `Login info: ${logedIn}, token ${JSON.stringify(token)}`})
-    });
-  $: CAPNativeLog.log({level: "info", message: `Login info: ${logedIn}, $Auth: ${$Auth}`})
+  async function openNotification(notification) {
+    if (logedIn) {
+      if (["/order/", "/orders/"].includes(notification?.data?.uri)) {
+        Cache.setObject("ORDERS_HISTORY", null);
+        Cache.setObject("ORDERS", null);
+        Navigation.goTo(Routes.orders, false);
+      }
+    }
+  }
 
   async function hasRegisteredCallBack(token, platform) {
     const tokenObject = { platform, token };
@@ -49,15 +68,58 @@
     await registerPushNotificationToken(tokenObject);
   }
 
-  function pushNotificationReceivedCallBack(notification) {
-    // CAPNativeLog.log({ level: "info", message: JSON.stringify(notification) });
+  async function hasErrorCallBack(error) {
+    //TODO: -- handle and report error
+    CAPNativeLog.log({ level: "error", message: JSON.stringify(error) });
   }
 
-  function pushNotificationActionPerformedCallBack(notification) {
-    // CAPNativeLog.log({ level: "info", message: JSON.stringify(notification) });
+  async function permissionStatus(permissionStatus) {
+    //TODO: -- handle and report permissions
+    CAPNativeLog.log({ level: "info", message: `permissionStatusObject: ${JSON.stringify(permissionStatus)}` });
+  }
+
+  function receivedCallBack(notification) {
+    CAPNativeLog.log({ level: "info", message: JSON.stringify(notification) });
+    if (
+      $Settings?.popups.newOrder &&
+      !notificationIds.includes(notification?.id) &&
+      (logedIn || !((notification?.data?.logon ?? "true") === "true"))
+    ) {
+      notificationIds.push(notification?.id);
+      notificationPopup.title = notification?.title;
+      notificationPopup.body = notification?.body;
+      notificationPopup.buttons = [
+        {
+          name: "Fechar",
+          callback: togglePushNotificationPopup,
+        },
+      ];
+      if (notification?.data?.uri) {
+        notificationPopup?.buttons?.push({
+          name: "Abrir",
+          callback: () => {
+            showNotificationPopup = false;
+            openNotification(notification);
+          },
+          principal: true,
+        });
+      }
+      notificationPopup = notificationPopup;
+      CAPNativeLog.log({ level: "info", message: "Inside" });
+      togglePushNotificationPopup();
+    }
+  }
+
+  function actionPerformedCallBack(notification) {
+    CAPNativeLog.log({ level: "info", message: JSON.stringify(notification) });
+    openNotification(notification?.notification);
   }
 
   onMount(async () => {
+    CAPNativeLog.log({
+      level: "info",
+      message: `DOMAIN: ${JSON.stringify(window.location.host)}`,
+    });
     networkStatus = await Network.getStatus();
     if (Capacitor.isNativePlatform()) {
       pushNotification.init();
@@ -68,7 +130,7 @@
   Network.addListener("networkStatusChange", (status) => {
     networkStatus = status;
   });
-  
+
   App.addListener("appUrlOpen", (data) => {
     // CAPNativeLog.log({
     //   level: "info",
@@ -78,6 +140,9 @@
   });
 </script>
 
+<Views.LoadJS
+  url="https://www.google.com/recaptcha/api.js?render=6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS"
+/>
 {#if networkStatus == null || !networkStatus.connected}
   <div id="internetError">Esperando por conexão a internet...</div>
 {/if}
@@ -93,8 +158,19 @@
 {:else}
   <Login />
 {/if}
+{#if showNotificationPopup}
+  <Views.Alert
+    title={notificationPopup?.title}
+    message={notificationPopup?.body}
+    closeCallBack={togglePushNotificationPopup}
+    buttons={notificationPopup?.buttons}
+  />
+{/if}
 
 <style>
+  :global(.grecaptcha-badge) {
+    visibility: hidden;
+  }
   #internetError {
     background-color: #4c0708;
     color: white;

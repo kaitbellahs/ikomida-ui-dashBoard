@@ -48,11 +48,13 @@
   />
 {/if}
 <div class="category">
-  <Views.TextEdit name="Nome da categoria" bind:value={item.title} />
+  <Views.TextEdit placeHolder="Nome da categoria" bind:value={item.title}
+    initialValue={item.title} />
   <Views.TextEdit
     type="text"
-    name="Descrição da categoria"
+    placeHolder="Descrição da categoria"
     bind:value={item.description}
+    initialValue={item.description}
   />
   <Views.Divider />
   <Views.Divider />

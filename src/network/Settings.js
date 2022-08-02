@@ -15,9 +15,16 @@ export async function getSettings() {
     }
     return null;
 }
+export async function getQuotas() {
+    let response = await Network.instance.get("/vendor/quotas", get(Auth));
+    if (response?.success) {
+        return response?.data
+    }
+    return null;
+}
 
 export async function getPagSeguroUrl() {
-    return Network.instance.get("/vendor/pagSeguroUrl", get(Auth));
+    return Network.instance.get("/vendor/pagSeguroUrl", get(Auth), "pagSeguroUrl");
 }
 
 export async function setSettings(object) {
@@ -25,11 +32,11 @@ export async function setSettings(object) {
 }
 
 export async function updatePaymentGateway(object) {
-    return Network.instance.put("/vendor/updatePaymentGateway", get(Auth), object);
+    return Network.instance.put("/vendor/updatePaymentGateway", get(Auth), object, "updatePaymentGateway");
 }
 
 export async function revokePaymentGateway(object) {
-    return Network.instance.remove("/vendor/revokePaymentGateway", get(Auth), object);
+    return Network.instance.remove("/vendor/revokePaymentGateway", get(Auth), object, "revokePaymentGateway");
 }
 
 export async function updateBusinessHours(object) {

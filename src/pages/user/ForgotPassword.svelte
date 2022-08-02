@@ -28,7 +28,7 @@
   let timer = null;
   let countdownCanRequestCode = true;
   let countdown = 0;
-  let showRequestValidatingCodeAlert= false
+  let showRequestValidatingCodeAlert = false;
 
   $: if (countdown === 0) {
     if (timer) {
@@ -40,9 +40,8 @@
 
   $: styleHeight = `${Number($StatusBar.height) + 50}px`;
 
-  function toggleshowRequestValidatingCodeAlert(){
-    console.log("showRequestValidatingCodeAlert")
-    showRequestValidatingCodeAlert = !showRequestValidatingCodeAlert
+  function toggleshowRequestValidatingCodeAlert() {
+    showRequestValidatingCodeAlert = !showRequestValidatingCodeAlert;
   }
 
   function toggleErrorAlert(messageObject) {
@@ -82,7 +81,9 @@
       timer = setInterval(() => {
         countdown--;
       }, 1000);
-      toggleErrorAlert(`Digite o código que você receberá em instantes no seu celular no campo seguinte `)
+      toggleErrorAlert(
+        `Digite o código que você receberá em instantes no seu celular no campo seguinte `
+      );
     } else {
       toggleErrorAlert(response?.data);
     }
@@ -115,26 +116,29 @@
   style="margin-top:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; overflow: hidden;max-width: 100%;height: 100%;"
 >
   <Views.Divider />
-  <h2>Por favor informe seu número de telefone cadastrado</h2><small>clique em "<b>Solicitar</b>" para solicitar o código de validação</small>
+  <h2>Por favor informe seu número de telefone cadastrado</h2>
+  <small
+    >clique em "<b>Solicitar</b>" para solicitar o código de validação</small
+  >
   <Views.TextEdit
     type="phone"
-    bind:rawValue={requestPasswordObject.phone}
-    icon={faPhone}
+    bind:value={requestPasswordObject.phone}
     buttonName="Solicitar"
     callback={toggleshowRequestValidatingCodeAlert}
     buttonDisabled={!canRequestCode || !countdownCanRequestCode}
     bind:isValid={canRequestCode}
-    name="Número do telefone"
+    placeHolder="Número do telefone"
   />
   {#if !countdownCanRequestCode}
     <small
-      >Caso não receber o código, espera {countdown} segundos para solicitar um novo código!</small
+      >Caso não receber o código, espera {countdown} segundos para solicitar um novo
+      código!</small
     >
   {/if}
   <Views.Divider />
   <Views.TextEdit
     type="number"
-    bind:rawValue={requestPasswordObject.phoneValidationCode}
+    bind:value={requestPasswordObject.phoneValidationCode}
     icon={faUnlock}
     mask="_ _ _ _"
     buttonName="Confirmar"
@@ -143,24 +147,34 @@
     disabled={!canDigitValidationCode}
     bind:isValid={isValidationValid}
     validation={validateValidationCode}
-    name="Código de validação"
+    placeHolder="Código de validação"
   />
   <Views.Divider />
   <Views.Divider />
   <Views.Button on:click={requestNewPassword} disabled={!canRequestPassword}
     >Solicitar nova senha</Views.Button
   >
+  <Views.GTerms />
   <Views.MessageAlert object={errorAlert} bind:show={showAlert} />
   {#if showRequestValidatingCodeAlert}
-  <Views.Alert
-    title="Alerta"
-    message={`Verifica se seu número de telefone inserido ${Utils.Strings.formatAsPhone(requestPasswordObject?.phone)} está correto para prosseguir`}
-    closeCallBack={toggleshowRequestValidatingCodeAlert}
-    buttons={[
-      { name: "Quero corrigir", callback: toggleshowRequestValidatingCodeAlert },
-      { name: "Está correto", callback: requestPhoneValidation, principal: true },
-    ]}
-  />
+    <Views.Alert
+      title="Alerta"
+      message={`Verifica se seu número de telefone inserido ${Utils.Strings.formatAsPhone(
+        requestPasswordObject?.phone
+      )} está correto para prosseguir`}
+      closeCallBack={toggleshowRequestValidatingCodeAlert}
+      buttons={[
+        {
+          name: "Quero corrigir",
+          callback: toggleshowRequestValidatingCodeAlert,
+        },
+        {
+          name: "Está correto",
+          callback: requestPhoneValidation,
+          principal: true,
+        },
+      ]}
+    />
   {/if}
 </main>
 

@@ -169,6 +169,7 @@
     </tbody>
   </table>
 </div>
+<Views.GTerms />
 <Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 
 <style>

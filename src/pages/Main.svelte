@@ -7,7 +7,7 @@
     Menu,
     MenuHamburger,
   } from "../stores/Navigation";
-  import { Views } from "@ikomida/components";
+  import { Views, Utils } from "@ikomida/components";
   import Home from "./products/Home.svelte";
   import Orders from "./Orders/Orders.svelte";
   import Order from "./Orders/Order.svelte";
@@ -20,8 +20,12 @@
   import Edit from "./products/Edit.svelte";
   import Coupons from "./products/Coupons.svelte";
   import NewCoupon from "./products/NewCoupon.svelte";
+  import Quotas from "./user/Quotas.svelte";
   import EditCategory from "./products/EditCategory.svelte";
+  import Staff from "./Staff/Staff.svelte";
+  import NewStaff from "./Staff/NewStaff.svelte";
   import { StatusBar } from "../stores/Setup";
+  import { Auth } from "../stores/Auth";
   import {
     faHome,
     faList,
@@ -31,7 +35,7 @@
     faSlidersH,
   } from "@fortawesome/free-solid-svg-icons";
   import { onMount } from "svelte";
-
+let userInfo
   const tabs = [
     {
       name: "Home",
@@ -49,7 +53,7 @@
       icon: faBook,
     },
   ];
-  const menuHamburgerItems = [
+  $: menuHamburgerItems = [
     {
       name: "Home",
       callback: () => Navigation.reset(Routes.home),
@@ -60,16 +64,26 @@
       callback: () => Navigation.goTo(Routes.profile),
       icon: faUser,
     },
-    {
+    userInfo?.role === 'vendor' ? {
       name: "Cobranças",
       callback: () => Navigation.goTo(Routes.subscription),
       icon: faUser,
-    },
+    } : null,
     {
       name: "Configurações",
       callback: () => Navigation.goTo(Routes.settings),
       icon: faSlidersH,
     },
+    {
+      name: "Quotas",
+      callback: () => Navigation.goTo(Routes.quotas),
+      icon: faIdCard,
+    },
+    userInfo?.role === 'vendor' ? {
+      name: "Colaboradores",
+      callback: () => Navigation.goTo(Routes.staff),
+      icon: faIdCard,
+    } : null,
     {
       name: "Layout",
       callback: () => Navigation.goTo(Routes.layout),
@@ -80,7 +94,8 @@
   $: styleHeight = `${Number($StatusBar.height) + 60}px`;
   $: route = $Router.route;
 
-  onMount(() => {
+  onMount(async () => {
+    userInfo = await Utils.Jws.extractToken($Auth);
     const style = document.createElement("style");
     style.innerHTML = `
     body {
@@ -91,8 +106,10 @@
     document.head.appendChild(style);
   });
 
-  MenuHamburger.reset();
-  menuHamburgerItems.forEach((page) => MenuHamburger.addItem(page));
+  $: if(menuHamburgerItems){
+    MenuHamburger.reset();
+    menuHamburgerItems?.forEach((page) => MenuHamburger.addItem(page));
+  }
 </script>
 
 <main
@@ -124,6 +141,12 @@
     <Layout />
   {:else if route == Routes.subscription}
     <Subscription />
+  {:else if route == Routes.staff}
+    <Staff />
+  {:else if route == Routes.newStaff}
+    <NewStaff />
+  {:else if route == Routes.quotas}
+    <Quotas />
   {:else}
     <Home />
   {/if}
