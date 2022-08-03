@@ -54,7 +54,7 @@
     let response = await getLayout();
     if (response?.success && response?.data) {
       layout = { ...layout, ...response?.data };
-      Utils?.Objects?.UpdateInputs(layoutInputs, layout)
+      Utils?.Objects?.updateInputs(layoutInputs, layout)
     }
   });
 

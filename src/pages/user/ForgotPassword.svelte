@@ -2,7 +2,6 @@
   import { Title, Navigation, Routes, Menu } from "../../stores/Navigation";
   import { Views, Utils } from "@ikomida/components";
   import { StatusBar } from "../../stores/Setup";
-  import { faPhone, faUnlock } from "@fortawesome/free-solid-svg-icons";
   import {
     requestPasswordPhoneValidation,
     validatePasswordPhoneValidationCode,
@@ -29,6 +28,7 @@
   let countdownCanRequestCode = true;
   let countdown = 0;
   let showRequestValidatingCodeAlert = false;
+  let showPasswordRequistedAlert = false;
 
   $: if (countdown === 0) {
     if (timer) {
@@ -42,6 +42,9 @@
 
   function toggleshowRequestValidatingCodeAlert() {
     showRequestValidatingCodeAlert = !showRequestValidatingCodeAlert;
+  }
+  function toggleshowPasswordRequistedAlert() {
+    showPasswordRequistedAlert = !showPasswordRequistedAlert;
   }
 
   function toggleErrorAlert(messageObject) {
@@ -57,7 +60,7 @@
     isLoading = true;
     const response = await requestPassword(requestPasswordObject);
     if (response?.success) {
-      Navigation.reset(Routes.login);
+      showPasswordRequistedAlert = true;
     } else {
       toggleErrorAlert(response?.data);
     }
@@ -65,7 +68,7 @@
   }
 
   async function requestPhoneValidation() {
-    showRequestValidatingCodeAlert = false
+    showRequestValidatingCodeAlert = false;
     isLoading = true;
     requestPasswordObject.phone = requestPasswordObject.phone;
     const response = await requestPasswordPhoneValidation(
@@ -143,7 +146,6 @@
   <Views.TextEdit
     type="number"
     bind:value={requestPasswordObject.phoneValidationCode}
-    icon={faUnlock}
     mask="_ _ _ _"
     buttonName="Confirmar"
     callback={ValidatePhoneCode}
@@ -175,6 +177,20 @@
         {
           name: "Está correto",
           callback: requestPhoneValidation,
+          principal: true,
+        },
+      ]}
+    />
+  {/if}
+  {#if showPasswordRequistedAlert}
+    <Views.Alert
+      title="Alerta"
+      message={`Sua senha foi resetada e gerada uma nova senha aleatória e foi enviada para seu email cadastrado, em instantes você receberá o nosso email, verifica nas caixas de entrada e caixa spam.`}
+      closeCallBack={toggleshowPasswordRequistedAlert}
+      buttons={[
+        {
+          name: "Fazer login",
+          callback: () => Navigation.reset(Routes.login),
           principal: true,
         },
       ]}

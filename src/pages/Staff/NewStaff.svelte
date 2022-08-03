@@ -81,7 +81,7 @@
           const address = response?.data;
           currentPostalCode = address?.postalCode;
           items.address = { ...items?.address, ...address };
-          Utils?.Objects?.UpdateInputs(itemsInputs, items);
+          Utils?.Objects?.updateInputs(itemsInputs, items);
         } else {
           toggleErrorAlert(response?.data);
         }
