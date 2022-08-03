@@ -15,8 +15,8 @@ export async function getSettings() {
     }
     return null;
 }
-export async function getQuotas() {
-    let response = await Network.instance.get("/vendor/quotas", get(Auth));
+export async function getLimits() {
+    let response = await Network.instance.get("/vendor/limits", get(Auth));
     if (response?.success) {
         return response?.data
     }

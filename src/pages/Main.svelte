@@ -20,7 +20,7 @@
   import Edit from "./products/Edit.svelte";
   import Coupons from "./products/Coupons.svelte";
   import NewCoupon from "./products/NewCoupon.svelte";
-  import Quotas from "./user/Quotas.svelte";
+  import Limits from "./user/Limits.svelte";
   import EditCategory from "./products/EditCategory.svelte";
   import Staff from "./Staff/Staff.svelte";
   import NewStaff from "./Staff/NewStaff.svelte";
@@ -33,6 +33,9 @@
     faBook,
     faIdCard,
     faSlidersH,
+    faMoneyBill1Wave,
+    faChartColumn,
+    faUserGroup
   } from "@fortawesome/free-solid-svg-icons";
   import { onMount } from "svelte";
 let userInfo
@@ -65,9 +68,9 @@ let userInfo
       icon: faUser,
     },
     userInfo?.role === 'vendor' ? {
-      name: "Cobranças",
+      name: "Assinatura",
       callback: () => Navigation.goTo(Routes.subscription),
-      icon: faUser,
+      icon: faMoneyBill1Wave,
     } : null,
     {
       name: "Configurações",
@@ -75,14 +78,14 @@ let userInfo
       icon: faSlidersH,
     },
     {
-      name: "Quotas",
-      callback: () => Navigation.goTo(Routes.quotas),
-      icon: faIdCard,
+      name: "Limites",
+      callback: () => Navigation.goTo(Routes.limits),
+      icon: faChartColumn,
     },
     userInfo?.role === 'vendor' ? {
       name: "Colaboradores",
       callback: () => Navigation.goTo(Routes.staff),
-      icon: faIdCard,
+      icon: faUserGroup,
     } : null,
     {
       name: "Layout",
@@ -145,8 +148,8 @@ let userInfo
     <Staff />
   {:else if route == Routes.newStaff}
     <NewStaff />
-  {:else if route == Routes.quotas}
-    <Quotas />
+  {:else if route == Routes.limits}
+    <Limits />
   {:else}
     <Home />
   {/if}

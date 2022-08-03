@@ -2,13 +2,12 @@
   import { Title } from "../../stores/Navigation";
   import { Views, Utils } from "@ikomida/components";
   import { StatusBar } from "../../stores/Setup";
-  import { getQuotas } from "../../network/Settings";
+  import { getLimits } from "../../network/Settings";
   import { onMount } from "svelte";
   import Fa from "svelte-fa";
-  import { faReceipt, faFileInvoice } from "@fortawesome/free-solid-svg-icons";
-  import { AppLauncher } from "@capacitor/app-launcher";
+  import { faTruck, faUserGroup, faMoneyBill1Wave, faPercent, faCartShopping } from "@fortawesome/free-solid-svg-icons";
 
-  let quotas;
+  let limits;
   let isLoading = false;
   let errorAlert;
   let showAlert = false;
@@ -19,10 +18,10 @@
   }
 
   onMount(async () => {
-    quotas = await getQuotas();
+    limits = await getLimits();
   });
 
-  Title.set("Cobranças");
+  Title.set("Limites");
   function color(percent) {
     return `rgb(${percent < 50 ? (255 / 100) * (percent * 2) : 255}, ${
       percent >= 50 ? (255 / 100) * ((100 - percent) * 2) : 255
@@ -39,23 +38,24 @@
   function limitCurrency(limit) {
     return limit === 0 ? "∞" : Utils.Strings.currency(limit ?? 0);
   }
-  $: staff = percent(quotas?.limits?.staff, quotas?.quotas?.staff);
-  $: products = percent(quotas?.limits?.products, quotas?.quotas?.products);
-  $: orders = percent(quotas?.limits?.orders, quotas?.quotas?.orders);
-  $: coupons = percent(quotas?.limits?.coupons, quotas?.quotas?.coupons);
-  $: billing = percent(quotas?.limits?.billing, quotas?.quotas?.billing);
+  $: staff = percent(limits?.limits?.staff, limits?.used?.staff);
+  $: products = percent(limits?.limits?.products, limits?.used?.products);
+  $: orders = percent(limits?.limits?.orders, limits?.used?.orders);
+  $: coupons = percent(limits?.limits?.coupons, limits?.used?.coupons);
+  $: billing = percent(limits?.limits?.billing, limits?.used?.billing);
 </script>
 
 <h2>Aqui você analisa métricas de uso do seu plano</h2>
 
 <section>
-  {#if quotas}
+  {#if limits}
     <Views.Divider />
     <article>
-      <h4>Pedidos</h4>
-      <span><b>Usado:</b> {quotas?.quotas?.orders ?? 0} Pedidos este Mês</span
+      <h4>
+        <Fa style="color: #4c0708;" icon={faTruck} /> Pedidos</h4>
+      <span><b>Usado:</b> {limits?.used?.orders ?? 0} Pedidos este Mês</span
       ><span>
-        <b>Limite:</b> {limit(quotas?.limits?.orders)} Pedidos por Mês</span
+        <b>Limite:</b> {limit(limits?.limits?.orders)} Pedidos por Mês</span
       ><span><b>Percentagem:</b> {orders}% saturado</span>
       <div class="chart">
         <div style="--width: {orders}%; --color: {color(orders)};" />
@@ -63,12 +63,12 @@
     </article>
     <Views.Divider />
     <article>
-      <h4>Faturamento</h4>
+      <h4><Fa style="color: #4c0708;" icon={faMoneyBill1Wave} /> Faturamento</h4>
       <span
         ><b>Usado:</b>
-        {Utils.Strings.currency(quotas?.quotas?.billing) ?? 0} este Mês</span
+        {Utils.Strings.currency(limits?.used?.billing) ?? 0} este Mês</span
       ><span>
-        <b>Limite:</b> {limitCurrency(quotas?.limits?.billing)} por Mês</span
+        <b>Limite:</b> {limitCurrency(limits?.limits?.billing)} por Mês</span
       ><span><b>Percentagem:</b> {billing}% saturado</span>
       <div class="chart">
         <div style="--width: {billing}%; --color: {color(billing)};" />
@@ -76,9 +76,10 @@
     </article>
     <Views.Divider />
     <article>
-      <h4>Produtos</h4>
-      <span><b>Usado:</b> {quotas?.quotas?.products ?? 0}</span><span>
-        <b>Limite:</b> {limit(quotas?.limits?.products)}</span
+      <h4>
+        <Fa style="color: #4c0708;" icon={faCartShopping} /> Produtos</h4>
+      <span><b>Usado:</b> {limits?.used?.products ?? 0}</span><span>
+        <b>Limite:</b> {limit(limits?.limits?.products)}</span
       ><span><b>Percentagem:</b> {products}% saturado</span>
       <div class="chart">
         <div style="--width: {products}%; --color: {color(products)};" />
@@ -86,9 +87,10 @@
     </article>
     <Views.Divider />
     <article>
-      <h4>Cupons</h4>
-      <span><b>Usado:</b> {quotas?.quotas?.coupons ?? 0}</span><span>
-        <b>Limite:</b> {limit(quotas?.limits?.coupons)}</span
+      <h4>
+        <Fa style="color: #4c0708;" icon={faPercent} /> Cupons</h4>
+      <span><b>Usado:</b> {limits?.used?.coupons ?? 0}</span><span>
+        <b>Limite:</b> {limit(limits?.limits?.coupons)}</span
       ><span><b>Percentagem:</b> {coupons}% saturado</span>
       <div class="chart">
         <div style="--width: {coupons}%; --color: {color(coupons)};" />
@@ -96,9 +98,10 @@
     </article>
     <Views.Divider />
     <article>
-      <h4>Colaboradores</h4>
-      <span><b>Usado:</b> {quotas?.quotas?.staff ?? 0}</span><span>
-        <b>Limite:</b> {limit(quotas?.limits?.staff)}</span
+      <h4>
+        <Fa style="color: #4c0708;" icon={faUserGroup} /> Colaboradores</h4>
+      <span><b>Usado:</b> {limits?.used?.staff ?? 0}</span><span>
+        <b>Limite:</b> {limit(limits?.limits?.staff)}</span
       ><span><b>Percentagem:</b> {staff}% saturado</span>
       <div class="chart">
         <div style="--width: {staff}%; --color: {color(staff)};" />
@@ -107,7 +110,7 @@
   {/if}
 </section>
 
-{#if !quotas || isLoading}
+{#if !limits || isLoading}
   <Views.Loading
     topPadding={$StatusBar.height}
     bottomPadding={$StatusBar.bottomPadding}

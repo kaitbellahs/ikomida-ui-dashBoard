@@ -24,7 +24,7 @@
     if (!value) {
       await Clipboard.write({ string: url });
       toggleErrorAlert(
-            `Se o navegador externo no for aberto automaticamente, por favor o abra e digita esa URL: ${url}, que também foi copiado para sua área de transferência para colar-lo!`
+        `Se o navegador externo no for aberto automaticamente, por favor o abra e digita esa URL: ${url}, que também foi copiado para sua área de transferência para colar-lo!`
       );
     }
   }
@@ -60,16 +60,17 @@
     return "-";
   }
 
-  Title.set("Cobranças");
+  Title.set("Assinatura");
 </script>
 
-<h2>dados do seu plano</h2>
+<h2>dados da sua assinatura</h2>
 <Views.TextValue text="plano:" value={subscription?.plan} fontSize="1.2em" />
 <Views.TextValue text="Valor:" value={subscription?.value} fontSize="1.2em" />
 <Views.TextValue
   text="Estado:"
   value={subscriptionStatus(subscription?.status)}
   fontSize="1.2em"
+  rightColor={subscription?.status === 'ACTIVE' ? "green" : 'yello'}
 />
 <Views.TextValue
   text="inscrição:"
@@ -84,18 +85,22 @@
 <Views.Divider />
 <h2>Ciclo de pagamento</h2>
 {#if subscription?.charges}
-  {#each subscription?.charges as charges}
+  {#each subscription?.charges?.sort((i1, i2) => new Date(i2?.dueDate) - new Date(i1?.dueDate)) as charges}
     <div class="charge">
-      <span
-        alt="Abrir a nota fiscal"
-        on:click={open(charges?.transactionReceiptUrl)}
-        class="receipt"><Fa icon={faReceipt} /></span
-      >
-      <span
-        alt="Abrir comprovante de pagamento"
-        on:click={open(charges?.invoiceUrl)}
-        class="invoice"><Fa icon={faFileInvoice} /></span
-      >
+      {#if charges?.invoiceUrl}
+        <span
+          alt="Abrir comprovante de pagamento"
+          on:click={open(charges?.invoiceUrl)}
+          class="invoice"><Fa icon={faFileInvoice} /></span
+        >
+      {/if}
+      {#if charges?.transactionReceiptUrl}
+        <span
+          alt="Abrir a nota fiscal"
+          on:click={open(charges?.transactionReceiptUrl)}
+          class="receipt"><Fa icon={faReceipt} /></span
+        >
+      {/if}
       <Views.TextValue
         text="value:"
         value={charges?.value}
@@ -125,6 +130,7 @@
         value={paymentStatus(charges?.status)}
         fontSize="0.9em"
         leftMargin="50"
+        rightColor={charges?.status === 'CONFIRMED' ? "green" : (charges?.status === 'PENDING' ? 'yellow' : 'red')}
       />
     </div>
   {/each}
@@ -146,7 +152,7 @@
     padding: 15px;
     margin-top: 20px;
   }
-  .receipt {
+  .invoice {
     position: absolute;
     top: -10px;
     right: -10px;
@@ -161,7 +167,7 @@
     text-align: center;
     padding: 4px;
   }
-  .invoice {
+  .receipt {
     position: absolute;
     top: -10px;
     right: 35px;
@@ -175,5 +181,8 @@
     vertical-align: middle;
     text-align: center;
     padding: 4px;
+  }
+  .confirmed {
+    color: green
   }
 </style>

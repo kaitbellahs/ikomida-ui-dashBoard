@@ -6,7 +6,7 @@
   import { countCoupons } from "../../network/Payment";
   import { Views } from "@ikomida/components";
 
-  Title.set("Dashboard");
+  Title.set("iKomida");
 </script>
 
 <h2>Essas são algumas estatísticas sobre seu estabelecimento</h2>
