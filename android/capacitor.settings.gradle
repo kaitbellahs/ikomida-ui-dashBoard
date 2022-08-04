@@ -29,8 +29,5 @@ project(':capacitor-status-bar').projectDir = new File('../node_modules/@capacit
 include ':capacitor-storage'
 project(':capacitor-storage').projectDir = new File('../node_modules/@capacitor/storage/android')
 
-include ':ikomida-capacitor-safeapp'
-project(':ikomida-capacitor-safeapp').projectDir = new File('../node_modules/@ikomida/capacitor-safeapp/android')
-
 include ':capacitor-native-log'
 project(':capacitor-native-log').projectDir = new File('../node_modules/capacitor-native-log/android')

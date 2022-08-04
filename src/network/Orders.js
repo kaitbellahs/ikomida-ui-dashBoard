@@ -1,5 +1,6 @@
 import {
-    Network
+    Network,
+    Types
 } from "@ikomida/components";
 import {
     get
@@ -8,7 +9,7 @@ import {
     Auth
 } from '../stores/Auth';
 
-const openOrdersStatus = ["waitingPayment", "open", "accepted", "waitingDelivery", "delivery"];
+const openOrdersStatus = [Types.OrderStatusType.WAITING_PAYMENT, Types.OrderStatusType.OPEN, Types.OrderStatusType.ACCEPTED, Types.OrderStatusType.WAITING_DELIVERY, Types.OrderStatusType.IN_DELIVERY];
 
 export async function getOrders (history, timestamp = 0) {
     let response = await Network.instance.get(`/orders/${timestamp}${history ? '/history' : ''}`, get(Auth));
@@ -36,35 +37,16 @@ export async function countOrders() {
 
 export function OrderStatus(status) {
     switch (status) {
-        case "waitingPayment":
+        case Types.OrderStatusType.WAITING_PAYMENT:
             return "aguardando pagamento";
-        case "open":
-        case "accepted":
-        case "waitingDelivery":
-        case "delivery":
+        case Types.OrderStatusType.OPEN:
+        case Types.OrderStatusType.ACCEPTED:
+        case Types.OrderStatusType.WAITING_DELIVERY:
+        case Types.OrderStatusType.IN_DELIVERY:
             return "em andamento";
-        case "delivered":
+        case Types.OrderStatusType.DELIVERED:
             return "entregue";
-        case "canceled":
-            return "cancelado";
-    }
-}
-
-export function OrderStage(status) {
-    switch (status) {
-        case "waitingPayment":
-            return "aguardando pagamento";
-        case "open":
-            return "aguardando aprovação";
-        case "accepted":
-            return "em preparação";
-        case "waitingDelivery":
-            return "esperando para sair para delivery";
-        case "delivery":
-            return "a caminho até você";
-        case "delivered":
-            return "entregue";
-        case "canceled":
+        case Types.OrderStatusType.CANCELED:
             return "cancelado";
     }
 }

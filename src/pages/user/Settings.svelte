@@ -180,7 +180,7 @@
   async function requestPagSeguroIntegration() {
     isLoading = true;
     if (paymentGateway?.type) {
-      const response = await revokePaymentGateway;
+      const response = await revokePaymentGateway();
       if (response?.success) {
         toggleErrorAlert(
           `A integração dos nossos nossos sistemas com o pagseguro foi revogado com sucesso!`

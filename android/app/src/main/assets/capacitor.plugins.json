@@ -36,10 +36,6 @@
 		"classpath": "com.capacitorjs.plugins.storage.StoragePlugin"
 	},
 	{
-		"pkg": "@ikomida/capacitor-safeapp",
-		"classpath": "br.com.tialtonivel.safeapp.SafeAppPlugin"
-	},
-	{
 		"pkg": "capacitor-native-log",
 		"classpath": "host.mote.capacitornativelog.CAPNativeLog"
 	}

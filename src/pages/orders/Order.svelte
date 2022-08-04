@@ -101,7 +101,7 @@
 
   <h3>Pedido #{order?.customID}:</h3>
   <span class="status">
-    {#if order?.status == "open"}
+    {#if order?.status == Types.OrderStatusType.OPEN}
       O pedido está
       <span>{OrderStatus(order?.status)}</span>
     {:else}

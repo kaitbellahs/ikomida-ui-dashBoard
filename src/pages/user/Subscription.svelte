@@ -1,6 +1,6 @@
 <script>
   import { Title } from "../../stores/Navigation";
-  import { Views, Utils } from "@ikomida/components";
+  import { Views, Utils, Types } from "@ikomida/components";
   import { StatusBar } from "../../stores/Setup";
   import { getSubscription } from "../../network/Payment";
   import { onMount } from "svelte";
@@ -36,9 +36,9 @@
   function subscriptionStatus(status) {
     if (typeof status === "string") {
       switch (status.toUpperCase()) {
-        case "ACTIVE":
+        case Types.PaymentStatusTypes.AsaasSignature.ACTIVE:
           return "Ativo";
-        case "CANCELED":
+        case Types.PaymentStatusTypes.AsaasSignature.CANCELED:
           return "Cancelado";
         default:
           return "-";
@@ -49,9 +49,9 @@
   function paymentStatus(status) {
     if (typeof status === "string") {
       switch (status.toUpperCase()) {
-        case "CONFIRMED":
+        case Types.PaymentStatusTypes.Asaas.CONFIRMED:
           return "Confirmado";
-        case "PENDING":
+        case Types.PaymentStatusTypes.Asaas.PENDING:
           return "Aguardando";
         default:
           return "-";
@@ -70,7 +70,7 @@
   text="Estado:"
   value={subscriptionStatus(subscription?.status)}
   fontSize="1.2em"
-  rightColor={subscription?.status === 'ACTIVE' ? "green" : 'yello'}
+  rightColor={subscription?.status === Types.PaymentStatusTypes.AsaasSignature.ACTIVE ? "green" : 'yello'}
 />
 <Views.TextValue
   text="inscrição:"
@@ -130,7 +130,7 @@
         value={paymentStatus(charges?.status)}
         fontSize="0.9em"
         leftMargin="50"
-        rightColor={charges?.status === 'CONFIRMED' ? "green" : (charges?.status === 'PENDING' ? 'yellow' : 'red')}
+        rightColor={charges?.status === Types.PaymentStatusTypes.Asaas.CONFIRMED ? "green" : (charges?.status === Types.PaymentStatusTypes.Asaas.PENDING ? 'yellow' : 'red')}
       />
     </div>
   {/each}
@@ -181,8 +181,5 @@
     vertical-align: middle;
     text-align: center;
     padding: 4px;
-  }
-  .confirmed {
-    color: green
   }
 </style>
