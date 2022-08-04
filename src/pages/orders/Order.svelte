@@ -47,7 +47,10 @@
 
   let errorAlert;
   let showAlert = false;
-  $: total = (Number((order?.subtotal ?? 0)) + Number((order?.delivery ?? 0)) - Number((order?.discount ?? 0)));
+  $: total =
+    Number(order?.subtotal ?? 0) +
+    Number(order?.delivery ?? 0) -
+    Number(order?.discount ?? 0);
 
   $: if (selected !== oldSelected) {
     isLoading = true;
@@ -116,7 +119,8 @@
       <span class="quantity">{quantity}</span><span class="title">{title}</span
       ><span class="price"
         >{Utils.Strings.currency(
-          quantity * Utils.Numbers.calcDiscount(price, discount, discountType)
+          quantity *
+            (price - Utils.Numbers.calcDiscount(price, discount, discountType))
         )}</span
       >
     </div>

@@ -47,10 +47,7 @@
 {/if}
 <div class="product">
   {#if item.image}
-    <img
-      src={item.image}
-      alt={item.title}
-    />
+    <img src={item.image} alt={item.title} />
   {/if}
   <h2>{item.title}</h2>
   <p>{item.description}</p>
@@ -64,12 +61,18 @@
     {/if}
     <span class="current"
       >{Utils.Strings.currency(
-        Utils.Numbers.calcDiscount(item.price, item.discount, item.discountType)
+        item.price -
+          Utils.Numbers.calcDiscount(
+            item.price,
+            item.discount,
+            item.discountType
+          )
       )}</span
     >
   </div>
   <div class="quantity">
-    Resta{item.quantity > 1 ? "m" : ""} <span>{item.quantity}</span> unidade{item.quantity > 1 ? "s" : ""}
+    Resta{item.quantity > 1 ? "m" : ""} <span>{item.quantity}</span>
+    unidade{item.quantity > 1 ? "s" : ""}
   </div>
   <Views.Divider />
   <Views.Button on:click={removeProduct}

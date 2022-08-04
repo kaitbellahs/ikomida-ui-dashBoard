@@ -17,11 +17,11 @@
   import Product from "./products/Product.svelte";
   import Products from "./products/Products.svelte";
   import Layout from "./user/Layout.svelte";
-  import Edit from "./products/Edit.svelte";
-  import Coupons from "./products/Coupons.svelte";
-  import NewCoupon from "./products/NewCoupon.svelte";
+  import NewProduct from "./products/NewProduct.svelte";
+  import Coupons from "./Coupons/Coupons.svelte";
+  import NewCoupon from "./Coupons/NewCoupon.svelte";
   import Limits from "./user/Limits.svelte";
-  import EditCategory from "./products/EditCategory.svelte";
+  import NewCategory from "./products/NewCategory.svelte";
   import Staff from "./Staff/Staff.svelte";
   import NewStaff from "./Staff/NewStaff.svelte";
   import { StatusBar } from "../stores/Setup";
@@ -133,9 +133,9 @@ let userInfo
   {:else if route == Routes.product}
     <Product />
   {:else if route == Routes.editProduct}
-    <Edit />
+    <NewProduct />
   {:else if route == Routes.editCategory}
-    <EditCategory />
+    <NewCategory />
   {:else if route == Routes.coupons}
     <Coupons />
   {:else if route == Routes.newCoupon}
