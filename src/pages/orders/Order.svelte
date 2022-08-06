@@ -1,49 +1,65 @@
 <script>
   import { Title, Router } from "../../stores/Navigation";
-  import { OrderStatus } from "../../network/Orders";
+  import { OrderStatus, ChangeOrderStatus } from "../../network/Orders";
   import { Views, Utils, Types } from "@ikomida/components";
   import { PaymentType } from "../../network/Payment";
-  import { ChangeOrderStatus } from "../../network/Orders";
   import { StatusBar } from "../../stores/Setup";
-  import { beforeUpdate } from "svelte";
+  import Cache from "../../stores/Cache";
 
-  const orderFinishedOptions = ["delivered", "canceled"];
+  $: CACHE_NAME = "ORDERS";
+
   const order = $Router.options;
-  let selected = null;
-  let oldSelected = null;
   let isLoading = false;
-  const orderOptions = (orderID) => [
-    new Types.SelectorOptions({
-      id: "accepted",
-      name: "1. Aceitar o pedido",
-      selectedName: "Pedido aceito",
-      orderID,
-    }),
-    new Types.SelectorOptions({
-      id: "waitingDelivery",
-      name: "2. Esperando o entregador",
-      selectedName: "Pedido a Espera do entregador",
-      orderID,
-    }),
-    new Types.SelectorOptions({
-      id: "delivery",
-      name: "3. Saiu para entrega",
-      selectedName: "Pedido a caminho do cliente",
-      orderID,
-    }),
-    new Types.SelectorOptions({
-      id: "delivered",
-      name: "4. Pedido entrege",
-      selectedName: "Pedido entrege",
-      orderID,
-    }),
-    new Types.SelectorOptions({
-      id: "canceled",
-      name: "5. Cancelar o pedido",
-      selectedName: "Pedido cancelado",
-      orderID,
-    }),
-  ];
+
+  const nextButtonText = (order) => {
+    switch (order?.status) {
+      case Types.OrderStatusType.WAITING_PAYMENT:
+        return "";
+      case Types.OrderStatusType.OPEN:
+        return "Aceitar o pedido";
+      case Types.OrderStatusType.ACCEPTED:
+        return "Esperando o entregador";
+      case Types.OrderStatusType.WAITING_DELIVERY:
+        return "Saiu para entrega";
+      case Types.OrderStatusType.IN_DELIVERY:
+        return "Pedido entrege";
+      default:
+        return "-";
+    }
+  };
+
+  async function cancel() {
+    isLoading = true;
+    const response = await ChangeOrderStatus(
+      order?.id,
+      Types.OrderStatusType.CANCELED
+    );
+    if (response?.success) {
+      order.status = Types.OrderStatusType.CANCELED;
+      Cache.setObject(CACHE_NAME, null);
+      toggleErrorAlert("O pedido foi atualizado con sucesso!");
+    } else {
+      toggleErrorAlert(response?.data);
+    }
+    isLoading = false;
+  }
+
+  async function next() {
+    isLoading = true;
+    let newStatus =
+      Types.OrderStatusType.keys[
+        Types.OrderStatusType.keys.indexOf(order?.status) + 1
+      ];
+    const response = await ChangeOrderStatus(order?.id, newStatus);
+    if (response?.success) {
+      order.status = newStatus;
+      Cache.setObject(CACHE_NAME, null);
+      toggleErrorAlert("O pedido foi atualizado con sucesso!");
+    } else {
+      toggleErrorAlert(response?.data);
+    }
+    isLoading = false;
+  }
 
   let errorAlert;
   let showAlert = false;
@@ -52,39 +68,14 @@
     Number(order?.delivery ?? 0) -
     Number(order?.discount ?? 0);
 
-  $: if (selected !== oldSelected) {
-    isLoading = true;
-    ChangeOrderStatus(selected?.orderID, selected?.id).then((response) => {
-      if (!response?.success) {
-        toggleErrorAlert(response?.data);
-      } else {
-        order.status = order?.selected?.id;
-      }
-    });
-    isLoading = false;
-  }
-
   function toggleErrorAlert(messageObject) {
     errorAlert = messageObject;
     showAlert = true;
   }
 
-  beforeUpdate(() => {
-    selected = orderOptions(order?.id)?.filter(
-      (option) => option?.id === order?.status
-    )?.[0];
-    oldSelected = selected;
-  });
-
   Title.set("Detalhes do predido");
 </script>
 
-{#if isLoading}
-  <Views.Loading
-    topPadding={$StatusBar.height}
-    bottomPadding={$StatusBar.bottomPadding}
-  />
-{/if}
 <div class="order">
   <span class="time"
     >Feito {Utils.Strings.timestampToString(order?.createdAt)}</span
@@ -129,13 +120,17 @@
   <div class="paymentMethod">
     Forma de pagamento: <b>{PaymentType(order?.payment?.type)}</b>
   </div>
-  {#if !orderFinishedOptions.includes(order?.status)}
-    <Views.Selector
-      bind:selected
-      name="selecione uma opção"
-      options={orderOptions(order?.id)}
-    />
-  {/if}
+  <div class="buttonGroup">
+    {#if ![Types.OrderStatusType.DELIVERED, Types.OrderStatusType.CANCELED].includes(order?.status)}
+      <Views.Button type="secondary" on:click={cancel}
+        >Cancelar</Views.Button
+      >
+    {/if}
+    {#if ![Types.OrderStatusType.DELIVERED, Types.OrderStatusType.CANCELED, Types.OrderStatusType.WAITING_PAYMENT].includes(order?.status)}
+      <Views.Button on:click={next}>{nextButtonText(order)}</Views.Button
+      >
+    {/if}
+  </div>
   <Views.Divider />
   <table>
     <thead>
@@ -175,6 +170,13 @@
 </div>
 <Views.GTerms />
 <Views.MessageAlert object={errorAlert} bind:show={showAlert} />
+
+{#if isLoading}
+  <Views.Loading
+    topPadding={$StatusBar.height}
+    bottomPadding={$StatusBar.bottomPadding}
+  />
+{/if}
 
 <style>
   .order {
@@ -266,5 +268,19 @@
     padding: 4px 20px;
     align-self: center;
     margin-bottom: 10px;
+  }
+  .order > .buttonGroup {
+    display: flex;
+    flex-direction: row;
+    margin-top: 20px;
+  }
+  .order > .buttonGroup > :global(*) {
+    flex: 1;
+  }
+  .order > .buttonGroup > :global(*):first-child {
+    margin-right: 5px;
+  }
+  .order > .buttonGroup > :global(*):last-child {
+    margin-left: 5px;
   }
 </style>

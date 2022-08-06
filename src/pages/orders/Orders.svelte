@@ -6,7 +6,7 @@
     Menu,
     Routes,
   } from "../../stores/Navigation";
-  import { getOrders , OrderStatus } from "../../network/Orders";
+  import { getOrders, OrderStatus } from "../../network/Orders";
   import { Views, Utils, Types } from "@ikomida/components";
   import { PaymentType } from "../../network/Payment";
   import { ChangeOrderStatus } from "../../network/Orders";
@@ -27,21 +27,17 @@
         : orders?.[orders.length - 1]?.timestamp ?? -1;
       canGetMore = false;
       orders = Cache.getObject(CACHE_NAME);
-      const newOrders = (await getOrders($Router.options, timestamp))?.map(
-        (order) => {
-          order.selected = orderOptions(order?.id)?.filter(
-            (option) => option?.id === order?.status
-          )?.[0];
-          order.oldSelected = order?.selected;
-          return order;
-        }
-      );
+      const newOrders = await getOrders($Router.options, timestamp);
       hasMore = newOrders.length > 0;
       orders = refresh
         ? newOrders
         : orders
         ? [...orders, ...newOrders]
         : newOrders;
+      orders = orders?.map((order) => {
+        order.statusIndex = Types.OrderStatusType.keys.indexOf(order.status);
+        return order;
+      });
       orders.sort((item1, item2) => item2.timestamp - item1.timestamp);
       Cache.setObject(CACHE_NAME, orders);
       canGetMore = refresh || lastTimestamp !== timestamp;
@@ -50,87 +46,84 @@
     }
   }
 
-async function update() {
-  orders = Cache.getObject(CACHE_NAME);
-  if (!orders) {
-    await getMore(null, true);
+  async function update() {
+    orders = Cache.getObject(CACHE_NAME);
+    if (!orders) {
+      await getMore(null, true);
+    }
   }
-}
 
   async function refresh() {
     await getMore(null, true);
   }
-  
-  const orderFinishedOptions = ["waitingPayment", "canceled"];
 
   let isLoading = false;
   let errorAlert;
   let showAlert = false;
-  const orderOptions = (orderID) => [
-    new Types.SelectorOptions({
-      id: "accepted",
-      name: "1. Aceitar o pedido",
-      selectedName: "Pedido aceito",
-      orderID,
-    }),
-    new Types.SelectorOptions({
-      id: "waitingDelivery",
-      name: "2. Esperando o entregador",
-      selectedName: "Pedido a Espera do entregador",
-      orderID,
-    }),
-    new Types.SelectorOptions({
-      id: "delivery",
-      name: "3. Saiu para entrega",
-      selectedName: "Pedido a caminho",
-      orderID,
-    }),
-    new Types.SelectorOptions({
-      id: "delivered",
-      name: "4. Pedido entrege",
-      selectedName: "Pedido entrege",
-      orderID,
-    }),
-    new Types.SelectorOptions({
-      id: "canceled",
-      name: "5. Cancelar o pedido",
-      selectedName: "Pedido cancelado",
-      orderID,
-    }),
-  ];
-
 
   $: CACHE_NAME = $Router?.options ? "ORDERS_HISTORY" : "ORDERS";
   $: if ($Router?.options === null || $Router?.options !== null) {
-    if (!$Router?.options) {
-      Menu.addItem({
-        icon: faHistory,
-        name: "Históricos",
-        callback: goToOrdersHistory,
-      });
-    }
+    // if (!$Router?.options) {
+    //   Menu.addItem({
+    //     icon: faHistory,
+    //     name: "Pedidos concluídos",
+    //     callback: goToOrdersHistory,
+    //   });
+    // }
     Menu.addItem({ name: "Atualizar", icon: faSync, callback: refresh });
     update();
   }
 
-  $: orders?.forEach((order) => {
-    if (order?.selected && order?.selected?.id && order?.selected?.id !== order?.oldSelected?.id) {
-      isLoading = true;
-      ChangeOrderStatus(order?.selected?.orderID, order?.selected?.id)
-        .then((response) => {
-          if (!response?.success) {
-            toggleErrorAlert(response?.data);
-          } else {
-            order.status = order?.selected.id;
-            order.oldSelected = order?.selected;
-          }
-        })
-        .catch((exception) => {
-          toggleErrorAlert(exception);
-        });
-      isLoading = false;
+  const nextButtonText = (order) => {
+    switch (order?.status) {
+      case Types.OrderStatusType.WAITING_PAYMENT:
+        return "";
+      case Types.OrderStatusType.OPEN:
+        return "Aceitar o pedido";
+      case Types.OrderStatusType.ACCEPTED:
+        return "Esperando o entregador";
+      case Types.OrderStatusType.WAITING_DELIVERY:
+        return "Saiu para entrega";
+      case Types.OrderStatusType.IN_DELIVERY:
+        return "Pedido entrege";
+      default:
+        return "-";
     }
-  });
+  };
+
+  async function cancel(order) {
+    console.log(`Cancel ${order?.id} triggered!`)
+    isLoading = true;
+    const response = await ChangeOrderStatus(
+      order?.id,
+      Types.OrderStatusType.CANCELED
+    );
+    if (response?.success) {
+      order.status = Types.OrderStatusType.CANCELED;
+      toggleErrorAlert("O pedido foi atualizado con sucesso!");
+      orders = orders;
+    } else {
+      toggleErrorAlert(response?.data);
+    }
+    isLoading = false;
+  }
+
+  async function next(order) {
+    isLoading = true;
+    let newStatus =
+      Types.OrderStatusType.keys[
+        Types.OrderStatusType.keys.indexOf(order?.status) + 1
+      ];
+    const response = await ChangeOrderStatus(order?.id, newStatus);
+    if (response?.success) {
+      order.status = newStatus;
+      toggleErrorAlert("O pedido foi atualizado con sucesso!");
+      orders = orders;
+    } else {
+      toggleErrorAlert(response?.data);
+    }
+    isLoading = false;
+  }
 
   function toggleErrorAlert(messageObject) {
     errorAlert = messageObject;
@@ -148,7 +141,7 @@ async function update() {
     Navigation.goTo(Routes.orders, true);
   }
 
-  Title.set("Pedidos");
+  Title.set(!$Router?.options ? "Pedidos abertos" : "Pedidos concluídos");
 </script>
 
 {#if isLoading}
@@ -194,13 +187,27 @@ async function update() {
             {Utils.Strings.timestampToString(order?.createdAt)}
           </div>
         </div>
-        {#if !orderFinishedOptions.includes(order?.status)}
-          <Views.Selector
-            options={orderOptions(order?.id)}
-            bind:selected={order.selected}
-            name="Selecione uma opção!"
-          />
-        {/if}
+        <div class="value">
+          Total do pedido: <span
+            >{Utils.Strings.currency(
+              Number(order?.subtotal ?? 0) +
+                Number(order?.delivery ?? 0) -
+                Number(order?.discount ?? 0)
+            )}</span
+          >
+        </div>
+        <div class="buttonGroup">
+          {#if ![Types.OrderStatusType.DELIVERED, Types.OrderStatusType.CANCELED].includes(order?.status)}
+            <Views.Button type="secondary" on:click={cancel(order)}
+              >Cancelar</Views.Button
+            >
+          {/if}
+          {#if ![Types.OrderStatusType.DELIVERED, Types.OrderStatusType.CANCELED, Types.OrderStatusType.WAITING_PAYMENT].includes(order?.status)}
+            <Views.Button on:click={next(order)}
+              >{nextButtonText(order)}</Views.Button
+            >
+          {/if}
+        </div>
       </div>
     {/each}
     <Views.Divider />
@@ -289,5 +296,28 @@ async function update() {
     padding: 4px 20px;
     align-self: center;
     margin-bottom: 10px;
+  }
+  .orderContainer > .buttonGroup {
+    display: flex;
+    flex-direction: row;
+    margin-top: 20px;
+  }
+  .orderContainer > .buttonGroup > :global(*) {
+    flex: 1;
+  }
+  .orderContainer > .buttonGroup > :global(*):first-child {
+    margin-right: 5px;
+  }
+  .orderContainer > .buttonGroup > :global(*):last-child {
+    margin-left: 5px;
+  }
+  .orderContainer > .value {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: row;
+  }
+  .orderContainer > .value > span {
+    color: green;
+    font-size: 1.1em;
   }
 </style>
