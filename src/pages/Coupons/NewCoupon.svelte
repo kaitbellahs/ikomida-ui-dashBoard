@@ -15,6 +15,12 @@
     quantity: null,
     validity: null,
   };
+  let itemsValidation = {
+    name: null,
+    value: null,
+    quantity: null,
+    validity: null,
+  };
   let isLoading = false;
 
   let errorAlert;
@@ -30,16 +36,7 @@
     item.value = 0;
     oldSelectedDiscountType = selectedDiscountType;
   }
-  $: canContinue =
-    item?.name &&
-    (item?.name?.length ?? 0) <= 255 &&
-    item?.validity &&
-    selectedDiscountType &&
-    selectedDiscountType.name !== Types.DiscountTypes.NO &&
-    item?.value &&
-    Utils.Numbers.toFinanceNumber(item?.value ?? 0) <= 99999999.99 &&
-    item?.quantity &&
-    Utils.Numbers.toFinanceNumber(item?.quantity ?? 0) <= 2147483647;
+  $: canContinue = Utils.Objects.validateFields(itemsValidation);
 
   function toggleErrorAlert(messageObject) {
     errorAlert = messageObject;
@@ -73,17 +70,24 @@
     upper={true}
     placeHolder="Nome"
     bind:value={item.name}
+    bind:isValid={itemsValidation.name}
     initialValue={item.name}
+    min="3"
+    max="255"
   />
   <Views.TextEdit
     placeHolder="Quantidade"
     bind:value={item.quantity}
+    bind:isValid={itemsValidation.quantity}
     initialValue={item.quantity}
+    min="1"
+    max="11"
   />
   <Views.TextEdit
     type="date"
     placeHolder="Validade"
     bind:value={item.validity}
+    bind:isValid={itemsValidation.validity}
     initialValue={item.validity}
   />
   <Views.Selector
@@ -97,14 +101,20 @@
         type="percent"
         placeHolder="Valor"
         bind:value={item.value}
+        bind:isValid={itemsValidation.value}
         initialValue={item.value}
+        min="1"
+        max="11"
       />
     {:else if selectedDiscountType.name === Types.DiscountTypes.VALUE}
       <Views.TextEdit
         placeHolder="Valor"
         bind:value={item.value}
+        bind:isValid={itemsValidation.value}
         initialValue={item.value}
         type="currency"
+        min="1"
+        max="11"
       />
     {/if}
   {/if}

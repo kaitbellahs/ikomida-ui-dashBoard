@@ -1,9 +1,6 @@
 <script>
   import { App } from "@capacitor/app";
   import { Auth, ikomidaID, PushNotificationToken } from "./stores/Auth";
-  import Login from "./pages/user/Login.svelte";
-  import Main from "./pages/Main.svelte";
-  import Tac from "./pages/user/Tac.svelte";
   import { Network } from "@capacitor/network";
   import { onMount } from "svelte";
   import { Navigation, Router, Routes } from "./stores/Navigation";
@@ -11,10 +8,14 @@
   import { StatusBar } from "@capacitor/status-bar";
   import { PushNotification, Utils, Views } from "@ikomida/components";
   import { registerPushNotificationToken } from "./network/PushNotification";
-  import ForgotPassword from "./pages/user/ForgotPassword.svelte";
   import { CAPNativeLog } from "capacitor-native-log";
   import Cache from "./stores/Cache";
   import { Network as iNetwork } from "@ikomida/components";
+  
+  import Main from "./pages/Main.svelte";
+  import Login from "./pages/Unlogged/Login.svelte";
+  import Tac from "./pages/Unlogged/Tac.svelte";
+  import ForgotPassword from "./pages/Unlogged/ForgotPassword.svelte";
 
   let notificationIds = [];
   let networkStatus = null;

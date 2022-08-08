@@ -37,7 +37,7 @@
     if (response?.success) {
       order.status = Types.OrderStatusType.CANCELED;
       Cache.setObject(CACHE_NAME, null);
-      toggleErrorAlert("O pedido foi atualizado con sucesso!");
+      toggleErrorAlert("O pedido foi atualizado com sucesso!");
     } else {
       toggleErrorAlert(response?.data);
     }
@@ -54,7 +54,7 @@
     if (response?.success) {
       order.status = newStatus;
       Cache.setObject(CACHE_NAME, null);
-      toggleErrorAlert("O pedido foi atualizado con sucesso!");
+      toggleErrorAlert("O pedido foi atualizado com sucesso!");
     } else {
       toggleErrorAlert(response?.data);
     }
@@ -122,12 +122,13 @@
   </div>
   <div class="buttonGroup">
     {#if ![Types.OrderStatusType.DELIVERED, Types.OrderStatusType.CANCELED].includes(order?.status)}
-      <Views.Button type="secondary" on:click={cancel}
+      <Views.Button multiplier="0.8" type="secondary" on:click={cancel}
         >Cancelar</Views.Button
       >
     {/if}
     {#if ![Types.OrderStatusType.DELIVERED, Types.OrderStatusType.CANCELED, Types.OrderStatusType.WAITING_PAYMENT].includes(order?.status)}
-      <Views.Button on:click={next}>{nextButtonText(order)}</Views.Button
+      <Views.Button multiplier="0.8" on:click={next}
+        >{nextButtonText(order)}</Views.Button
       >
     {/if}
   </div>

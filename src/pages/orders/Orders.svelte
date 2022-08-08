@@ -92,7 +92,7 @@
   };
 
   async function cancel(order) {
-    console.log(`Cancel ${order?.id} triggered!`)
+    console.log(`Cancel ${order?.id} triggered!`);
     isLoading = true;
     const response = await ChangeOrderStatus(
       order?.id,
@@ -100,7 +100,7 @@
     );
     if (response?.success) {
       order.status = Types.OrderStatusType.CANCELED;
-      toggleErrorAlert("O pedido foi atualizado con sucesso!");
+      toggleErrorAlert("O pedido foi atualizado com sucesso!");
       orders = orders;
     } else {
       toggleErrorAlert(response?.data);
@@ -117,7 +117,7 @@
     const response = await ChangeOrderStatus(order?.id, newStatus);
     if (response?.success) {
       order.status = newStatus;
-      toggleErrorAlert("O pedido foi atualizado con sucesso!");
+      toggleErrorAlert("O pedido foi atualizado com sucesso!");
       orders = orders;
     } else {
       toggleErrorAlert(response?.data);
@@ -150,8 +150,8 @@
     bottomPadding={$StatusBar.bottomPadding}
   />
 {/if}
-<div>
-  {#if orders && orders.length > 0}
+{#if orders && orders.length > 0}
+  <section>
     {#each orders as order}
       <div class="leftShadow orderContainer">
         <div on:click={goToOrder(order?.id)}>
@@ -198,12 +198,14 @@
         </div>
         <div class="buttonGroup">
           {#if ![Types.OrderStatusType.DELIVERED, Types.OrderStatusType.CANCELED].includes(order?.status)}
-            <Views.Button type="secondary" on:click={cancel(order)}
-              >Cancelar</Views.Button
+            <Views.Button
+              multiplier="0.8"
+              type="secondary"
+              on:click={cancel(order)}>Cancelar</Views.Button
             >
           {/if}
           {#if ![Types.OrderStatusType.DELIVERED, Types.OrderStatusType.CANCELED, Types.OrderStatusType.WAITING_PAYMENT].includes(order?.status)}
-            <Views.Button on:click={next(order)}
+            <Views.Button multiplier="0.8" on:click={next(order)}
               >{nextButtonText(order)}</Views.Button
             >
           {/if}
@@ -219,28 +221,23 @@
       >
     {/if}
     <Views.GTerms />
-  {:else}
-    <div id="noOrders">
-      <h2>
-        Não há pedido para exibir por enquanto, aproveite e divulga ja seu app
-        com seus clientes!
-      </h2>
-    </div>
-  {/if}
-</div>
+  </section>
+{:else}
+  <Views.CentredMessage
+    text="Não há pedido para exibir por enquanto, aproveite e divulga seu app
+  com seus clientes, e se precisar de ajudar para fazer sua campanhas de propaganda nos de um toque, que vamos te ajudar a turbinar suas vendas!"
+  >
+    <Views.Link url="https://ikomida.com/contact"
+      >Solicite seu orçamento agora!</Views.Link
+    >
+  </Views.CentredMessage>
+{/if}
 <Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 
 <style>
-  #noOrders {
+  section {
     display: flex;
-    flex-direction: row;
-    height: calc(100vh - 150px);
-  }
-  #noOrders > h2 {
-    place-self: center;
-    align-self: center;
-    justify-self: center;
-    text-align: center;
+    flex: 1;
   }
   .orderContainer {
     border-radius: 4px;

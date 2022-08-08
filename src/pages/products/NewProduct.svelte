@@ -10,6 +10,7 @@
     getCategories,
   } from "../../network/Products";
   import { onMount } from "svelte";
+  import CentredMessage from "../../../../ikomida-components/src/components/CentredMessage.svelte";
 
   let { item, edit } = Utils.Objects.copy($Router.options);
   let isLoading = false;
@@ -53,7 +54,7 @@
     Number(item?.quantity || 0) <= 2147483647;
 
   $: if (firstLaunch) {
-    if (categoriesOptions.length > 0) {
+    if ((categoriesOptions?.length ?? 0) > 0) {
       const result = categoriesOptions.filter(
         (option) => option.id == item.categoryID
       );
@@ -118,14 +119,13 @@
   async function generateOptions() {
     const response = await getCategories();
     if (response) {
-      categoriesOptions = response.map((item) => {
+      categoriesOptions = response?.map((item) => {
         return { id: item.id, name: item.title };
       });
       if (categoriesOptions.length > 0) {
         const result = categoriesOptions.filter(
           (option) => option.id == item.categoryID
         );
-
         item.category = result.length > 0 ? result[0] : null;
       }
     }
@@ -151,8 +151,8 @@
     bottomPadding={$StatusBar.bottomPadding}
   />
 {/if}
-<div class="product">
-  {#if categoriesOptions.length > 0}
+{#if (categoriesOptions?.length ?? 0) > 0}
+  <div class="product">
     <div class="imageContainer">
       <img src={imageSrc} alt={item?.title} />
       <img
@@ -241,14 +241,17 @@
       bottomPadding={$StatusBar.bottomPadding}
       ><Fa icon={faEdit} /> <span>Salvar</span></Views.Button
     >
-  {:else}
-    Precisa adicionar uma categoria pelo menos antes de adicionar novo produto
-  {/if}
-</div>
+  </div>
+{:else}
+  <Views.CentredMessage
+    text="Precisa adicionar pelo menos uma categoria antes de adicionar um novo produto!"
+  />
+{/if}
 <Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 
 <style>
   .product {
+    display: flex;
     padding-bottom: 50px;
   }
   .imageContainer {

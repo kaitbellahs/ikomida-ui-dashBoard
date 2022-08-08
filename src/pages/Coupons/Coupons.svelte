@@ -95,12 +95,12 @@
     bottomPadding={$StatusBar.bottomPadding}
   />
 {:else}
-  <section>
-    <Views.Button on:click={newCoupon} bottomPadding={$StatusBar.bottomPadding}
-      ><Fa icon={faEdit} /> <span>Novo cupom</span></Views.Button
-    >
-    <Views.Divider />
-    {#if coupons && coupons.length > 0}
+  <Views.Button on:click={newCoupon} bottomPadding={$StatusBar.bottomPadding}
+    ><Fa icon={faEdit} /> <span>Novo cupom</span></Views.Button
+  >
+  <Views.Divider />
+  {#if coupons && coupons.length > 0}
+    <section>
       {#each coupons as coupon}
         <article>
           <span on:click={removeCoupon(coupon.id)} class="remove"
@@ -119,13 +119,13 @@
           >carregar mais</Views.Button
         >
       {/if}
-    {:else}
-      <h2>
-        Não há cupons para exibir por enquanto, aproveite e cadastre novos
-        cupons para agradar seus clientes!
-      </h2>
-    {/if}
-  </section>
+    </section>
+  {:else}
+    <Views.CentredMessage
+      text="Não há cupons para exibir por enquanto, aproveite e cadastre novos
+    cupons para agradar seus clientes!"
+    />
+  {/if}
 {/if}
 
 <Views.MessageAlert object={errorAlert} bind:show={showAlert} />

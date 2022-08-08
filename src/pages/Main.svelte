@@ -8,20 +8,20 @@
     MenuHamburger,
   } from "../stores/Navigation";
   import { Views, Utils } from "@ikomida/components";
-  import Home from "./products/Home.svelte";
+  import Home from "./Products/Home.svelte";
   import Orders from "./Orders/Orders.svelte";
   import Order from "./Orders/Order.svelte";
-  import Profile from "./user/Profile.svelte";
-  import Settings from "./user/Settings.svelte";
-  import Subscription from "./user/Subscription.svelte";
-  import Product from "./products/Product.svelte";
-  import Products from "./products/Products.svelte";
-  import Layout from "./user/Layout.svelte";
-  import NewProduct from "./products/NewProduct.svelte";
+  import Profile from "./User/Profile.svelte";
+  import Settings from "./Control/Settings.svelte";
+  import Subscription from "./Control/Subscription.svelte";
+  import Product from "./Products/Product.svelte";
+  import Products from "./Products/Products.svelte";
+  import Layout from "./Control/Layout.svelte";
+  import NewProduct from "./Products/NewProduct.svelte";
   import Coupons from "./Coupons/Coupons.svelte";
   import NewCoupon from "./Coupons/NewCoupon.svelte";
-  import Limits from "./user/Limits.svelte";
-  import NewCategory from "./products/NewCategory.svelte";
+  import Limits from "./Control/Limits.svelte";
+  import NewCategory from "./Products/NewCategory.svelte";
   import Staff from "./Staff/Staff.svelte";
   import NewStaff from "./Staff/NewStaff.svelte";
   import { StatusBar } from "../stores/Setup";
@@ -116,7 +116,7 @@ let userInfo
 </script>
 
 <main
-  style="--paddingTop:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; --paddingBottom: 50px; overflow: scroll;max-width: 100%;height: 100%;"
+  style="--paddingTop:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; --paddingBottom: 50px; overflow: scroll;max-width: 100%;"
 >
   {#if route == Routes.home}
     <Home />
@@ -175,6 +175,7 @@ let userInfo
     padding-bottom: 55px;
     display: flex;
     flex-direction: column;
+    flex: 1
   }
   :global(*, *:before, *:after) {
     margin: 0;

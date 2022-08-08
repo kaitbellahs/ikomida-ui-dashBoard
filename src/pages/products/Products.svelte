@@ -113,43 +113,39 @@
     bottomPadding={$StatusBar.bottomPadding}
   />
 {:else}
-  <div>
-    <Views.TextEdit
-      icon={faSearch}
-      bind:value
-      placeHolder="Buscar no cardápio"
+  <Views.TextEdit icon={faSearch} bind:value placeHolder="Buscar no cardápio" />
+  <Views.Divider />
+  <Views.Button on:click={newProduct} bottomPadding={$StatusBar.bottomPadding}
+    ><Fa icon={faEdit} /> <span>Novo produto</span></Views.Button
+  >
+  <Views.Button on:click={newCategory} bottomPadding={$StatusBar.bottomPadding}
+    ><Fa icon={faEdit} /> <span>Nova categoria</span></Views.Button
+  >
+  <Views.Divider />
+  {#if (items.length > 0 || value) && !error}
+    <Views.ItemsList
+      {items}
+      productPage={Routes.product}
+      {Navigation}
+      {removeProduct}
     />
-    <Views.Divider />
-    <Views.Button on:click={newProduct} bottomPadding={$StatusBar.bottomPadding}
-      ><Fa icon={faEdit} /> <span>Novo produto</span></Views.Button
-    >
-    <Views.Button
-      on:click={newCategory}
-      bottomPadding={$StatusBar.bottomPadding}
-      ><Fa icon={faEdit} /> <span>Nova categoria</span></Views.Button
-    >
-    <Views.Divider />
-    {#if (items.length > 0 || value) && !error}
-      <Views.ItemsList
-        {items}
-        productPage={Routes.product}
-        {Navigation}
-        {removeProduct}
-      />
-    {:else if error}
-      <h2>Nenhum produto foi encontrado</h2>
-      <h3>Tente usar outro termo para pequisar</h3>
-    {:else if products.length > 0}
-      <Views.ItemsList
-        {removeCategory}
-        {editCategory}
-        items={products}
-        productPage={Routes.product}
-        {Navigation}
-        {removeProduct}
-      />
-    {/if}
-  </div>
+  {:else if error}
+    <h2>Nenhum produto foi encontrado</h2>
+    <h3>Tente usar outro termo para pequisar</h3>
+  {:else if products.length > 0}
+    <Views.ItemsList
+      {removeCategory}
+      {editCategory}
+      items={products}
+      productPage={Routes.product}
+      {Navigation}
+      {removeProduct}
+    />
+  {:else}
+    <Views.CentredMessage text="Nenhum produto foi encontrad">
+      <h3>Tente usar outro termo para pequisar ou cadastre novos produtos</h3>
+    </Views.CentredMessage>
+  {/if}
 {/if}
 
 <Views.MessageAlert object={errorAlert} bind:show={showAlert} />

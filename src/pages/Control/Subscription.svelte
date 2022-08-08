@@ -5,7 +5,11 @@
   import { getSubscription } from "../../network/Payment";
   import { onMount } from "svelte";
   import Fa from "svelte-fa";
-  import { faReceipt, faFileInvoice } from "@fortawesome/free-solid-svg-icons";
+  import {
+    faReceipt,
+    faFileInvoice,
+    faSterlingSign,
+  } from "@fortawesome/free-solid-svg-icons";
   import { AppLauncher } from "@capacitor/app-launcher";
 
   let subscription;
@@ -64,22 +68,29 @@
 </script>
 
 <h2>dados da sua assinatura</h2>
-<Views.TextValue text="plano:" value={subscription?.plan} fontSize="1.2em" />
-<Views.TextValue text="Valor:" value={subscription?.value} fontSize="1.2em" />
+<Views.TextValue text="plano" value=": {subscription?.plan}" fontSize="1.2em" />
 <Views.TextValue
-  text="Estado:"
-  value={subscriptionStatus(subscription?.status)}
+  text="Valor"
+  value=": {Utils.Strings.currency(subscription?.value)}"
   fontSize="1.2em"
-  rightColor={subscription?.status === Types.PaymentStatusTypes.AsaasSignature.ACTIVE ? "green" : 'yello'}
 />
 <Views.TextValue
-  text="inscrição:"
-  value={Utils.Strings.dateToDateString(subscription?.subscription)}
+  text="Estado"
+  value=": {subscriptionStatus(subscription?.status)}"
+  fontSize="1.2em"
+  rightColor={subscription?.status ===
+  Types.PaymentStatusTypes.AsaasSignature.ACTIVE
+    ? "green"
+    : "yello"}
+/>
+<Views.TextValue
+  text="inscrição"
+  value=": {Utils.Strings.dateToDateString(subscription?.subscription)}"
   fontSize="1.1em"
 />
 <Views.TextValue
-  text="Proximo venceimento:"
-  value={Utils.Strings.dateToDateString(subscription?.nextDueDate)}
+  text="Proxima data de venceimento"
+  value=": {Utils.Strings.dateToDateString(subscription?.nextDueDate)}"
   fontSize="1.1em"
 />
 <Views.Divider />
@@ -103,7 +114,7 @@
       {/if}
       <Views.TextValue
         text="value:"
-        value={charges?.value}
+        value={Utils.Strings.currency(charges?.value)}
         fontSize="0.9em"
         leftMargin="50"
       />
@@ -130,7 +141,11 @@
         value={paymentStatus(charges?.status)}
         fontSize="0.9em"
         leftMargin="50"
-        rightColor={charges?.status === Types.PaymentStatusTypes.Asaas.CONFIRMED ? "green" : (charges?.status === Types.PaymentStatusTypes.Asaas.PENDING ? 'yellow' : 'red')}
+        rightColor={charges?.status === Types.PaymentStatusTypes.Asaas.CONFIRMED
+          ? "green"
+          : charges?.status === Types.PaymentStatusTypes.Asaas.PENDING
+          ? "yellow"
+          : "red"}
       />
     </div>
   {/each}

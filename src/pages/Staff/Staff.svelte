@@ -5,19 +5,21 @@
   import { StatusBar } from "../../stores/Setup";
   import { onMount } from "svelte";
   import Fa from "svelte-fa";
+  import { Auth } from "../../stores/Auth";
   import {
     faEdit,
     faSync,
     faTrashAlt,
   } from "@fortawesome/free-solid-svg-icons";
   import Cache from "../../stores/Cache";
-  let staffs;
-
   const CACHE_NAME = "STAFF";
+
+  let staffs;
+  let userInfo;
   let hasMore = true;
   let canGetMore = true;
   let lastTimestamp = null;
-  
+
   let isLoading = false;
   let errorAlert;
   let showAlert = false;
@@ -30,7 +32,7 @@
     isLoading = true;
     let response = await removeStaff(id);
     if (response.success) {
-      await getMore(null, true)
+      await getMore(null, true);
     } else {
       toggleErrorAlert(response?.data);
       isLoading = false;
@@ -60,6 +62,7 @@
   }
 
   onMount(async () => {
+    userInfo = await Utils.Jws.extractToken($Auth);
     staffs = Cache.getObject(CACHE_NAME);
     if (!staffs) {
       await getMore(null, true);
@@ -99,16 +102,18 @@
     ><Fa icon={faEdit} /> <span>Novo colaborador</span></Views.Button
   >
   <Views.Divider />
-  <section>
-    {#if staffs.length > 0}
+  {#if staffs.length > 0}
+    <section>
       {#each staffs as staff}
         <article>
-          <span on:click={onRemoveClick(staff.id)} class="remove"
-            ><Fa icon={faTrashAlt} /></span
-          >
-          <h2>{staff.name} {staff.lastName}</h2>
-          <div>Telefone: {Utils.Strings.formatAsPhone(staff.phone)}</div>
-          <div>Título: {roleName(staff.role)}</div>
+          {#if userInfo?.id !== staff?.id}
+            <span on:click={onRemoveClick(staff?.id)} class="remove"
+              ><Fa icon={faTrashAlt} /></span
+            >
+          {/if}
+          <h2>{staff?.name} {staff?.lastName}</h2>
+          <div>Telefone: {Utils?.Strings?.formatAsPhone(staff?.phone)}</div>
+          <div>Título: {roleName(staff?.role)}</div>
         </article>
       {/each}
       <Views.Divider />
@@ -119,10 +124,12 @@
           >carregar mais</Views.Button
         >
       {/if}
-    {:else}
-      Não há colaboradores cadastrados para exibir!
-    {/if}
-  </section>
+    </section>
+  {:else}
+    <Views.CentredMessage
+      text="Não há colaboradores cadastrados para exibir!"
+    />
+  {/if}
 {/if}
 
 <Views.MessageAlert object={errorAlert} bind:show={showAlert} />
