@@ -252,6 +252,7 @@
 <style>
   .product {
     display: flex;
+    flex-direction: column;
     padding-bottom: 50px;
   }
   .imageContainer {

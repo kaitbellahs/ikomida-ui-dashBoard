@@ -113,7 +113,12 @@
     bottomPadding={$StatusBar.bottomPadding}
   />
 {:else}
-  <Views.TextEdit icon={faSearch} bind:value placeHolder="Buscar no cardápio" />
+  <Views.TextEdit
+    marginTop="0"
+    icon={faSearch}
+    bind:value
+    placeHolder="Buscar no cardápio"
+  />
   <Views.Divider />
   <Views.Button on:click={newProduct} bottomPadding={$StatusBar.bottomPadding}
     ><Fa icon={faEdit} /> <span>Novo produto</span></Views.Button

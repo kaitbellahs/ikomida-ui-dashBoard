@@ -92,7 +92,6 @@
   };
 
   async function cancel(order) {
-    console.log(`Cancel ${order?.id} triggered!`);
     isLoading = true;
     const response = await ChangeOrderStatus(
       order?.id,
@@ -238,6 +237,7 @@
   section {
     display: flex;
     flex: 1;
+    flex-direction: column;
   }
   .orderContainer {
     border-radius: 4px;
