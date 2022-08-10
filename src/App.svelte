@@ -5,7 +5,7 @@
   import { onMount } from "svelte";
   import { Navigation, Router, Routes } from "./stores/Navigation";
   import { StatusBar as _StatusBar, Settings } from "./stores/Setup";
-  import { StatusBar } from "@capacitor/status-bar";
+  import { StatusBar } from "@ikomida/capacitor-plugin-statusbar";
   import { PushNotification, Utils, Views } from "@ikomida/components";
   import { registerPushNotificationToken } from "./network/PushNotification";
   import { CAPNativeLog } from "capacitor-native-log";
