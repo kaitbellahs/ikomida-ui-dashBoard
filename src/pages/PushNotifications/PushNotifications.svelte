@@ -138,20 +138,4 @@
     margin-top: 10px;
     padding: 10px;
   }
-  section > article > .remove {
-    position: absolute;
-    top: -8px;
-    right: -10px;
-    font-size: 0.9em;
-    color: white;
-    font-family: RobotoBold;
-    border: 1px solid #4c0708;
-    background: #4c0708;
-    border-radius: 20px;
-    width: 25px;
-    height: 25px;
-    vertical-align: middle;
-    text-align: center;
-    padding: 4px;
-  }
 </style>

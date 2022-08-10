@@ -1,6 +1,6 @@
 {
 	"appId": "com.ikomida.br.vendor",
-	"appName": "iKomida",
+	"appName": "iKomida dashboard",
 	"webDir": "public",
 	"bundledWebRuntime": false,
 	"npmClient": "npm",

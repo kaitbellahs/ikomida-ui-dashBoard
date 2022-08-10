@@ -10,7 +10,6 @@
     getCategories,
   } from "../../network/Products";
   import { onMount } from "svelte";
-  import CentredMessage from "../../../../ikomida-components/src/components/CentredMessage.svelte";
 
   let { item, edit } = Utils.Objects.copy($Router.options);
   let isLoading = false;
