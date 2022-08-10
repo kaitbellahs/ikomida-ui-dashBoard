@@ -2,8 +2,7 @@ import {
 	writable
 } from 'svelte/store';
 import {
-	Storage
-} from '@capacitor/storage';
+	Preferences } from '@capacitor/preferences';
 
 const authToken = 'AuthToken';
 const ikomidaIDKey = 'ikomidaID';
@@ -15,7 +14,7 @@ function createAuth() {
 	} = writable(null, async (setter) => {
 		let token = null;
 		try {
-			const ret = await Storage.get({
+			const ret = await Preferences.get({
 				key: authToken
 			});
 			token = ret.value;
@@ -32,7 +31,7 @@ function createAuth() {
 		setToken: async (payload) => {
 			try {
 				set(payload);
-				await Storage.set({
+				await Preferences.set({
 					key: authToken,
 					value: payload
 				});
@@ -45,11 +44,11 @@ function createAuth() {
 
 export const Auth = createAuth();
 export const ikomidaID = {
-	set: async (id) => await Storage.set({
+	set: async (id) => await Preferences.set({
 		key: ikomidaIDKey,
 		value: id
 	}),
-	get: async () => (await Storage.get({
+	get: async () => (await Preferences.get({
 		key: ikomidaIDKey
 	})).value
 };
