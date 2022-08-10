@@ -45,6 +45,10 @@ export async function getCategories() {
     return [];
 }
 
+export async function getOrder(id) {
+    return Network.instance.get(`/product/${id}`, get(Auth));
+}
+
 export async function deleteProduct(id) {
     return Network.instance.remove(`/product/${id}`, get(Auth));
 }

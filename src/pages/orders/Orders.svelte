@@ -223,8 +223,7 @@
   </section>
 {:else}
   <Views.CentredMessage
-    text="Não há pedido para exibir por enquanto, aproveite e divulga seu app
-  com seus clientes, e se precisar de ajudar para fazer sua campanhas de propaganda nos de um toque, que vamos te ajudar a turbinar suas vendas!"
+    text="Não há pedido para exibir por enquanto, aproveite e divulgue seu app para seus clientes, e se precisar de ajuda para fazer suas campanhas de propaganda nos dê um toque pra gente, que vamos te ajudar a turbinar suas vendas!"
   >
     <Views.Link url="https://ikomida.com/contact"
       >Solicite seu orçamento agora!</Views.Link

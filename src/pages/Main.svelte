@@ -20,6 +20,8 @@
   import NewProduct from "./Products/NewProduct.svelte";
   import Coupons from "./Coupons/Coupons.svelte";
   import NewCoupon from "./Coupons/NewCoupon.svelte";
+  import PushNotifications from "./PushNotifications/PushNotifications.svelte";
+  import NewPushNotification from "./PushNotifications/NewPushNotification.svelte";
   import Limits from "./Control/Limits.svelte";
   import NewCategory from "./Products/NewCategory.svelte";
   import Staff from "./Staff/Staff.svelte";
@@ -35,10 +37,11 @@
     faSlidersH,
     faMoneyBill1Wave,
     faChartColumn,
-    faUserGroup
+    faUserGroup,
+    faMessage,
   } from "@fortawesome/free-solid-svg-icons";
   import { onMount } from "svelte";
-let userInfo
+  let userInfo;
   const tabs = [
     {
       name: "Home",
@@ -67,11 +70,13 @@ let userInfo
       callback: () => Navigation.goTo(Routes.profile),
       icon: faUser,
     },
-    userInfo?.role === 'vendor' ? {
-      name: "Assinatura",
-      callback: () => Navigation.goTo(Routes.subscription),
-      icon: faMoneyBill1Wave,
-    } : null,
+    userInfo?.role === "vendor"
+      ? {
+          name: "Assinatura",
+          callback: () => Navigation.goTo(Routes.subscription),
+          icon: faMoneyBill1Wave,
+        }
+      : null,
     {
       name: "Configurações",
       callback: () => Navigation.goTo(Routes.settings),
@@ -82,11 +87,18 @@ let userInfo
       callback: () => Navigation.goTo(Routes.limits),
       icon: faChartColumn,
     },
-    userInfo?.role === 'vendor' ? {
-      name: "Colaboradores",
-      callback: () => Navigation.goTo(Routes.staff),
-      icon: faUserGroup,
-    } : null,
+    {
+      name: "Comunicação",
+      callback: () => Navigation.goTo(Routes.pushNotifications),
+      icon: faMessage,
+    },
+    userInfo?.role === "vendor"
+      ? {
+          name: "Colaboradores",
+          callback: () => Navigation.goTo(Routes.staff),
+          icon: faUserGroup,
+        }
+      : null,
     {
       name: "Layout",
       callback: () => Navigation.goTo(Routes.layout),
@@ -109,7 +121,7 @@ let userInfo
     document.head.appendChild(style);
   });
 
-  $: if(menuHamburgerItems){
+  $: if (menuHamburgerItems) {
     MenuHamburger.reset();
     menuHamburgerItems?.forEach((page) => MenuHamburger.addItem(page));
   }
@@ -140,6 +152,10 @@ let userInfo
     <Coupons />
   {:else if route == Routes.newCoupon}
     <NewCoupon />
+  {:else if route == Routes.pushNotifications}
+    <PushNotifications />
+  {:else if route == Routes.newPushNotification}
+    <NewPushNotification />
   {:else if route == Routes.layout}
     <Layout />
   {:else if route == Routes.subscription}
@@ -175,7 +191,7 @@ let userInfo
     padding-bottom: 55px;
     display: flex;
     flex-direction: column;
-    flex: 1
+    flex: 1;
   }
   :global(*, *:before, *:after) {
     margin: 0;

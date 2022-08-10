@@ -22,6 +22,8 @@ export const Routes = {
     subscribe: Symbol("/subscribe"),
     coupons: Symbol("/coupons"),
     newCoupon: Symbol("/newCoupon"),
+    pushNotifications: Symbol("/pushNotifications"),
+    newPushNotification: Symbol("/newPushNotification"),
     tac: Symbol("/tac"),
     profile: Symbol("/profile"),
     forgotPassword: Symbol("/forgotPassword"),

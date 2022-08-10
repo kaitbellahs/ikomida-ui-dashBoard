@@ -1,8 +1,9 @@
 <script>
-  import { Title, Router } from "../../stores/Navigation";
+  import { Navigation, Title, Router, Routes } from "../../stores/Navigation";
   import { OrderStatus, ChangeOrderStatus } from "../../network/Orders";
   import { Views, Utils, Types } from "@ikomida/components";
   import { PaymentType } from "../../network/Payment";
+  import { getOrder } from "../../network/Products";
   import { StatusBar } from "../../stores/Setup";
   import Cache from "../../stores/Cache";
 
@@ -73,6 +74,18 @@
     showAlert = true;
   }
 
+  async function goToProduct(id) {
+    isLoading = true;
+    const response = await getOrder(id);
+    if (response?.success) {
+      const product = response?.data;
+      Navigation?.goTo(Routes.product, product);
+    } else {
+      toggleErrorAlert(response?.data);
+    }
+    isLoading = false;
+  }
+
   Title.set("Detalhes do predido");
 </script>
 
@@ -105,8 +118,8 @@
       >
     {/if}
   </span>
-  {#each order?.products as { title, price, quantity, discount, discountType }, index}
-    <div class="product">
+  {#each order?.products as { id, title, price, quantity, discount, discountType }, index}
+    <div class="product" on:click={goToProduct(id)}>
       <span class="quantity">{quantity}</span><span class="title">{title}</span
       ><span class="price"
         >{Utils.Strings.currency(
