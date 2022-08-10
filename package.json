@@ -5,7 +5,7 @@
   "author": "Khalid Ait Bellahs",
   "license": "UNLICENSED",
   "scripts": {
-    "build": "rollup -c --environment ENV:prod && @powershell -NoProfile -ExecutionPolicy Unrestricted -Command ",
+    "build": "rollup -c --environment ENV:prod && @powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./build.ps1",
     "dev": "rollup -c -w",
     "prod": "rollup -c -w --environment ENV:prod",
     "start": "sirv public --no-clear",
