@@ -7,6 +7,7 @@
   "scripts": {
     "build:windows": "rollup -c --environment ENV:prod && @powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./build.ps1",
     "build:mac": "rollup -c --environment ENV:prod && ./build.sh",
+    "build": "rollup -c --environment ENV:prod",
     "dev": "rollup -c -w",
     "prod": "rollup -c -w --environment ENV:prod",
     "start": "sirv public --no-clear",
