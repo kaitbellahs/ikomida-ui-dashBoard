@@ -134,7 +134,9 @@
     networkStatus = await Network.getStatus();
     if (Capacitor.isNativePlatform()) {
       pushNotification.init();
-      _StatusBar.setStatusBar(await StatusBar.getInfo());
+      const sbarInfo = await StatusBar.getInfo()
+      console.log("await StatusBar.getInfo():", sbarInfo)
+      _StatusBar.setStatusBar(sbarInfo);
     }
   });
 

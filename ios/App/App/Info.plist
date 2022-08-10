@@ -21,11 +21,13 @@
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>com.getcapacitor.capacitor</string>
+			<string>com.ikomida.br.vendor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>iKomida://</string>
+				<string>com.ikomida.br.vendor</string>
 			</array>
 		</dict>
 	</array>
@@ -60,5 +62,9 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Usamos sua localizacao para entregar seus pedidos</string>
+	<key></key>
+	<string></string>
 </dict>
 </plist>

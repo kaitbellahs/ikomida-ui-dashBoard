@@ -32,7 +32,7 @@
 		"classpath": "com.capacitorjs.plugins.pushnotifications.PushNotificationsPlugin"
 	},
 	{
-		"pkg": "@capacitor/status-bar",
+		"pkg": "@ikomida/capacitor-plugin-status-bar",
 		"classpath": "com.capacitorjs.plugins.statusbar.StatusBarPlugin"
 	},
 	{

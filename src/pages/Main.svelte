@@ -111,24 +111,25 @@
 
   onMount(async () => {
     userInfo = await Utils.Jws.extractToken($Auth);
-    const style = document.createElement("style");
-    style.innerHTML = `
-    body {
-      --paddingTop: ${styleHeight};
-      --paddingBottom: 60px;
-    }
-  `;
-    document.head.appendChild(style);
+    // const style = document.createElement("style");
+  //   style.innerHTML = `
+  //   body {
+  //     --paddingTop: ${styleHeight};
+  //     --paddingBottom: 60px;
+  //   }
+  // `;
+  //   document.head.appendChild(style);
   });
 
   $: if (menuHamburgerItems) {
     MenuHamburger.reset();
     menuHamburgerItems?.forEach((page) => MenuHamburger.addItem(page));
   }
+  $: console.log("$StatusBar.height:", $StatusBar.height)
 </script>
 
 <main
-  style="--paddingTop:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; --paddingBottom: 50px; overflow: scroll;max-width: 100%;"
+  style="--paddingTop:{styleHeight};--paddingBottom: {70 + $StatusBar.bottomPadding}px; overflow: scroll;max-width: 100%;"
 >
   {#if route == Routes.home}
     <Home />
@@ -176,6 +177,7 @@
   {Menu}
   {Title}
   paddingTop={$StatusBar.height}
+  topMargin={$StatusBar.height}
   paddingBottom={$StatusBar.bottomPadding}
   {Navigation}
 />
@@ -184,14 +186,15 @@
 <style>
   main {
     padding: 20px;
-    padding-top: 0;
+    padding-top: var(--paddingTop);
     overflow: hidden;
     max-width: 100%;
     position: relative;
-    padding-bottom: 55px;
+    /* padding-bottom: calc(55px + var(--marginBottom)); */
     display: flex;
     flex-direction: column;
     flex: 1;
+    padding-bottom: var(--paddingBottom);
   }
   :global(*, *:before, *:after) {
     margin: 0;
@@ -200,7 +203,7 @@
     box-sizing: border-box;
   }
   :global(body) {
-    padding-top: var(--paddingTop);
-    padding-bottom: var(--paddingBottom);
+    padding-top: 0;/*var(--paddingTop)*/;
+    padding-bottom: 0;
   }
 </style>
