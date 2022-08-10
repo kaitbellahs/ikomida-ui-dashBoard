@@ -5,7 +5,15 @@
   import { getLimits } from "../../network/Settings";
   import { onMount } from "svelte";
   import Fa from "svelte-fa";
-  import { faTruck, faUserGroup, faMoneyBill1Wave, faPercent, faCartShopping } from "@fortawesome/free-solid-svg-icons";
+  import {
+    faTruck,
+    faUserGroup,
+    faMoneyBill1Wave,
+    faPercent,
+    faCartShopping,
+    faRocket,
+    faTableList,
+  } from "@fortawesome/free-solid-svg-icons";
 
   let limits;
   let isLoading = false;
@@ -42,6 +50,11 @@
   $: products = percent(limits?.limits?.products, limits?.used?.products);
   $: orders = percent(limits?.limits?.orders, limits?.used?.orders);
   $: coupons = percent(limits?.limits?.coupons, limits?.used?.coupons);
+  $: categories = percent(limits?.limits?.categories, limits?.used?.categories);
+  $: pushNotifications = percent(
+    limits?.limits?.pushNotifications,
+    limits?.used?.pushNotifications
+  );
   $: billing = percent(limits?.limits?.billing, limits?.used?.billing);
 </script>
 
@@ -52,7 +65,8 @@
     <Views.Divider />
     <article>
       <h4>
-        <Fa style="color: #4c0708;" icon={faTruck} /> Pedidos</h4>
+        <Fa style="color: #4c0708;" icon={faTruck} /> Pedidos
+      </h4>
       <span><b>Usado:</b> {limits?.used?.orders ?? 0} Pedidos este Mês</span
       ><span>
         <b>Limite:</b> {limit(limits?.limits?.orders)} Pedidos por Mês</span
@@ -63,7 +77,9 @@
     </article>
     <Views.Divider />
     <article>
-      <h4><Fa style="color: #4c0708;" icon={faMoneyBill1Wave} /> Faturamento</h4>
+      <h4>
+        <Fa style="color: #4c0708;" icon={faMoneyBill1Wave} /> Faturamento
+      </h4>
       <span
         ><b>Usado:</b>
         {Utils.Strings.currency(limits?.used?.billing) ?? 0} este Mês</span
@@ -77,7 +93,8 @@
     <Views.Divider />
     <article>
       <h4>
-        <Fa style="color: #4c0708;" icon={faCartShopping} /> Produtos</h4>
+        <Fa style="color: #4c0708;" icon={faCartShopping} /> Produtos
+      </h4>
       <span><b>Usado:</b> {limits?.used?.products ?? 0}</span><span>
         <b>Limite:</b> {limit(limits?.limits?.products)}</span
       ><span><b>Percentagem:</b> {products}% saturado</span>
@@ -88,7 +105,25 @@
     <Views.Divider />
     <article>
       <h4>
-        <Fa style="color: #4c0708;" icon={faPercent} /> Cupons</h4>
+        <Fa style="color: #4c0708;" icon={faRocket} /> Mensagens push
+      </h4>
+      <span><b>Usado:</b> {limits?.used?.pushNotifications ?? 0} este Mês</span
+      ><span>
+        <b>Limite:</b> {limit(limits?.limits?.pushNotifications)} por Mês</span
+      ><span><b>Percentagem:</b> {pushNotifications}% saturado</span>
+      <div class="chart">
+        <div
+          style="--width: {pushNotifications}%; --color: {color(
+            pushNotifications
+          )};"
+        />
+      </div>
+    </article>
+    <Views.Divider />
+    <article>
+      <h4>
+        <Fa style="color: #4c0708;" icon={faPercent} /> Cupons
+      </h4>
       <span><b>Usado:</b> {limits?.used?.coupons ?? 0}</span><span>
         <b>Limite:</b> {limit(limits?.limits?.coupons)}</span
       ><span><b>Percentagem:</b> {coupons}% saturado</span>
@@ -99,12 +134,25 @@
     <Views.Divider />
     <article>
       <h4>
-        <Fa style="color: #4c0708;" icon={faUserGroup} /> Colaboradores</h4>
+        <Fa style="color: #4c0708;" icon={faUserGroup} /> Colaboradores
+      </h4>
       <span><b>Usado:</b> {limits?.used?.staff ?? 0}</span><span>
         <b>Limite:</b> {limit(limits?.limits?.staff)}</span
       ><span><b>Percentagem:</b> {staff}% saturado</span>
       <div class="chart">
         <div style="--width: {staff}%; --color: {color(staff)};" />
+      </div>
+    </article>
+    <Views.Divider />
+    <article>
+      <h4>
+        <Fa style="color: #4c0708;" icon={faTableList} /> Categorias
+      </h4>
+      <span><b>Usado:</b> {limits?.used?.categories ?? 0}</span><span>
+        <b>Limite:</b> {limit(limits?.limits?.categories)}</span
+      ><span><b>Percentagem:</b> {categories}% saturado</span>
+      <div class="chart">
+        <div style="--width: {categories}%; --color: {color(categories)};" />
       </div>
     </article>
   {/if}
