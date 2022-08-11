@@ -1,16 +1,27 @@
 <script>
-  import { Navigation, Title, Router, Routes } from "../../stores/Navigation";
-  import { OrderStatus, ChangeOrderStatus } from "../../network/Orders";
   import { Views, Utils, Types } from "@ikomida/components";
-  import { PaymentType } from "../../network/Payment";
+  import { faShare } from "@fortawesome/free-solid-svg-icons";
+  import { Filesystem, Directory } from "@capacitor/filesystem";
+  import {
+    Navigation,
+    Title,
+    Router,
+    Routes,
+    Menu,
+  } from "../../stores/Navigation";
+  import { OrderStatus, ChangeOrderStatus } from "../../network/Orders";
   import { getOrder } from "../../network/Products";
   import { StatusBar } from "../../stores/Setup";
   import Cache from "../../stores/Cache";
+  import { Share } from "@capacitor/share";
+  import { onMount } from "svelte";
+  import html2canvas from "html2canvas";
 
   $: CACHE_NAME = "ORDERS";
 
   const order = $Router.options;
   let isLoading = false;
+  let orderScreen;
 
   const nextButtonText = (order) => {
     switch (order?.status) {
@@ -86,15 +97,48 @@
     isLoading = false;
   }
 
+  async function share() {
+    // const checkPermissions = await Filesystem.checkPermissions();
+    // console.log(checkPermissions);
+    // if (checkPermissions === "denied") {
+    //   return;
+    // }
+    // if (
+    //   checkPermissions !== "granted" &&
+    //   (await Filesystem.requestPermissions()) !== "granted"
+    // ) {
+    //   return;
+    // }
+    const canvas = await html2canvas(orderScreen);
+    const data = canvas.toDataURL().split(",");
+    const screenShot = await Filesystem.writeFile({
+      path: `screenshots/order-${order?.customID}.jpg`,
+      data: data?.[1],
+      directory: Directory.Cache,
+      recursive: true,
+    });
+    //TODO: -- report identifier of the app that received the share action. Can be an empty string in some cases. On web it will be undefined.
+    const activityType = await Share.share({
+      title: `Pedido #${order?.customID}`,
+      text: "Eu estou compartilhando com você esse pedido",
+      url: `file://${screenShot?.uri}`,
+      dialogTitle: "Compartilhar o pedido",
+    });
+  }
+  onMount(async () => {
+    if (await Share.canShare()) {
+      Menu.addItem({ name: "Compartilhar", icon: faShare, callback: share });
+    }
+  });
   Title.set("Detalhes do predido");
 </script>
 
-<div class="order">
+<div class="order" bind:this={orderScreen}>
   <span class="time"
     >Feito {Utils.Strings.timestampToString(order?.createdAt)}</span
   >
 
-  {#if ["waitingPayment", "open", "accepted", "waitingDelivery", "delivery"].includes(order?.status)}
+  {#if [Types.OrderStatusType.WAITING_PAYMENT, Types.OrderStatusType.OPEN, Types.OrderStatusType.ACCEPTED, Types.OrderStatusType.WAITING_DELIVERY, Types.OrderStatusType.IN_DELIVERY].includes(order.status)}
     {#if new Date(new Date(order?.createdAt).getTime() + order?.preparation?.max * 1000) < new Date()}
       <span class="lateOrder">Pedido atrasado</span>
     {/if}
@@ -118,6 +162,7 @@
       >
     {/if}
   </span>
+  <h3>Itens a entregar</h3>
   {#each order?.products as { id, title, price, quantity, discount, discountType }, index}
     <div class="product" on:click={goToProduct(id)}>
       <span class="quantity">{quantity}</span><span class="title">{title}</span
@@ -129,9 +174,53 @@
       >
     </div>
   {/each}
-  <div class="address">Entregue em: <b>{order?.address?.street}</b></div>
+  <Views.Divider />
+  <h3>Dados para entregar</h3>
+  <div class="user">
+    <span
+      >Nome: <b
+        >{Utils.Strings.formatAsName(
+          `${order?.user?.name} ${order?.user?.lastName}`
+        )}</b
+      ></span
+    >
+    <span
+      >Contato: <b>{Utils.Strings.formatAsPhone(order?.user?.phone)}</b></span
+    >
+  </div>
+  <div class="address">
+    Endereço:
+    <span class="street"
+      >{order?.address?.street}, {order?.address?.number}{order?.address
+        ?.complement
+        ? ` - ${order?.address?.complement}`
+        : ""}</span
+    ><br />
+    <span class="neighborhood"
+      >{order?.address?.neighborhood}<br />
+      <span class="city"
+        >{order?.address?.city}/{order?.address?.stat} CEP: {order?.address
+          ?.postalCode}</span
+      >
+    </span>
+  </div>
+  <h3>Dados de pagamento</h3>
   <div class="paymentMethod">
-    Forma de pagamento: <b>{PaymentType(order?.payment?.type)}</b>
+    <span
+      >Pago com <b
+        >{new Types.PaymentMethodType(order?.payment.type).name}
+        {new Types.PaymentMethodType(order?.payment.type).description}</b
+      ></span
+    >
+    <span class="brand">
+      {#if order?.payment.type === Types.PaymentMethodType.CREDIT_CARD_ONLINE}
+        <img
+          src="/Assets/cardBrand/{order?.payment.brand}.svg"
+          alt={order?.payment.brand}
+        />
+        **** {order?.payment.lastDigits}
+      {/if}
+    </span>
   </div>
   <div class="buttonGroup">
     {#if ![Types.OrderStatusType.DELIVERED, Types.OrderStatusType.CANCELED].includes(order?.status)}
@@ -210,7 +299,7 @@
   .product {
     font-family: RobotoLight;
     font-size: 0.9em;
-    margin-top: 20px;
+    margin-top: 10px;
     margin-bottom: 0;
     display: flex;
     justify-content: space-between;
@@ -231,18 +320,36 @@
     font-size: 1em;
   }
   .address {
-    font-family: RobotoThin;
     font-size: 0.9em;
     margin-top: 20px;
     margin-bottom: 10px;
   }
+  .address > .street {
+    font-family: "RobotoMedium";
+    margin-bottom: 10px;
+  }
+  .address > .neighborhood {
+    font-family: "RobotoMedium";
+    font-size: 1em;
+    width: 100%;
+  }
   .paymentMethod {
-    font-family: RobotoThin;
     font-size: 0.9em;
     margin-bottom: 5px;
+    display: flex;
+    flex-direction: column;
+  }
+  .paymentMethod > .brand > img {
+    height: 14px;
+  }
+  .paymentMethod > .brand {
+    font-weight: lighter;
+    font-size: 1em;
+    width: 100%;
+    margin-top: 5px;
   }
   .time {
-    font-family: RobotoThin;
+    /* font-family: RobotoThin; */
     font-size: 0.8em;
     margin-top: 5px;
   }
@@ -296,5 +403,15 @@
   }
   .order > .buttonGroup > :global(*):last-child {
     margin-left: 5px;
+  }
+  .order > .user {
+    display: flex;
+    flex-direction: column;
+  }
+  h3 {
+    border-left: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    padding-left: 20px;
+    margin-bottom: 10px;
   }
 </style>

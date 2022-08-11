@@ -11,7 +11,7 @@
   import { PaymentType } from "../../network/Payment";
   import { ChangeOrderStatus } from "../../network/Orders";
   import { StatusBar } from "../../stores/Setup";
-  import { faHistory, faSync } from "@fortawesome/free-solid-svg-icons";
+  import { faSync } from "@fortawesome/free-solid-svg-icons";
   import Cache from "../../stores/Cache";
   let orders;
 
@@ -63,13 +63,6 @@
 
   $: CACHE_NAME = $Router?.options ? "ORDERS_HISTORY" : "ORDERS";
   $: if ($Router?.options === null || $Router?.options !== null) {
-    // if (!$Router?.options) {
-    //   Menu.addItem({
-    //     icon: faHistory,
-    //     name: "Pedidos concluídos",
-    //     callback: goToOrdersHistory,
-    //   });
-    // }
     Menu.addItem({ name: "Atualizar", icon: faSync, callback: refresh });
     update();
   }
@@ -155,7 +148,7 @@
       <div class="leftShadow orderContainer">
         <div on:click={goToOrder(order?.id)}>
           <h3>#{order?.customID}: pedido {OrderStatus(order?.status)}</h3>
-          {#if ["waitingPayment", "open", "accepted", "waitingDelivery", "delivery"].includes(order?.status)}
+          {#if [Types.OrderStatusType.WAITING_PAYMENT, Types.OrderStatusType.OPEN, Types.OrderStatusType.ACCEPTED, Types.OrderStatusType.WAITING_DELIVERY, Types.OrderStatusType.IN_DELIVERY].includes(order?.status)}
             {#if new Date(new Date(order?.createdAt).getTime() + order?.preparation?.max * 1000) < new Date()}
               <span class="lateOrder">Pedido atrasado</span>
             {/if}
@@ -176,18 +169,16 @@
               {order?.products?.length - 1 == 1 ? "item" : "itens"}
             </div>
           {/if}
-          <div class="address">
-            Entregue em: <b>{order?.address?.street}</b>
-          </div>
+          <div class="address">Entregue na: <b>{order?.address.street}</b></div>
           <div class="paymentMethod">
-            Forma de pagamento: <b>{PaymentType(order?.payment?.type)}</b>
-          </div>
-          <div class="time">
-            {Utils.Strings.timestampToString(order?.createdAt)}
+            Forma de pagamento: <b
+              >{new Types.PaymentMethodType(order?.payment.type).name}
+              {new Types.PaymentMethodType(order?.payment.type).description}</b
+            >
           </div>
         </div>
         <div class="value">
-          Total do pedido: <span
+          Total: <span
             >{Utils.Strings.currency(
               Number(order?.subtotal ?? 0) +
                 Number(order?.delivery ?? 0) -
@@ -209,6 +200,7 @@
             >
           {/if}
         </div>
+        <div class="time">{Utils.Strings.dateToString(order?.createdAt)}</div>
       </div>
     {/each}
     <Views.Divider />

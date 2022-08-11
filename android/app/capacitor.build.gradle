@@ -13,10 +13,12 @@ dependencies {
     implementation project(':capacitor-app')
     implementation project(':capacitor-app-launcher')
     implementation project(':capacitor-clipboard')
+    implementation project(':capacitor-filesystem')
     implementation project(':capacitor-geolocation')
     implementation project(':capacitor-network')
     implementation project(':capacitor-preferences')
     implementation project(':capacitor-push-notifications')
+    implementation project(':capacitor-share')
     implementation project(':ikomida-capacitor-plugin-status-bar')
     implementation project(':capacitor-native-log')
 
