@@ -3,7 +3,7 @@
   import Fa from "svelte-fa";
   import { faEdit } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
-  import { Views, Image, Types, Utils } from "@ikomida/components";
+  import { Views, Types, Utils } from "@ikomida/components";
   import {
     newProduct,
     updateProduct,
@@ -13,10 +13,8 @@
 
   let { item, edit } = Utils.Objects.copy($Router.options);
   let isLoading = false;
-  let fileinput;
   let categoriesOptions = [];
   let firstLaunch = true;
-  let imageSrc = "/Assets/Images/food-plate.svg";
   let errorAlert;
   let showAlert = false;
   let selectedDiscountType;
@@ -92,29 +90,6 @@
     isLoading = false;
   }
 
-  async function onFileSelected(e) {
-    isLoading = true;
-    let imageSrcFile = e.target.files[0];
-    isLoading = false;
-    let reader = new FileReader();
-    reader.readAsDataURL(imageSrcFile);
-    reader.onload = async (e) => {
-      const [dataType, data] = e.target.result.split(";");
-      let imageType = "jpeg";
-      switch (dataType) {
-        case "image/jpeg":
-        case "image/jpg":
-          imageType = "jpeg";
-          break;
-        case "image/png":
-          imageType = "png";
-          break;
-      }
-      item.image = await Image.resizeImage(imageSrcFile, 400, 400, imageType);
-      imageSrc = item.image;
-    };
-  }
-
   async function generateOptions() {
     const response = await getCategories();
     if (response) {
@@ -134,9 +109,6 @@
     if (!item.category) {
       item.category = null;
     }
-    if (item.image) {
-      imageSrc = item.image;
-    }
   });
 
   generateOptions();
@@ -152,22 +124,7 @@
 {/if}
 {#if (categoriesOptions?.length ?? 0) > 0}
   <div class="product">
-    <div class="imageContainer">
-      <img src={imageSrc} alt={item?.title} />
-      <img
-        class="upload"
-        src="/Assets/Images/upload.png"
-        alt=""
-        on:click={fileinput.click()}
-      />
-      <input
-        style="display:none"
-        type="file"
-        accept=".jpg, .jpeg, .png"
-        on:change={onFileSelected}
-        bind:this={fileinput}
-      />
-    </div>
+    <Views.UploadablePhoto image={item.image} title={item?.title} />
     <Views.Selector
       bind:selected={item.category}
       name="Selecione uma opção"
@@ -253,23 +210,5 @@
     display: flex;
     flex-direction: column;
     padding-bottom: 50px;
-  }
-  .imageContainer {
-    position: relative;
-    border-radius: 4px;
-    width: 100%;
-    overflow: hidden;
-  }
-  .imageContainer > img {
-    max-width: 100%;
-    /* max-height: 200px; */
-    width: 100%;
-  }
-  .imageContainer > img.upload {
-    width: 60px;
-    position: absolute;
-    left: 0;
-    background: #00000077;
-    border-radius: 4px;
   }
 </style>

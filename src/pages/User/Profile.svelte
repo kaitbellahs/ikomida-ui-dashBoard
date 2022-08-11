@@ -2,7 +2,7 @@
   import { Auth } from "../../stores/Auth";
   import { updatePassword } from "../../network/Auth";
   import { Title } from "../../stores/Navigation";
-  import { Views, Image, Utils } from "@ikomida/components";
+  import { Views, Utils } from "@ikomida/components";
   import { getSettings, setSettings } from "../../network/Settings";
   import { StatusBar } from "../../stores/Setup";
   import { onMount } from "svelte";
@@ -20,7 +20,6 @@
     newPass: false,
     reNewPass: false,
   };
-  let fileinput;
 
   function toggleErrorAlert(messageObject) {
     errorAlert = messageObject;
@@ -60,35 +59,6 @@
     isLoading = false;
   }
 
-  async function onFileSelected(e) {
-    isLoading = true;
-    let imageSrcFile = e.target.files[0];
-    isLoading = false;
-    let reader = new FileReader();
-    reader.readAsDataURL(imageSrcFile);
-    reader.onload = async (e) => {
-      const [dataType, data] = e.target.result.split(";");
-      let imageType = "jpeg";
-      switch (dataType) {
-        case "image/jpeg":
-        case "image/jpg":
-          imageType = "jpeg";
-          break;
-        case "image/png":
-          imageType = "png";
-          break;
-      }
-      profile.mainPicture = await Image.resizeImage(
-        imageSrcFile,
-        400,
-        400,
-        imageType
-      );
-      imageSrc = profile?.mainPicture;
-      await update();
-    };
-  }
-
   onMount(async () => {
     const response = await getSettings();
     profile = { ...profile, ...response?.profile };
@@ -99,38 +69,11 @@
 </script>
 
 <div class="profile">
-  <div class="imageContainer">
-    {#if profile?.mainPicture}
-      <img
-        class="avatarCircle"
-        src={profile?.mainPicture}
-        alt={profile?.restaurantName}
-      />
-    {:else}
-      <div class="avatarCircle">
-        {profile?.restaurantName?.[0]}{profile?.restaurantName?.[1]}
-      </div>
-      <Views.Divider />
-      <small>
-        Esse é o lugar da foto do logo do seu estabelecimento que vai aparecer
-        no app dos seus clientes e para atualizá-la clica na câmera no canto
-        superior esquerdo da foto</small
-      >
-    {/if}
-    <img
-      class="upload"
-      src="/Assets/Images/upload.png"
-      alt=""
-      on:click={fileinput.click()}
-    />
-    <input
-      style="display:none"
-      type="file"
-      accept=".jpg, .jpeg, .png"
-      on:change={onFileSelected}
-      bind:this={fileinput}
-    />
-  </div>
+  <Views.UploadablePhoto
+    type="vendor"
+    image={profile?.mainPicture}
+    title={profile?.restaurantName}
+  />
   <div class="data">
     <h2>{profile?.restaurantName}</h2>
     <Views.Divider />
