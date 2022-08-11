@@ -21,6 +21,10 @@
     reNewPass: false,
   };
 
+  $: if (profile?.mainPicture) {
+    update();
+  }
+
   function toggleErrorAlert(messageObject) {
     errorAlert = messageObject;
     showAlert = true;
@@ -71,7 +75,7 @@
 <div class="profile">
   <Views.UploadablePhoto
     type="vendor"
-    image={profile?.mainPicture}
+    bind:image={profile.mainPicture}
     title={profile?.restaurantName}
   />
   <div class="data">
@@ -164,15 +168,6 @@
   .profile > div {
     width: 100%;
   }
-  .imageContainer {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    position: relative;
-    border-radius: 4px;
-    width: 100%;
-    overflow: hidden;
-  }
   .profile > div > h2 {
     margin-left: 20px;
   }
@@ -184,31 +179,5 @@
 
   .profile > .data > h2 {
     text-align: center;
-  }
-  .avatarCircle {
-    font-size: 3em;
-    height: 90px;
-    width: 90px;
-    background: #ccc;
-    border-radius: 45px;
-    float: left;
-    line-height: 90px;
-    text-align: center;
-    vertical-align: middle;
-    display: table-cell;
-    overflow: hidden;
-    margin-right: 10px;
-  }
-  .imageContainer > img {
-    max-width: 100%;
-    /* max-height: 200px; */
-    width: 100%;
-  }
-  .imageContainer > img.upload {
-    width: 60px;
-    position: absolute;
-    left: 0;
-    background: #00000077;
-    border-radius: 4px;
   }
 </style>

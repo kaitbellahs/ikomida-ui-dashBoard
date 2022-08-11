@@ -9,7 +9,7 @@
   Title.set("iKomida - Dashboard");
 </script>
 
-<h2>Essas são algumas estatísticas sobre seu estabelecimento</h2>
+<h2>Estatísticas</h2>
 <Views.Divider />
 <section>
   <article>
@@ -74,6 +74,9 @@
     width: 100%;
     font-size: 3em;
     color: #4c0708;
+    text-align: center;
+  }
+  h2 {
     text-align: center;
   }
 </style>
