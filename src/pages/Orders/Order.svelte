@@ -98,40 +98,20 @@
     isLoading = false;
   }
   async function share() {
+    isLoading = true;
+    screenShot = true;
     async function sleep(ms) {
       return new Promise((resolve) => setTimeout(resolve, ms));
     }
-    isLoading = true;
-    screenShot = true;
-    await sleep(300);
+    await sleep(3);
     const canvas = await html2canvas(orderScreen, {
-      scale: 0.7,
       logging: false,
       backgroundColor: "#fff",
       allowTaint: true,
-      removeContainer: false,
-      windowWidth: orderScreen?.offsetWidth,
-      windowHeight: orderScreen.offsetHeight,
-      width: orderScreen?.offsetWidth,
-      height: orderScreen.offsetHeight,
       useCORS: true,
-      x: 0,
-      y: 0,
-      scrollX: 0,
-      scrollY: 0,
     });
     screenShot = false;
     isLoading = false;
-    // const popup = window.open();
-    // // const img = new Image()
-    // // img.style = 'width: 100%'
-    // // img.src = canvas.toDataURL()
-    // popup.document.write(
-    //   `<img style="width: 100%;" src="${canvas.toDataURL()}">`
-    // );
-    // const ctx = canvas.getContext('2d');
-    // const imageData = ctx.getImageData(0,0,orderScreen?.offsetWidth, orderScreen.offsetHeight);
-    // console.log(imageData)
     const data = canvas.toDataURL("image/jpeg", 1.0).split(",");
     const screenShotFile = await Filesystem.writeFile({
       path: `screenshots/order-${order?.customID}.jpg`,
@@ -184,21 +164,24 @@
     {/if}
     <Views.Divider height="30" />
   </div>
-  {#if [Types.OrderStatusType.WAITING_PAYMENT, Types.OrderStatusType.OPEN, Types.OrderStatusType.ACCEPTED, Types.OrderStatusType.WAITING_DELIVERY, Types.OrderStatusType.IN_DELIVERY].includes(order.status) && new Date(new Date(order?.createdAt).getTime() + order?.preparation?.max * 1000) < new Date()}
-    <Views.Status type={Views.Status.Types.ERROR} circle={true}
-      >Pedido atrasado</Views.Status
-    >
-  {/if}
-  {#if [Types.OrderStatusType.DELIVERED].includes(order.status)}
-    <Views.Status type={Views.Status.Types.SUCCESS} circle={true}
-      >Pedido entregue</Views.Status
-    >
-  {/if}
-  {#if [Types.OrderStatusType.CANCELED].includes(order.status)}
-    <Views.Status type={Views.Status.Types.ERROR}>Pedido cancelado</Views.Status
-    >
-  {/if}
-  <Views.Divider />
+  <div class="orderStatus" data-html2canvas-ignore>
+    {#if [Types.OrderStatusType.WAITING_PAYMENT, Types.OrderStatusType.OPEN, Types.OrderStatusType.ACCEPTED, Types.OrderStatusType.WAITING_DELIVERY, Types.OrderStatusType.IN_DELIVERY].includes(order.status) && new Date(new Date(order?.createdAt).getTime() + order?.preparation?.max * 1000) < new Date()}
+      <Views.Status type={Views.Status.Types.ERROR} circle={true}
+        >Pedido atrasado</Views.Status
+      >
+    {/if}
+    {#if [Types.OrderStatusType.DELIVERED].includes(order.status)}
+      <Views.Status type={Views.Status.Types.SUCCESS} circle={true}
+        >Pedido entregue</Views.Status
+      >
+    {/if}
+    {#if [Types.OrderStatusType.CANCELED].includes(order.status)}
+      <Views.Status type={Views.Status.Types.ERROR}
+        >Pedido cancelado</Views.Status
+      >
+    {/if}
+    <Views.Divider />
+  </div>
   <h3 class="title">Pedido N˚: {order?.customID}</h3>
   <Views.Divider />
   <div class="info" data-html2canvas-ignore>
@@ -214,10 +197,12 @@
   </div>
 
   {#if ![Types.OrderStatusType.DELIVERED, Types.OrderStatusType.CANCELED].includes(order.status)}
-    <Views.Status>
-      Pedido {OrderStatus(order?.status)}
-    </Views.Status>
-    <Views.Divider />
+    <div class="orderStatus" data-html2canvas-ignore>
+      <Views.Status>
+        Pedido {OrderStatus(order?.status)}
+      </Views.Status>
+      <Views.Divider />
+    </div>
   {/if}
   <span class="time"
     >Data: {Utils.Strings.timestampToString(order?.createdAt)}</span
@@ -345,19 +330,10 @@
   <div class="signature {screenShot ? 'screenShot' : ''}">
     <Views.Divider height="30" />
     <span>Feito com carinho por</span><img
-      width="50%"
-      style="object-fit: cover;width:50%;"
-      src="/Assets/Icons/transparent-logo-1.svg"
+      src="/Assets/Icons/transparent-logo-1.png"
       alt="iKomida"
     />
-    <span>++++++=====++++++</span>
   </div>
-  <img
-    height="45px"
-    style="object-fit: cover;width:50%;"
-    src="/Assets/Icons/transparent-logo-1.svg"
-    alt="iKomida"
-  />
 </div>
 <Views.GTerms />
 <Views.MessageAlert object={errorAlert} bind:show={showAlert} />
@@ -379,6 +355,10 @@
     padding: 20px;
   }
   .order > .info {
+    display: flex;
+    flex-direction: column;
+  }
+  .order > .orderStatus {
     display: flex;
     flex-direction: column;
   }
@@ -512,19 +492,15 @@
     overflow: hidden;
   }
   .signature {
-    display: flex;
+    display: none;
     flex-direction: column;
     align-items: center;
     place-content: center;
-    overflow: hidden;
-    /* background-color: red; */
   }
   .signature.screenShot {
     display: flex;
   }
   .signature > img {
-    /* height: 45px; */
-    width: 50%;
-    overflow: hidden;
+    height: 45px;
   }
 </style>
