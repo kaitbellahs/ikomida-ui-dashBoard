@@ -3,7 +3,7 @@
   import { onMount } from "svelte";
   import html2canvas from "html2canvas";
   import { Views, Utils, Types } from "@ikomida/components";
-  import { faL, faShare } from "@fortawesome/free-solid-svg-icons";
+  import { faShare } from "@fortawesome/free-solid-svg-icons";
   import { Filesystem, Directory } from "@capacitor/filesystem";
   import {
     Navigation,
@@ -15,11 +15,8 @@
   import { OrderStatus, ChangeOrderStatus } from "../../network/Orders";
   import { getOrder } from "../../network/Products";
   import { StatusBar } from "../../stores/Setup";
-  import Cache from "../../../../ikomida-components/src/Network/Cache";
   import { Settings } from "../../stores/Setup";
   import { getSettings } from "../../network/Settings";
-
-  $: CACHE_NAME = "ORDERS";
 
   const order = $Router.options;
   let isLoading = false;

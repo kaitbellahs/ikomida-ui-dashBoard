@@ -128,23 +128,4 @@
     box-shadow: 2px 3px #cccccc7a;
     padding: 20px;
   }
-  .remove {
-    position: absolute;
-    top: -8px;
-    right: -10px;
-    font-size: 0.9em;
-    color: white;
-    font-family: RobotoBold;
-    border: 1px solid #4c0708;
-    background: #4c0708;
-    border-radius: 20px;
-    width: 26px;
-    height: 26px;
-    vertical-align: middle;
-    text-align: center;
-    padding: 6px;
-    display: flex;
-    place-items: center;
-    place-content: center;
-  }
 </style>
