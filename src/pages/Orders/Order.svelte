@@ -105,12 +105,34 @@
     screenShot = true;
     await sleep(300);
     const canvas = await html2canvas(orderScreen, {
+      scale: 0.7,
       logging: false,
-      backgroundColor: "#dfdfdf",
+      backgroundColor: "#fff",
+      allowTaint: true,
+      removeContainer: false,
+      windowWidth: orderScreen?.offsetWidth,
+      windowHeight: orderScreen.offsetHeight,
+      width: orderScreen?.offsetWidth,
+      height: orderScreen.offsetHeight,
+      useCORS: true,
+      x: 0,
+      y: 0,
+      scrollX: 0,
+      scrollY: 0,
     });
     screenShot = false;
     isLoading = false;
-    const data = canvas.toDataURL().split(",");
+    // const popup = window.open();
+    // // const img = new Image()
+    // // img.style = 'width: 100%'
+    // // img.src = canvas.toDataURL()
+    // popup.document.write(
+    //   `<img style="width: 100%;" src="${canvas.toDataURL()}">`
+    // );
+    // const ctx = canvas.getContext('2d');
+    // const imageData = ctx.getImageData(0,0,orderScreen?.offsetWidth, orderScreen.offsetHeight);
+    // console.log(imageData)
+    const data = canvas.toDataURL("image/jpeg", 1.0).split(",");
     const screenShotFile = await Filesystem.writeFile({
       path: `screenshots/order-${order?.customID}.jpg`,
       data: data?.[1],
@@ -120,7 +142,7 @@
     //TODO: -- report identifier of the app that received the share action. Can be an empty string in some cases. On web it will be undefined.
     const activityType = await Share.share({
       title: `Pedido #${order?.customID}`,
-      text: "Eu estou compartilhando com você esse pedido",
+      // text: "Eu estou compartilhando com você esse pedido",
       url: `file://${screenShotFile?.uri}`,
       dialogTitle: "Compartilhar o pedido",
     });
@@ -147,21 +169,19 @@
 
 <div class="order {screenShot ? 'screenShot' : ''}" bind:this={orderScreen}>
   <div class="avatar {screenShot ? 'screenShot' : ''}">
-    <div class="avatar">
-      {#if $Settings?.profile?.mainPicture && showImage}
-        <img
-          on:error={erroLoadImage}
-          src={$Settings?.profile?.mainPicture ??
-            "Assets/icons/transparent-logo-1.svg"}
-          alt={$Settings?.profile?.restaurantName ?? "iKomida"}
-        />
-      {:else if $Settings?.profile?.restaurantName}
-        <h1>{$Settings?.profile?.restaurantName}</h1>
-      {:else}
-        <img src="Assets/icons/transparent-logo-1.svg" alt="iKomida" />
-        <h2>{$Settings?.profile?.restaurantName}</h2>
-      {/if}
-    </div>
+    {#if $Settings?.profile?.mainPicture && showImage}
+      <img
+        on:error={erroLoadImage}
+        src={$Settings?.profile?.mainPicture ??
+          "Assets/icons/transparent-logo-1.svg"}
+        alt={$Settings?.profile?.restaurantName ?? "iKomida"}
+      />
+    {:else if $Settings?.profile?.restaurantName}
+      <h1>{$Settings?.profile?.restaurantName}</h1>
+    {:else}
+      <img src="Assets/icons/transparent-logo-1_144x45.png" alt="iKomida" />
+      <h2>{$Settings?.profile?.restaurantName}</h2>
+    {/if}
     <Views.Divider height="30" />
   </div>
   {#if [Types.OrderStatusType.WAITING_PAYMENT, Types.OrderStatusType.OPEN, Types.OrderStatusType.ACCEPTED, Types.OrderStatusType.WAITING_DELIVERY, Types.OrderStatusType.IN_DELIVERY].includes(order.status) && new Date(new Date(order?.createdAt).getTime() + order?.preparation?.max * 1000) < new Date()}
@@ -259,6 +279,7 @@
     <span class="brand">
       {#if order?.payment.type === Types.PaymentMethodType.CREDIT_CARD_ONLINE}
         <img
+          style="object-fit: cover;"
           src="/Assets/cardBrand/{order?.payment.brand}.svg"
           alt={order?.payment.brand}
         />
@@ -324,16 +345,26 @@
   <div class="signature {screenShot ? 'screenShot' : ''}">
     <Views.Divider height="30" />
     <span>Feito com carinho por</span><img
+      width="50%"
+      style="object-fit: cover;width:50%;"
       src="/Assets/Icons/transparent-logo-1.svg"
       alt="iKomida"
     />
+    <span>++++++=====++++++</span>
   </div>
+  <img
+    height="45px"
+    style="object-fit: cover;width:50%;"
+    src="/Assets/Icons/transparent-logo-1.svg"
+    alt="iKomida"
+  />
 </div>
 <Views.GTerms />
 <Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 
 {#if isLoading}
   <Views.Loading
+    opacity="0.99"
     topPadding={$StatusBar.height}
     bottomPadding={$StatusBar.bottomPadding}
   />
@@ -481,15 +512,19 @@
     overflow: hidden;
   }
   .signature {
-    display: none;
+    display: flex;
     flex-direction: column;
     align-items: center;
     place-content: center;
+    overflow: hidden;
+    /* background-color: red; */
   }
   .signature.screenShot {
     display: flex;
   }
   .signature > img {
-    height: 45px;
+    /* height: 45px; */
+    width: 50%;
+    overflow: hidden;
   }
 </style>
