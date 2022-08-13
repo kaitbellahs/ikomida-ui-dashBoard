@@ -117,7 +117,7 @@
     MenuHamburger.reset();
     menuHamburgerItems?.forEach((page) => MenuHamburger.addItem(page));
   }
-  $: console.log("$StatusBar.height:", $StatusBar.height);
+  $: console.log("$StatusBar.bottomPadding:", $StatusBar.bottomPadding);
 </script>
 
 <main

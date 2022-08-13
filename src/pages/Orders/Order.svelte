@@ -101,20 +101,9 @@
     async function sleep(ms) {
       return new Promise((resolve) => setTimeout(resolve, ms));
     }
-    // const checkPermissions = await Filesystem.checkPermissions();
-    // console.log(checkPermissions);
-    // if (checkPermissions === "denied") {
-    //   return;
-    // }
-    // if (
-    //   checkPermissions !== "granted" &&
-    //   (await Filesystem.requestPermissions()) !== "granted"
-    // ) {
-    //   return;
-    // }
     isLoading = true;
     screenShot = true;
-    await sleep(1);
+    await sleep(300);
     const canvas = await html2canvas(orderScreen, {
       logging: false,
       backgroundColor: "#dfdfdf",
@@ -163,13 +152,13 @@
         <img
           on:error={erroLoadImage}
           src={$Settings?.profile?.mainPicture ??
-            "assets/icons/transparent-logo-1.svg"}
+            "Assets/icons/transparent-logo-1.svg"}
           alt={$Settings?.profile?.restaurantName ?? "iKomida"}
         />
       {:else if $Settings?.profile?.restaurantName}
         <h1>{$Settings?.profile?.restaurantName}</h1>
       {:else}
-        <img src="assets/icons/transparent-logo-1.svg" alt="iKomida" />
+        <img src="Assets/icons/transparent-logo-1.svg" alt="iKomida" />
         <h2>{$Settings?.profile?.restaurantName}</h2>
       {/if}
     </div>
@@ -335,7 +324,7 @@
   <div class="signature {screenShot ? 'screenShot' : ''}">
     <Views.Divider height="30" />
     <span>Feito com carinho por</span><img
-      src="assets/icons/transparent-logo-1.svg"
+      src="/Assets/Icons/transparent-logo-1.svg"
       alt="iKomida"
     />
   </div>
