@@ -9,7 +9,6 @@
   import { PushNotification, Utils, Views } from "@ikomida/components";
   import { registerPushNotificationToken } from "./network/PushNotification";
   import { CAPNativeLog } from "capacitor-native-log";
-  import Cache from "./stores/Cache";
   import { Network as iNetwork } from "@ikomida/components";
 
   import Main from "./pages/Main.svelte";
@@ -67,8 +66,7 @@
   async function openNotification(notification) {
     if (logedIn) {
       if (["/order/", "/orders/"].includes(notification?.data?.uri)) {
-        Cache.setObject("ORDERS_HISTORY", null);
-        Cache.setObject("ORDERS", null);
+        await Network.instance.clearCache(Network.cacheTypes.ORDERS);
         Navigation.goTo(Routes.orders, false);
       }
     }
@@ -134,8 +132,8 @@
     networkStatus = await Network.getStatus();
     if (Capacitor.isNativePlatform()) {
       pushNotification.init();
-      const sbarInfo = await StatusBar.getInfo()
-      console.log("await StatusBar.getInfo():", sbarInfo)
+      const sbarInfo = await StatusBar.getInfo();
+      console.log("await StatusBar.getInfo():", sbarInfo);
       _StatusBar.setStatusBar(sbarInfo);
     }
   });

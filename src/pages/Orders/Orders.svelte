@@ -1,71 +1,35 @@
 <script>
-  import {
-    Title,
-    Navigation,
-    Router,
-    Menu,
-    Routes,
-  } from "../../stores/Navigation";
+  import { Title, Navigation, Menu, Routes } from "../../stores/Navigation";
   import { getOrders, OrderStatus } from "../../network/Orders";
   import { Views, Utils, Types } from "@ikomida/components";
-  import { PaymentType } from "../../network/Payment";
   import { ChangeOrderStatus } from "../../network/Orders";
   import { StatusBar } from "../../stores/Setup";
   import { faSync } from "@fortawesome/free-solid-svg-icons";
-  import Cache from "../../stores/Cache";
-  let orders;
+  import { onMount } from "svelte";
 
-  let hasMore = true;
+  let items;
+  let isLoading = false;
+  let errorAlert;
+  let showAlert = false;
+  let localLoading = false;
   let canGetMore = true;
-  let lastTimestamp = null;
 
   async function getMore(e, refresh = false) {
-    if (refresh || (canGetMore && hasMore)) {
-      isLoading = true;
-      const timestamp = refresh
-        ? 0
-        : orders?.[orders.length - 1]?.timestamp ?? -1;
-      canGetMore = false;
-      orders = Cache.getObject(CACHE_NAME);
-      const newOrders = await getOrders($Router.options, timestamp);
-      hasMore = newOrders.length > 0;
-      orders = refresh
-        ? newOrders
-        : orders
-        ? [...orders, ...newOrders]
-        : newOrders;
-      orders = orders?.map((order) => {
-        order.statusIndex = Types.OrderStatusType.keys.indexOf(order.status);
-        return order;
-      });
-      orders.sort((item1, item2) => item2.timestamp - item1.timestamp);
-      Cache.setObject(CACHE_NAME, orders);
-      canGetMore = refresh || lastTimestamp !== timestamp;
-      lastTimestamp = timestamp;
-      isLoading = false;
-    }
-  }
-
-  async function update() {
-    orders = Cache.getObject(CACHE_NAME);
-    if (!orders) {
-      await getMore(null, true);
-    }
+    localLoading = true;
+    [canGetMore, items] = await getOrders(refresh);
+    localLoading = false;
   }
 
   async function refresh() {
     await getMore(null, true);
   }
 
-  let isLoading = false;
-  let errorAlert;
-  let showAlert = false;
-
-  $: CACHE_NAME = $Router?.options ? "ORDERS_HISTORY" : "ORDERS";
-  $: if ($Router?.options === null || $Router?.options !== null) {
+  onMount(async () => {
+    isLoading = true;
     Menu.addItem({ name: "Atualizar", icon: faSync, callback: refresh });
-    update();
-  }
+    [canGetMore, items] = await getOrders(false);
+    isLoading = false;
+  });
 
   const nextButtonText = (order) => {
     switch (order?.status) {
@@ -93,7 +57,7 @@
     if (response?.success) {
       order.status = Types.OrderStatusType.CANCELED;
       toggleErrorAlert("O pedido foi atualizado com sucesso!");
-      orders = orders;
+      items = items;
     } else {
       toggleErrorAlert(response?.data);
     }
@@ -110,7 +74,7 @@
     if (response?.success) {
       order.status = newStatus;
       toggleErrorAlert("O pedido foi atualizado com sucesso!");
-      orders = orders;
+      items = items;
     } else {
       toggleErrorAlert(response?.data);
     }
@@ -122,18 +86,11 @@
     showAlert = true;
   }
 
-  function goToOrder(id) {
-    const order = orders?.find((order) => {
-      return order?.id === id;
-    });
+  function goToOrder(order) {
     Navigation.goTo(Routes.order, order);
   }
 
-  function goToOrdersHistory() {
-    Navigation.goTo(Routes.orders, true);
-  }
-
-  Title.set(!$Router?.options ? "Pedidos abertos" : "Pedidos concluídos");
+  Title.set("Pedidos");
 </script>
 
 {#if isLoading}
@@ -142,24 +99,56 @@
     bottomPadding={$StatusBar.bottomPadding}
   />
 {/if}
-{#if orders && orders.length > 0}
+{#if items && items.length > 0}
   <section>
-    {#each orders as order}
+    {#each items as order}
       <div class="leftShadow orderContainer">
-        <div on:click={goToOrder(order?.id)}>
-          <h3>#{order?.customID}: pedido {OrderStatus(order?.status)}</h3>
-          {#if [Types.OrderStatusType.WAITING_PAYMENT, Types.OrderStatusType.OPEN, Types.OrderStatusType.ACCEPTED, Types.OrderStatusType.WAITING_DELIVERY, Types.OrderStatusType.IN_DELIVERY].includes(order?.status)}
-            {#if new Date(new Date(order?.createdAt).getTime() + order?.preparation?.max * 1000) < new Date()}
-              <span class="lateOrder">Pedido atrasado</span>
-            {/if}
-            <span class="deliveryForecast">Prepare o pedido antes de </span>
-            <span class="deliveryForecastValue">
-              {Utils.Strings.dateToString(
-                new Date(order?.createdAt).getTime() +
-                  order?.preparation?.max * 1000
-              )}</span
+        <div on:click={goToOrder(order)}>
+          <h3 class="title">Pedido N˚: {order?.customID}</h3>
+          {#if [Types.OrderStatusType.WAITING_PAYMENT, Types.OrderStatusType.OPEN, Types.OrderStatusType.ACCEPTED, Types.OrderStatusType.WAITING_DELIVERY, Types.OrderStatusType.IN_DELIVERY].includes(order.status) && new Date(new Date(order?.createdAt).getTime() + order?.preparation?.max * 1000) < new Date()}
+            <Views.Status
+              type={Views.Status.Types.ERROR}
+              circle={false}
+              showIcon={false}>Pedido atrasado</Views.Status
             >
           {/if}
+          {#if [Types.OrderStatusType.DELIVERED].includes(order.status)}
+            <Views.Status
+              type={Views.Status.Types.SUCCESS}
+              circle={false}
+              showIcon={false}>Pedido entregue</Views.Status
+            >
+          {/if}
+          {#if [Types.OrderStatusType.CANCELED].includes(order.status)}
+            <Views.Status
+              type={Views.Status.Types.ERROR}
+              circle={false}
+              showIcon={false}>Pedido cancelado</Views.Status
+            >
+          {/if}
+          <Views.Divider height="5" />
+          <div class="info">
+            {#if [Types.OrderStatusType.WAITING_PAYMENT, Types.OrderStatusType.OPEN, Types.OrderStatusType.ACCEPTED, Types.OrderStatusType.WAITING_DELIVERY, Types.OrderStatusType.IN_DELIVERY].includes(order.status)}
+              <Views.Status showIcon={false} type={Views.Status.Types.WARNING}
+                >Prepare o pedido antes de
+                {Utils.Strings.dateToString(
+                  new Date(order?.createdAt).getTime() +
+                    order?.preparation?.max * 1000
+                )}</Views.Status
+              >
+              <Views.Divider height="5" />
+            {/if}
+          </div>
+          {#if ![Types.OrderStatusType.DELIVERED, Types.OrderStatusType.CANCELED].includes(order.status)}
+            <Views.Status>
+              Pedido {OrderStatus(order?.status)}
+            </Views.Status>
+            <Views.Divider height="5" />
+          {/if}
+          <div class="time">
+            Data: {Utils.Strings.dateToString(order?.createdAt)}
+          </div>
+          <Views.Divider height="10" />
           {#if order?.products?.length > 0}
             <div class="product">1. {order?.products?.[0]?.title}</div>
           {/if}
@@ -169,7 +158,8 @@
               {order?.products?.length - 1 == 1 ? "item" : "itens"}
             </div>
           {/if}
-          <div class="address">Entregue na: <b>{order?.address.street}</b></div>
+          <Views.Divider height="5" />
+          <div class="address">Entregua na: <b>{order?.address.street}</b></div>
           <div class="paymentMethod">
             Forma de pagamento: <b
               >{new Types.PaymentMethodType(order?.payment.type).name}
@@ -177,8 +167,9 @@
             >
           </div>
         </div>
+        <Views.Divider height="10" />
         <div class="value">
-          Total: <span
+          Total:&nbsp;<span
             >{Utils.Strings.currency(
               Number(order?.subtotal ?? 0) +
                 Number(order?.delivery ?? 0) -
@@ -186,30 +177,31 @@
             )}</span
           >
         </div>
-        <div class="buttonGroup">
-          {#if ![Types.OrderStatusType.DELIVERED, Types.OrderStatusType.CANCELED].includes(order?.status)}
-            <Views.Button
-              multiplier="0.8"
-              type="secondary"
-              on:click={cancel(order)}>Cancelar</Views.Button
-            >
-          {/if}
-          {#if ![Types.OrderStatusType.DELIVERED, Types.OrderStatusType.CANCELED, Types.OrderStatusType.WAITING_PAYMENT].includes(order?.status)}
-            <Views.Button multiplier="0.8" on:click={next(order)}
-              >{nextButtonText(order)}</Views.Button
-            >
-          {/if}
-        </div>
-        <div class="time">{Utils.Strings.dateToString(order?.createdAt)}</div>
+        {#if ![Types.OrderStatusType.DELIVERED, Types.OrderStatusType.CANCELED, Types.OrderStatusType.WAITING_PAYMENT].includes(order?.status)}
+          <Views.Divider height="10" />
+          <div class="buttonGroup">
+            {#if ![Types.OrderStatusType.DELIVERED, Types.OrderStatusType.CANCELED].includes(order?.status)}
+              <Views.Button
+                multiplier="0.8"
+                type="secondary"
+                on:click={cancel(order)}>Cancelar</Views.Button
+              >
+            {/if}
+            {#if ![Types.OrderStatusType.DELIVERED, Types.OrderStatusType.CANCELED, Types.OrderStatusType.WAITING_PAYMENT].includes(order?.status)}
+              <Views.Button multiplier="0.8" on:click={next(order)}
+                >{nextButtonText(order)}</Views.Button
+              >
+            {/if}
+          </div>
+        {/if}
       </div>
+      <Views.Divider />
     {/each}
-    <Views.Divider />
-    {#if hasMore && !canGetMore}
+    {#if localLoading}
       <Views.LocalLoading />
-    {:else}
-      <Views.Button disabled={!hasMore || !canGetMore} on:click={getMore}
-        >carregar mais</Views.Button
-      >
+    {/if}
+    {#if canGetMore}
+      <Views.Button on:click={getMore}>carregar mais</Views.Button>
     {/if}
     <Views.GTerms />
   </section>
@@ -234,8 +226,6 @@
     border-radius: 4px;
     border: 1px solid #ccc;
     padding: 20px;
-    margin-bottom: 10px;
-    margin-top: 10px;
     background: #eeeeee33;
     display: flex;
     flex-direction: column;
@@ -246,49 +236,27 @@
   }
   .orderContainer > div > h3 {
     padding: 0;
-    margin: 0;
     font-size: 1.1em;
-    margin-bottom: 5px;
+    text-align: center;
   }
   .orderContainer > div > .product {
     font-family: RobotoLight;
     font-size: 0.9em;
-    margin-bottom: 2px;
   }
   .orderContainer > div > .address {
     font-family: RobotoThin;
     font-size: 0.9em;
-    margin-bottom: 2px;
   }
   .orderContainer > div > .paymentMethod {
     font-family: RobotoThin;
     font-size: 0.9em;
-    margin-bottom: 2px;
   }
-  .orderContainer > div > .time {
-    font-family: RobotoThin;
-    font-size: 0.6em;
-  }
-  .orderContainer > div > .deliveryForecast {
-    font-size: 1.1em;
-    color: #00000099;
-  }
-  .orderContainer > div > .deliveryForecastValue {
-    color: rgb(0, 177, 0);
-    margin-bottom: 10px;
-  }
-  .orderContainer > div > .lateOrder {
-    background-color: #4c0708;
-    border-radius: 6px;
-    color: white;
-    padding: 4px 20px;
-    align-self: center;
-    margin-bottom: 10px;
+  .time {
+    font-size: 0.8em;
   }
   .orderContainer > .buttonGroup {
     display: flex;
     flex-direction: row;
-    margin-top: 20px;
   }
   .orderContainer > .buttonGroup > :global(*) {
     flex: 1;
@@ -300,9 +268,9 @@
     margin-left: 5px;
   }
   .orderContainer > .value {
-    margin-top: 10px;
     display: flex;
     flex-direction: row;
+    align-self: center;
   }
   .orderContainer > .value > span {
     color: green;

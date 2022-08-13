@@ -1,12 +1,10 @@
 <script>
   import { Title, Navigation } from "../../stores/Navigation";
   import Fa from "svelte-fa";
-  import { faEdit, faSearch, faPhone } from "@fortawesome/free-solid-svg-icons";
+  import { faEdit, faSearch } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
   import { Views, Utils } from "@ikomida/components";
   import { addStaff, GetAddressByCep } from "../../network/Staff";
-  import Cache from "../../stores/Cache";
-  const CACHE_NAME = "STAFF";
 
   let items = {
     name: null,
@@ -72,6 +70,7 @@
   ) {
     findAddress();
   }
+
   function findAddress() {
     isLoading = true;
     currentPostalCode = items?.address?.postalCode;
@@ -91,7 +90,6 @@
         toggleErrorAlert(exception);
       });
   }
-
   const submit = async () => {
     if (!Utils.Objects.validateFields(itemsValidation)) {
       toggleErrorAlert(
@@ -102,7 +100,6 @@
     isLoading = true;
     let response = await addStaff(items);
     if (response.success) {
-      Cache.setObject(CACHE_NAME, null);
       Navigation.pop();
     } else {
       toggleErrorAlert(response?.data);

@@ -8,16 +8,16 @@ import {
     Network
 } from "@ikomida/components";
 
-export async function getStaff(timestamp = 0) {
-    const response = await Network.instance.get(`/vendor/staff/${timestamp}`, get(Auth));
-    if (response && response?.success) {
-        return response?.data ?? [];
-    }
-    return [];
+export async function getStaff(refresh = false) {
+    return await Network.instance.loadMore(Network.cacheTypes.STAFF, '/vendor/staff', get(Auth), refresh)
 }
 
 export async function addStaff(object) {
-    return Network.instance.post("/vendor/staff", get(Auth), object);
+    const response = await Network.instance.post("/vendor/staff", get(Auth), object);
+    if (response?.success) {
+        await Network.instance.clearCache(Network.cacheTypes.STAFF)
+    }
+    return response
 }
 
 export async function updateStaff(object) {

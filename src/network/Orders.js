@@ -9,15 +9,8 @@ import {
     Auth
 } from '../stores/Auth';
 
-const openOrdersStatus = [Types.OrderStatusType.WAITING_PAYMENT, Types.OrderStatusType.OPEN, Types.OrderStatusType.ACCEPTED, Types.OrderStatusType.WAITING_DELIVERY, Types.OrderStatusType.IN_DELIVERY];
-
-export async function getOrders (history, timestamp = 0) {
-    let response = await Network.instance.get(`/orders/${timestamp}${history ? '/history' : ''}`, get(Auth));
-    let orders = [];
-    if (response?.success) {
-        orders = response?.data || [];
-    }
-    return orders;
+export async function getOrders(refresh = false) {
+    return await Network.instance.loadMore(Network.cacheTypes.ORDERS, '/orders', get(Auth), refresh)
 }
 
 export async function ChangeOrderStatus(id, status) {
@@ -40,10 +33,13 @@ export function OrderStatus(status) {
         case Types.OrderStatusType.WAITING_PAYMENT:
             return "aguardando pagamento";
         case Types.OrderStatusType.OPEN:
+            return "aguardando aprovação";
         case Types.OrderStatusType.ACCEPTED:
+            return "em preparação";
         case Types.OrderStatusType.WAITING_DELIVERY:
+            return "esperando o entregador";
         case Types.OrderStatusType.IN_DELIVERY:
-            return "em andamento";
+            return "a caminho do cliente";
         case Types.OrderStatusType.DELIVERED:
             return "entregue";
         case Types.OrderStatusType.CANCELED:

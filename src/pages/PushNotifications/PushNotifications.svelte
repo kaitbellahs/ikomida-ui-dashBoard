@@ -1,67 +1,35 @@
 <script>
-  import {
-    Title,
-    Navigation,
-    Router,
-    Routes,
-    Menu,
-  } from "../../stores/Navigation";
+  import { Title, Navigation, Routes, Menu } from "../../stores/Navigation";
   import Fa from "svelte-fa";
   import { faSync, faRocket } from "@fortawesome/free-solid-svg-icons";
   import { Views, Utils } from "@ikomida/components";
   import { getPushNotifications } from "../../network/PushNotification";
   import { StatusBar } from "../../stores/Setup";
   import { onMount } from "svelte";
-  import Cache from "../../stores/Cache";
-  let pushNotifications;
 
-  const CACHE_NAME = "PUSH_NOTIFICATIONS";
-  let hasMore = true;
+  let items;
+  let isLoading = false;
+  let errorAlert;
+  let showAlert = false;
+  let localLoading = false;
   let canGetMore = true;
-  let lastTimestamp = null;
 
   async function getMore(e, refresh = false) {
-    if (refresh || (canGetMore && hasMore)) {
-      isLoading = true;
-      const timestamp = refresh
-        ? 0
-        : pushNotifications?.[pushNotifications.length - 1]?.timestamp ?? -1;
-      canGetMore = false;
-      pushNotifications = Cache.getObject(CACHE_NAME);
-      const newPushNotifications = await getPushNotifications(timestamp);
-      hasMore = (newPushNotifications?.length ?? 0) > 0;
-      pushNotifications = refresh
-        ? newPushNotifications
-        : pushNotifications
-        ? [...pushNotifications, ...newPushNotifications]
-        : newPushNotifications;
-      pushNotifications.sort(
-        (item1, item2) => new Date(item2.createdAt) - new Date(item1.createdAt)
-      );
-      Cache.setObject(CACHE_NAME, pushNotifications);
-      canGetMore = refresh || lastTimestamp !== timestamp;
-      lastTimestamp = timestamp;
-      isLoading = false;
-    }
+    localLoading = true;
+    [canGetMore, items] = await getPushNotifications(refresh);
+    localLoading = false;
   }
-
-  onMount(async () => {
-    pushNotifications = Cache.getObject(CACHE_NAME);
-    if (!pushNotifications) {
-      await getMore(null, true);
-    }
-  });
 
   async function refresh() {
     await getMore(null, true);
   }
 
-  Menu.addItem({ name: "Atualizar", icon: faSync, callback: refresh });
-
-  let isLoading = false;
-
-  let errorAlert;
-  let showAlert = false;
+  onMount(async () => {
+    Menu.addItem({ name: "Atualizar", icon: faSync, callback: refresh });
+    isLoading = true;
+    [canGetMore, items] = await getPushNotifications();
+    isLoading = false;
+  });
 
   function toggleErrorAlert(messageObject) {
     errorAlert = messageObject;
@@ -71,17 +39,6 @@
   const newPushNotification = async () => {
     Navigation.goTo(Routes.newPushNotification);
   };
-
-  async function removePushNotification(id) {
-    isLoading = true;
-    const response = await deletePushNotification(id);
-    if (response?.success) {
-      await getMore(null, true);
-    } else {
-      toggleErrorAlert(response?.data);
-    }
-    isLoading = false;
-  }
 
   Title.set("Mensagens push");
 </script>
@@ -98,9 +55,9 @@
     ><Fa icon={faRocket} /> <span>Enviar mensagem</span></Views.Button
   >
   <Views.Divider />
-  {#if pushNotifications && (pushNotifications?.length ?? 0) > 0}
+  {#if items && (items?.length ?? 0) > 0}
     <section>
-      {#each pushNotifications as pushNotification}
+      {#each items as pushNotification}
         <article>
           <h2>{pushNotification?.title}</h2>
           <div>{pushNotification?.body}</div>
@@ -113,12 +70,11 @@
         </article>
       {/each}
       <Views.Divider />
-      {#if hasMore && !canGetMore}
+      {#if localLoading}
         <Views.LocalLoading />
-      {:else}
-        <Views.Button disabled={!hasMore || !canGetMore} on:click={getMore}
-          >carregar mais</Views.Button
-        >
+      {/if}
+      {#if canGetMore}
+        <Views.Button on:click={getMore}>carregar mais</Views.Button>
       {/if}
     </section>
   {:else}

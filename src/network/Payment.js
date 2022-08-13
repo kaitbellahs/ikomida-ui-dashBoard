@@ -27,16 +27,16 @@ export function PaymentType(type) {
     }
 }
 
-export async function newCoupon(coupon) {
-    return Network.instance.post(`/coupon`, get(Auth), coupon);
+export async function newCoupon(object) {
+    const response = await Network.instance.post("/coupon", get(Auth), object);
+    if (response?.success) {
+        await Network.instance.clearCache(Network.cacheTypes.STAFF)
+    }
+    return response
 }
 
-export async function getCoupons(timestamp = 0) {
-    const response = await Network.instance.get(`/coupons/${timestamp}`, get(Auth));
-    if (response?.success) {
-        return response?.data;
-    }
-    return [];
+export async function getCoupons(refresh = false) {
+    return await Network.instance.loadMore(Network.cacheTypes.COUPONS, '/coupons', get(Auth), refresh)
 }
 
 export async function countCoupons() {

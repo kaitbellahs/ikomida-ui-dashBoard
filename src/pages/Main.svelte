@@ -111,25 +111,18 @@
 
   onMount(async () => {
     userInfo = await Utils.Jws.extractToken($Auth);
-    // const style = document.createElement("style");
-  //   style.innerHTML = `
-  //   body {
-  //     --paddingTop: ${styleHeight};
-  //     --paddingBottom: 60px;
-  //   }
-  // `;
-  //   document.head.appendChild(style);
   });
 
   $: if (menuHamburgerItems) {
     MenuHamburger.reset();
     menuHamburgerItems?.forEach((page) => MenuHamburger.addItem(page));
   }
-  $: console.log("$StatusBar.height:", $StatusBar.height)
+  $: console.log("$StatusBar.height:", $StatusBar.height);
 </script>
 
 <main
-  style="--paddingTop:{styleHeight};--paddingBottom: {70 + $StatusBar.bottomPadding}px; overflow: scroll;max-width: 100%;"
+  style="--paddingTop:{styleHeight};--paddingBottom: {70 +
+    $StatusBar.bottomPadding}px; overflow: scroll;max-width: 100%;"
 >
   {#if route == Routes.home}
     <Home />
@@ -203,7 +196,7 @@
     box-sizing: border-box;
   }
   :global(body) {
-    padding-top: 0;/*var(--paddingTop)*/;
+    padding-top: 0; /*var(--paddingTop)*/
     padding-bottom: 0;
   }
 </style>

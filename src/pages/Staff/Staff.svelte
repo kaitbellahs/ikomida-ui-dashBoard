@@ -11,22 +11,38 @@
     faSync,
     faTrashAlt,
   } from "@fortawesome/free-solid-svg-icons";
-  import Cache from "../../stores/Cache";
-  const CACHE_NAME = "STAFF";
-
-  let staffs;
+  let items;
   let userInfo;
-  let hasMore = true;
-  let canGetMore = true;
-  let lastTimestamp = null;
-
   let isLoading = false;
   let errorAlert;
   let showAlert = false;
+  let localLoading = false;
+  let canGetMore = true;
+
+  async function getMore(e, refresh = false) {
+    localLoading = true;
+    [canGetMore, items] = await getStaff(refresh);
+    localLoading = false;
+  }
+
+  async function refresh() {
+    isLoading = true;
+    await getMore(null, true);
+    isLoading = false;
+  }
+
   function toggleErrorAlert(messageObject) {
     errorAlert = messageObject;
     showAlert = true;
   }
+
+  onMount(async () => {
+    isLoading = true;
+    Menu.addItem({ name: "Atualizar", icon: faSync, callback: refresh });
+    [canGetMore, items] = await getStaff();
+    userInfo = await Utils.Jws.extractToken($Auth);
+    isLoading = false;
+  });
 
   async function onRemoveClick(id) {
     isLoading = true;
@@ -40,40 +56,6 @@
     }
     isLoading = false;
   }
-  async function getMore(e, refresh = false) {
-    if (refresh || (canGetMore && hasMore)) {
-      const timestamp = refresh
-        ? 0
-        : staffs?.[staffs.length - 1]?.timestamp ?? -1;
-      canGetMore = false;
-      staffs = Cache.getObject(CACHE_NAME);
-      const newStaffs = await getStaff(timestamp);
-      hasMore = newStaffs.length > 0;
-      staffs = refresh
-        ? newStaffs
-        : staffs
-        ? [...staffs, ...newStaffs]
-        : newStaffs;
-      staffs.sort((item1, item2) => item2.timestamp - item1.timestamp);
-      Cache.setObject(CACHE_NAME, staffs);
-      canGetMore = refresh || lastTimestamp !== timestamp;
-      lastTimestamp = timestamp;
-    }
-  }
-
-  onMount(async () => {
-    userInfo = await Utils.Jws.extractToken($Auth);
-    staffs = Cache.getObject(CACHE_NAME);
-    if (!staffs) {
-      await getMore(null, true);
-    }
-  });
-
-  async function refresh() {
-    await getMore(null, true);
-  }
-
-  Menu.addItem({ name: "Atualizar", icon: faSync, callback: refresh });
 
   async function newStaff() {
     Navigation.goTo(Routes.newStaff);
@@ -92,7 +74,7 @@
   Title.set("Lista de colaboradores");
 </script>
 
-{#if !staffs}
+{#if !items}
   <Views.Loading
     topPadding={$StatusBar.height}
     bottomPadding={$StatusBar.bottomPadding}
@@ -102,14 +84,12 @@
     ><Fa icon={faEdit} /> <span>Novo colaborador</span></Views.Button
   >
   <Views.Divider />
-  {#if staffs.length > 0}
+  {#if items.length > 0}
     <section>
-      {#each staffs as staff}
+      {#each items as staff}
         <article>
           {#if userInfo?.id !== staff?.id}
-            <span on:click={onRemoveClick(staff?.id)} class="remove"
-              ><Fa icon={faTrashAlt} /></span
-            >
+            <Views.FloatRemove callback={() => onRemoveClick(staff?.id)} />
           {/if}
           <h2>{staff?.name} {staff?.lastName}</h2>
           <div>Telefone: {Utils?.Strings?.formatAsPhone(staff?.phone)}</div>
@@ -117,12 +97,11 @@
         </article>
       {/each}
       <Views.Divider />
-      {#if hasMore && !canGetMore}
+      {#if localLoading}
         <Views.LocalLoading />
-      {:else}
-        <Views.Button disabled={!hasMore || !canGetMore} on:click={getMore}
-          >carregar mais</Views.Button
-        >
+      {/if}
+      {#if canGetMore}
+        <Views.Button on:click={getMore}>carregar mais</Views.Button>
       {/if}
     </section>
   {:else}
@@ -133,7 +112,7 @@
 {/if}
 
 <Views.MessageAlert object={errorAlert} bind:show={showAlert} />
-{#if isLoading || !staffs}
+{#if isLoading || !items}
   <Views.Loading
     topPadding={$StatusBar.height}
     bottomPadding={$StatusBar.bottomPadding}

@@ -16,63 +16,37 @@
   import { getCoupons, deleteCoupon } from "../../network/Payment";
   import { StatusBar } from "../../stores/Setup";
   import { onMount } from "svelte";
-  import Cache from "../../stores/Cache";
-  let coupons;
-
-  const CACHE_NAME = "COUPONS";
-  let hasMore = true;
+  let items;
+  let isLoading = false;
+  let errorAlert;
+  let showAlert = false;
+  let localLoading = false;
   let canGetMore = true;
-  let lastTimestamp = null;
 
   async function getMore(e, refresh = false) {
-    if (refresh || (canGetMore && hasMore)) {
-      isLoading = true;
-      const timestamp = refresh
-        ? 0
-        : coupons?.[coupons.length - 1]?.timestamp ?? -1;
-      canGetMore = false;
-      coupons = Cache.getObject(CACHE_NAME);
-      const newCoupons = await getCoupons(timestamp);
-      hasMore = newCoupons.length > 0;
-      coupons = refresh
-        ? newCoupons
-        : coupons
-        ? [...coupons, ...newCoupons]
-        : newCoupons;
-      coupons.sort((item1, item2) => item2.timestamp - item1.timestamp);
-      Cache.setObject(CACHE_NAME, coupons);
-      canGetMore = refresh || lastTimestamp !== timestamp;
-      lastTimestamp = timestamp;
-      isLoading = false;
-    }
+    localLoading = true;
+    [canGetMore, items] = await getCoupons(refresh);
+    localLoading = false;
   }
-
-  onMount(async () => {
-    coupons = Cache.getObject(CACHE_NAME);
-    if (!coupons) {
-      await getMore(null, true);
-    }
-  });
 
   async function refresh() {
     await getMore(null, true);
   }
-
-  Menu.addItem({ name: "Atualizar", icon: faSync, callback: refresh });
-
-  const item = $Router.options;
-  let isLoading = false;
-
-  let errorAlert;
-  let showAlert = false;
 
   function toggleErrorAlert(messageObject) {
     errorAlert = messageObject;
     showAlert = true;
   }
 
+  onMount(async () => {
+    Menu.addItem({ name: "Atualizar", icon: faSync, callback: refresh });
+    isLoading = true;
+    [canGetMore, items] = await getCoupons();
+    isLoading = false;
+  });
+
   const newCoupon = async () => {
-    Navigation.goTo(Routes.newCoupon, { item, edit: false });
+    Navigation.goTo(Routes.newCoupon);
   };
 
   async function removeCoupon(id) {
@@ -99,9 +73,9 @@
     ><Fa icon={faEdit} /> <span>Novo cupom</span></Views.Button
   >
   <Views.Divider />
-  {#if coupons && coupons.length > 0}
+  {#if items && items.length > 0}
     <section>
-      {#each coupons as coupon}
+      {#each items as coupon}
         <article>
           <span on:click={removeCoupon(coupon.id)} class="remove"
             ><Fa icon={faTrashAlt} /></span
@@ -112,12 +86,11 @@
         </article>
       {/each}
       <Views.Divider />
-      {#if hasMore && !canGetMore}
+      {#if localLoading}
         <Views.LocalLoading />
-      {:else}
-        <Views.Button disabled={!hasMore || !canGetMore} on:click={getMore}
-          >carregar mais</Views.Button
-        >
+      {/if}
+      {#if canGetMore}
+        <Views.Button on:click={getMore}>carregar mais</Views.Button>
       {/if}
     </section>
   {:else}

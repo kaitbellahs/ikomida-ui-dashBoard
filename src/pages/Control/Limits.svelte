@@ -26,7 +26,14 @@
   }
 
   onMount(async () => {
-    limits = await getLimits();
+    isLoading = true;
+    const response = await getLimits();
+    if (response?.success) {
+      limits = response.data;
+    } else {
+      toggleErrorAlert(response?.data);
+    }
+    isLoading = false;
   });
 
   Title.set("Limites");
@@ -158,7 +165,7 @@
   {/if}
 </section>
 
-{#if !limits || isLoading}
+{#if isLoading}
   <Views.Loading
     topPadding={$StatusBar.height}
     bottomPadding={$StatusBar.bottomPadding}

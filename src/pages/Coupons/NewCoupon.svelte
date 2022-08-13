@@ -5,9 +5,6 @@
   import { StatusBar } from "../../stores/Setup";
   import { Views, Types, Utils } from "@ikomida/components";
   import { newCoupon } from "../../network/Payment";
-  import Cache from "../../stores/Cache";
-
-  const CACHE_NAME = "COUPONS";
 
   let item = {
     name: null,
@@ -48,8 +45,7 @@
     let response;
     response = await newCoupon(item);
     if (response?.success) {
-      Cache.setObject(CACHE_NAME, null);
-      Navigation.reset(Routes.coupons);
+      Navigation.pop(Routes.coupons);
     } else {
       toggleErrorAlert(response?.data);
     }

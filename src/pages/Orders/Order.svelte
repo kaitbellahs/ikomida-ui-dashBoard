@@ -1,6 +1,9 @@
 <script>
+  import { Share } from "@capacitor/share";
+  import { onMount } from "svelte";
+  import html2canvas from "html2canvas";
   import { Views, Utils, Types } from "@ikomida/components";
-  import { faShare } from "@fortawesome/free-solid-svg-icons";
+  import { faL, faShare } from "@fortawesome/free-solid-svg-icons";
   import { Filesystem, Directory } from "@capacitor/filesystem";
   import {
     Navigation,
@@ -12,15 +15,16 @@
   import { OrderStatus, ChangeOrderStatus } from "../../network/Orders";
   import { getOrder } from "../../network/Products";
   import { StatusBar } from "../../stores/Setup";
-  import Cache from "../../stores/Cache";
-  import { Share } from "@capacitor/share";
-  import { onMount } from "svelte";
-  import html2canvas from "html2canvas";
+  import Cache from "../../../../ikomida-components/src/Network/Cache";
+  import { Settings } from "../../stores/Setup";
+  import { getSettings } from "../../network/Settings";
 
   $: CACHE_NAME = "ORDERS";
 
   const order = $Router.options;
   let isLoading = false;
+  let screenShot = false;
+  let showImage = true;
   let orderScreen;
 
   const nextButtonText = (order) => {
@@ -96,8 +100,10 @@
     }
     isLoading = false;
   }
-
   async function share() {
+    async function sleep(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
     // const checkPermissions = await Filesystem.checkPermissions();
     // console.log(checkPermissions);
     // if (checkPermissions === "denied") {
@@ -109,9 +115,17 @@
     // ) {
     //   return;
     // }
-    const canvas = await html2canvas(orderScreen);
+    isLoading = true;
+    screenShot = true;
+    await sleep(1);
+    const canvas = await html2canvas(orderScreen, {
+      logging: false,
+      backgroundColor: "#dfdfdf",
+    });
+    screenShot = false;
+    isLoading = false;
     const data = canvas.toDataURL().split(",");
-    const screenShot = await Filesystem.writeFile({
+    const screenShotFile = await Filesystem.writeFile({
       path: `screenshots/order-${order?.customID}.jpg`,
       data: data?.[1],
       directory: Directory.Cache,
@@ -121,47 +135,88 @@
     const activityType = await Share.share({
       title: `Pedido #${order?.customID}`,
       text: "Eu estou compartilhando com você esse pedido",
-      url: `file://${screenShot?.uri}`,
+      url: `file://${screenShotFile?.uri}`,
       dialogTitle: "Compartilhar o pedido",
     });
   }
   onMount(async () => {
+    isLoading = true;
     if (await Share.canShare()) {
       Menu.addItem({ name: "Compartilhar", icon: faShare, callback: share });
     }
+    if (!("profile" in $Settings) || !$Settings?.profile) {
+      const response = await getSettings();
+      if (response) {
+        $Settings.profile = response?.profile;
+        Settings.set($Settings);
+      }
+    }
+    isLoading = false;
   });
+  function erroLoadImage(event) {
+    showImage = false;
+  }
   Title.set("Detalhes do predido");
 </script>
 
-<div class="order" bind:this={orderScreen}>
-  <span class="time"
-    >Feito {Utils.Strings.timestampToString(order?.createdAt)}</span
-  >
-
-  {#if [Types.OrderStatusType.WAITING_PAYMENT, Types.OrderStatusType.OPEN, Types.OrderStatusType.ACCEPTED, Types.OrderStatusType.WAITING_DELIVERY, Types.OrderStatusType.IN_DELIVERY].includes(order.status)}
-    {#if new Date(new Date(order?.createdAt).getTime() + order?.preparation?.max * 1000) < new Date()}
-      <span class="lateOrder">Pedido atrasado</span>
-    {/if}
-    <span class="deliveryForecast">Prepare o pedido antes de </span>
-    <span class="deliveryForecastValue">
-      {Utils.Strings.dateToString(
-        new Date(order?.createdAt).getTime() + order?.preparation?.max * 1000
-      )}</span
+<div class="order {screenShot ? 'screenShot' : ''}" bind:this={orderScreen}>
+  <div class="avatar {screenShot ? 'screenShot' : ''}">
+    <div class="avatar">
+      {#if $Settings?.profile?.mainPicture && showImage}
+        <img
+          on:error={erroLoadImage}
+          src={$Settings?.profile?.mainPicture ??
+            "assets/icons/transparent-logo-1.svg"}
+          alt={$Settings?.profile?.restaurantName ?? "iKomida"}
+        />
+      {:else if $Settings?.profile?.restaurantName}
+        <h1>{$Settings?.profile?.restaurantName}</h1>
+      {:else}
+        <img src="assets/icons/transparent-logo-1.svg" alt="iKomida" />
+        <h2>{$Settings?.profile?.restaurantName}</h2>
+      {/if}
+    </div>
+    <Views.Divider height="30" />
+  </div>
+  {#if [Types.OrderStatusType.WAITING_PAYMENT, Types.OrderStatusType.OPEN, Types.OrderStatusType.ACCEPTED, Types.OrderStatusType.WAITING_DELIVERY, Types.OrderStatusType.IN_DELIVERY].includes(order.status) && new Date(new Date(order?.createdAt).getTime() + order?.preparation?.max * 1000) < new Date()}
+    <Views.Status type={Views.Status.Types.ERROR} circle={true}
+      >Pedido atrasado</Views.Status
     >
   {/if}
-
-  <h3>Pedido #{order?.customID}:</h3>
-  <span class="status">
-    {#if order?.status == Types.OrderStatusType.OPEN}
-      O pedido está
-      <span>{OrderStatus(order?.status)}</span>
-    {:else}
-      {OrderStatus(order?.status)} em
-      <span class="time"
-        >{Utils.Strings.timestampToString(order?.finishedAt)}</span
+  {#if [Types.OrderStatusType.DELIVERED].includes(order.status)}
+    <Views.Status type={Views.Status.Types.SUCCESS} circle={true}
+      >Pedido entregue</Views.Status
+    >
+  {/if}
+  {#if [Types.OrderStatusType.CANCELED].includes(order.status)}
+    <Views.Status type={Views.Status.Types.ERROR}>Pedido cancelado</Views.Status
+    >
+  {/if}
+  <Views.Divider />
+  <h3 class="title">Pedido N˚: {order?.customID}</h3>
+  <Views.Divider />
+  <div class="info" data-html2canvas-ignore>
+    {#if [Types.OrderStatusType.WAITING_PAYMENT, Types.OrderStatusType.OPEN, Types.OrderStatusType.ACCEPTED, Types.OrderStatusType.WAITING_DELIVERY, Types.OrderStatusType.IN_DELIVERY].includes(order.status)}
+      <Views.Status showIcon={false} type={Views.Status.Types.WARNING}
+        >Prepare o pedido antes de
+        {Utils.Strings.dateToString(
+          new Date(order?.createdAt).getTime() + order?.preparation?.max * 1000
+        )}</Views.Status
       >
+      <Views.Divider />
     {/if}
-  </span>
+  </div>
+
+  {#if ![Types.OrderStatusType.DELIVERED, Types.OrderStatusType.CANCELED].includes(order.status)}
+    <Views.Status>
+      Pedido {OrderStatus(order?.status)}
+    </Views.Status>
+    <Views.Divider />
+  {/if}
+  <span class="time"
+    >Data: {Utils.Strings.timestampToString(order?.createdAt)}</span
+  >
+  <Views.Divider />
   <h3>Itens a entregar</h3>
   {#each order?.products as { id, title, price, quantity, discount, discountType }, index}
     <div class="product" on:click={goToProduct(id)}>
@@ -175,7 +230,8 @@
     </div>
   {/each}
   <Views.Divider />
-  <h3>Dados para entregar</h3>
+  <h3>Dados da entrega</h3>
+  <Views.Divider />
   <div class="user">
     <span
       >Nome: <b
@@ -204,7 +260,9 @@
       >
     </span>
   </div>
+  <Views.Divider />
   <h3>Dados de pagamento</h3>
+  <Views.Divider />
   <div class="paymentMethod">
     <span
       >Pago com <b
@@ -222,7 +280,7 @@
       {/if}
     </span>
   </div>
-  <div class="buttonGroup">
+  <div data-html2canvas-ignore class="buttonGroup">
     {#if ![Types.OrderStatusType.DELIVERED, Types.OrderStatusType.CANCELED].includes(order?.status)}
       <Views.Button multiplier="0.8" type="secondary" on:click={cancel}
         >Cancelar</Views.Button
@@ -254,6 +312,13 @@
               >- {Utils.Strings.currency(order?.discount)}</span
             ></td
           >
+        </tr><tr>
+          <td class="coupon" colspan="2"
+            >{order?.coupon?.name?.toUpperCase()} (- {order?.coupon?.type?.toUpperCase() ===
+            Types?.DiscountTypes?.PERCENT?.toUpperCase()
+              ? Utils.Strings.percent(order?.coupon?.value)
+              : Utils.Strings.currency(order?.coupon?.value)})</td
+          >
         </tr>
       {/if}
       <tr>
@@ -270,6 +335,13 @@
       </tr>
     </tbody>
   </table>
+  <div class="signature {screenShot ? 'screenShot' : ''}">
+    <Views.Divider height="30" />
+    <span>Feito com carinho por</span><img
+      src="assets/icons/transparent-logo-1.svg"
+      alt="iKomida"
+    />
+  </div>
 </div>
 <Views.GTerms />
 <Views.MessageAlert object={errorAlert} bind:show={showAlert} />
@@ -286,15 +358,12 @@
     display: flex;
     flex-direction: column;
   }
-  h3 {
-    padding: 0;
-    margin: 0;
-    font-size: 1.1em;
-    margin-bottom: 5px;
-    margin-top: 10px;
+  .order.screenShot {
+    padding: 20px;
   }
-  .status {
-    margin-bottom: 10px;
+  .order > .info {
+    display: flex;
+    flex-direction: column;
   }
   .product {
     font-family: RobotoLight;
@@ -349,7 +418,6 @@
     margin-top: 5px;
   }
   .time {
-    /* font-family: RobotoThin; */
     font-size: 0.8em;
     margin-top: 5px;
   }
@@ -363,32 +431,19 @@
   .resumeText {
     text-align: left;
     width: 50%;
-    font-size: 0.9em;
+    font-size: 1em;
     font-weight: lighter;
   }
   .resumeValue {
     text-align: right;
-    font-size: 0.9em;
+    font-size: 1.1em;
+  }
+  .coupon {
+    text-align: center;
+    font-size: 0.8em;
   }
   .deliveryFree {
     color: green;
-  }
-  .deliveryForecast {
-    margin-top: 10px;
-    font-size: 1.1em;
-    color: #00000099;
-  }
-  .deliveryForecastValue {
-    color: rgb(0, 177, 0);
-    margin-bottom: 10px;
-  }
-  .lateOrder {
-    background-color: #4c0708;
-    border-radius: 6px;
-    color: white;
-    padding: 4px 20px;
-    align-self: center;
-    margin-bottom: 10px;
   }
   .order > .buttonGroup {
     display: flex;
@@ -408,10 +463,47 @@
     display: flex;
     flex-direction: column;
   }
-  h3 {
+
+  .order > h3 {
     border-left: 1px solid #ccc;
     border-bottom: 1px solid #ccc;
-    padding-left: 20px;
-    margin-bottom: 10px;
+    padding: 0 20px;
+    margin: 0;
+    font-size: 1.1em;
+  }
+
+  .order > h3.title {
+    text-align: center;
+    border: 0;
+  }
+  .avatar {
+    display: none;
+    align-items: center;
+    flex-direction: column;
+  }
+  .avatar.screenShot {
+    display: flex;
+  }
+  .avatar > img {
+    font-size: 3em;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 45px;
+    line-height: 90px;
+    vertical-align: middle;
+    display: table-cell;
+    overflow: hidden;
+  }
+  .signature {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    place-content: center;
+  }
+  .signature.screenShot {
+    display: flex;
+  }
+  .signature > img {
+    height: 45px;
   }
 </style>

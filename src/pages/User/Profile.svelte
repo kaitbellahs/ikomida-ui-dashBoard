@@ -2,7 +2,7 @@
   import { Auth } from "../../stores/Auth";
   import { updatePassword } from "../../network/Auth";
   import { Title } from "../../stores/Navigation";
-  import { Views, Utils } from "@ikomida/components";
+  import { Views, Utils, Network } from "@ikomida/components";
   import { getSettings, setSettings } from "../../network/Settings";
   import { StatusBar } from "../../stores/Setup";
   import { onMount } from "svelte";
@@ -30,8 +30,9 @@
     showAlert = true;
   }
 
-  function logout() {
+  async function logout() {
     Auth.setToken(null);
+    await Network.instance.clearAllCache();
   }
 
   async function update() {

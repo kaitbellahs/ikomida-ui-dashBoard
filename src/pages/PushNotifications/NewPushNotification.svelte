@@ -5,9 +5,6 @@
   import { StatusBar } from "../../stores/Setup";
   import { Views, Utils } from "@ikomida/components";
   import { newPushNotification } from "../../network/PushNotification";
-  import Cache from "../../stores/Cache";
-
-  const CACHE_NAME = "PUSH_NOTIFICATIONS";
 
   let item = {
     title: null,
@@ -45,7 +42,6 @@
     let response;
     response = await newPushNotification(item);
     if (response?.success) {
-      Cache.setObject(CACHE_NAME, null);
       Navigation.reset(Routes.pushNotifications);
     } else {
       toggleErrorAlert(response?.data);

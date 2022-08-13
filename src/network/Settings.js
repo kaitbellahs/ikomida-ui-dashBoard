@@ -16,11 +16,7 @@ export async function getSettings() {
     return null;
 }
 export async function getLimits() {
-    let response = await Network.instance.get("/vendor/limits", get(Auth));
-    if (response?.success) {
-        return response?.data
-    }
-    return null;
+    return Network.instance.get("/vendor/limits", get(Auth));
 }
 
 export async function getPagSeguroUrl() {
@@ -44,5 +40,5 @@ export async function updateBusinessHours(object) {
 }
 
 export async function setDelivery(preparation, delivery) {
-    return Network.instance.put("/vendor/delivery", get(Auth), {preparation, delivery});
+    return Network.instance.put("/vendor/delivery", get(Auth), { preparation, delivery });
 }
