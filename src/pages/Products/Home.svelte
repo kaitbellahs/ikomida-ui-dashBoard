@@ -5,7 +5,6 @@
   import { countUsers } from "../../network/User";
   import { countCoupons } from "../../network/Payment";
   import { Views } from "@ikomida/components";
-
   Title.set("iKomida - Dashboard");
 </script>
 
