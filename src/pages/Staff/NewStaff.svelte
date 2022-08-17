@@ -183,7 +183,7 @@
     bind:isValid={itemsValidation.address.number}
     min="1"
     max="255"
-    empty={false}
+    empty={!itemsValidation.address.postalCode}
   />
   <Views.TextEdit
     placeHolder="Complemento"

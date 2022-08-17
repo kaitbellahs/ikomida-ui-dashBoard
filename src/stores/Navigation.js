@@ -25,6 +25,7 @@ export const Routes = {
     pushNotifications: Symbol("/pushNotifications"),
     newPushNotification: Symbol("/newPushNotification"),
     tac: Symbol("/tac"),
+    company: Symbol("/company"),
     profile: Symbol("/profile"),
     forgotPassword: Symbol("/forgotPassword"),
     layout: Symbol("/layout"),

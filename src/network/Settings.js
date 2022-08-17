@@ -9,11 +9,7 @@ import {
 } from "@ikomida/components";
 
 export async function getSettings() {
-    let response = await Network.instance.get("/vendor/settings", get(Auth));
-    if (response?.success) {
-        return response?.data
-    }
-    return null;
+    return await Network.instance.get("/vendor/settings", get(Auth));
 }
 export async function getLimits() {
     return Network.instance.get("/vendor/limits", get(Auth));

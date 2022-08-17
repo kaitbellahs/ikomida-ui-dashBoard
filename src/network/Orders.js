@@ -14,10 +14,14 @@ export async function getOrders(refresh = false) {
 }
 
 export async function ChangeOrderStatus(id, status) {
-    return Network.instance.put("/order", get(Auth), {
+    let response = await Network.instance.put("/order", get(Auth), {
         id,
         status
     }, "editOrder");
+    if (response?.success) {
+        await Network.instance.clearCache(Network.cacheTypes.ORDERS)
+    }
+    return response
 }
 
 export async function countOrders() {

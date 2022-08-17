@@ -49,7 +49,6 @@
     );
     if (response?.success) {
       order.status = Types.OrderStatusType.CANCELED;
-      Cache.setObject(CACHE_NAME, null);
       toggleErrorAlert("O pedido foi atualizado com sucesso!");
     } else {
       toggleErrorAlert(response?.data);
@@ -66,7 +65,6 @@
     const response = await ChangeOrderStatus(order?.id, newStatus);
     if (response?.success) {
       order.status = newStatus;
-      Cache.setObject(CACHE_NAME, null);
       toggleErrorAlert("O pedido foi atualizado com sucesso!");
     } else {
       toggleErrorAlert(response?.data);

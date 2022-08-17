@@ -12,7 +12,7 @@
   import { onMount } from "svelte";
 
   let { item, edit } = Utils.Objects.copy($Router.options);
-  let isLoading = false;
+  let isLoading = true;
   let categoriesOptions = [];
   let firstLaunch = true;
   let errorAlert;
@@ -91,6 +91,7 @@
   }
 
   async function generateOptions() {
+    isLoading = true;
     const response = await getCategories();
     if (response) {
       categoriesOptions = response?.map((item) => {
@@ -103,6 +104,7 @@
         item.category = result.length > 0 ? result[0] : null;
       }
     }
+    isLoading = false;
   }
 
   onMount(async () => {

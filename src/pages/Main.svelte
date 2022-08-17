@@ -11,6 +11,7 @@
   import Home from "./Products/Home.svelte";
   import Orders from "./Orders/Orders.svelte";
   import Order from "./Orders/Order.svelte";
+  import CompanyProfile from "./User/CompanyProfile.svelte";
   import Profile from "./User/Profile.svelte";
   import Settings from "./Control/Settings.svelte";
   import Subscription from "./Control/Subscription.svelte";
@@ -39,6 +40,7 @@
     faChartColumn,
     faUserGroup,
     faMessage,
+    faShop,
   } from "@fortawesome/free-solid-svg-icons";
   import { onMount } from "svelte";
   let userInfo;
@@ -70,6 +72,13 @@
       callback: () => Navigation.goTo(Routes.profile),
       icon: faUser,
     },
+    userInfo?.role === "vendor"
+      ? {
+          name: "Estabelecimento",
+          callback: () => Navigation.goTo(Routes.company),
+          icon: faShop,
+        }
+      : null,
     userInfo?.role === "vendor"
       ? {
           name: "Assinatura",
@@ -132,6 +141,8 @@
     <Order />
   {:else if route == Routes.settings}
     <Settings />
+  {:else if route == Routes.company}
+    <CompanyProfile />
   {:else if route == Routes.profile}
     <Profile />
   {:else if route == Routes.products}
