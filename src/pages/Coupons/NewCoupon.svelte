@@ -92,7 +92,7 @@
     options={Types.DiscountTypes.list}
   />
   {#if selectedDiscountType}
-    {#if selectedDiscountType.name === Types.DiscountTypes.PERCENT}
+    {#if selectedDiscountType.id === Types.DiscountTypes.PERCENT}
       <Views.TextEdit
         type="percent"
         placeHolder="Valor"
@@ -102,7 +102,7 @@
         min="1"
         max="11"
       />
-    {:else if selectedDiscountType.name === Types.DiscountTypes.VALUE}
+    {:else if selectedDiscountType.id === Types.DiscountTypes.VALUE}
       <Views.TextEdit
         placeHolder="Valor"
         bind:value={item.value}

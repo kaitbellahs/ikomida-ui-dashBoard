@@ -40,8 +40,7 @@
     Number(item?.weight || 0) <= 99999999.99 &&
     item?.price &&
     Logics.Finances.toFinanceNumber(item?.price || 0) <= 99999999.99 &&
-    (selectedDiscountType &&
-    selectedDiscountType.name !== Types.DiscountTypes.NO
+    (selectedDiscountType && selectedDiscountType.id !== Types.DiscountTypes.NO
       ? item?.discount &&
         Logics.Finances.toFinanceNumber(item?.discount || 0) <= 99999999.99
       : true) &&
@@ -178,7 +177,7 @@
       options={Types.DiscountTypes.list}
     />
     {#if selectedDiscountType}
-      {#if selectedDiscountType.name === Types.DiscountTypes.PERCENT}
+      {#if selectedDiscountType.id === Types.DiscountTypes.PERCENT}
         <Views.TextEdit
           type="percent"
           placeHolder="Disconto"
@@ -186,7 +185,7 @@
           initialValue={item.discount}
         />
         <Views.Divider />
-      {:else if selectedDiscountType.name === Types.DiscountTypes.VALUE}
+      {:else if selectedDiscountType.id === Types.DiscountTypes.VALUE}
         <Views.TextEdit
           placeHolder="Disconto"
           bind:value={item.discount}
