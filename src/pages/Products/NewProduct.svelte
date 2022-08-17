@@ -39,13 +39,11 @@
     item?.weight &&
     Number(item?.weight || 0) <= 99999999.99 &&
     item?.price &&
-    Utils.Numbers.Logics.Finances.toFinanceNumber(item?.price || 0) <=
-      99999999.99 &&
+    Logics.Finances.toFinanceNumber(item?.price || 0) <= 99999999.99 &&
     (selectedDiscountType &&
     selectedDiscountType.name !== Types.DiscountTypes.NO
       ? item?.discount &&
-        Utils.Numbers.Logics.Finances.toFinanceNumber(item?.discount || 0) <=
-          99999999.99
+        Logics.Finances.toFinanceNumber(item?.discount || 0) <= 99999999.99
       : true) &&
     item?.serves &&
     Number(item?.serves || 0) <= 2147483647 &&
