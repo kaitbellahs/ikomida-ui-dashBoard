@@ -5,9 +5,9 @@
   "author": "Khalid Ait Bellahs",
   "license": "UNLICENSED",
   "scripts": {
-    "build:windows": "rollup -c --environment ENV:prod && @powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./build.ps1",
+    "build:windows": "yarn upgrade && rollup -c --environment ENV:prod && @powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./build.ps1",
     "build:mac": "rollup -c --environment ENV:prod && yarn cap copy",
-    "build:mac:release": "rollup -c --environment ENV:prod && ./build.sh",
+    "build:mac:release": "yarn upgrade && rollup -c --environment ENV:prod && ./build.sh",
     "build": "rollup -c --environment ENV:prod",
     "dev": "rollup -c -w",
     "prod": "rollup -c -w --environment ENV:prod",

@@ -39,6 +39,8 @@
 	<string></string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Usamos a camera para que voce pode tirar fotos dos seus produtos</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Usamos sua localizacao para entregar seus pedidos</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
@@ -68,7 +70,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
-	<key>NSCameraUsageDescription</key>
-	<string>Usamos a camera para que voce pode tirar fotos dos seus produtos</string>
 </dict>
 </plist>
