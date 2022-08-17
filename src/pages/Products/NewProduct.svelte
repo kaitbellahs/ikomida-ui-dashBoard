@@ -59,6 +59,10 @@
       item.category = result.length > 0 ? result[0] : null;
     }
 
+    if(!item?.image){
+      item.image = null
+    }
+
     if (Types.DiscountTypes.list.length > 0) {
       const result = Types.DiscountTypes.list.filter(
         (option) => option.id == item.discountType
@@ -126,7 +130,7 @@
 {/if}
 {#if (categoriesOptions?.length ?? 0) > 0}
   <div class="product">
-    <Views.UploadablePhoto image={item.image} title={item?.title} />
+    <Views.UploadablePhoto bind:image={item.image} title={item?.title} />
     <Views.Selector
       bind:selected={item.category}
       name="Selecione uma opção"
