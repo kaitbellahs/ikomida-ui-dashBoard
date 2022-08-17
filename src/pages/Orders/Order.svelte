@@ -74,10 +74,15 @@
 
   let errorAlert;
   let showAlert = false;
+  let showCardBrand = false;
   $: total =
     Number(order?.subtotal ?? 0) +
     Number(order?.delivery ?? 0) -
     Number(order?.discount ?? 0);
+
+  function hideCardBrand() {
+    showCardBrand = false;
+  }
 
   function toggleErrorAlert(messageObject) {
     errorAlert = messageObject;
@@ -237,16 +242,16 @@
   <div class="address">
     Endereço:
     <span class="street"
-      >{order?.address?.street}, {order?.address?.number}{order?.address
-        ?.complement
+      >{order?.address?.street ?? "-"}, {order?.address?.number ?? "-"}{order
+        ?.address?.complement
         ? ` - ${order?.address?.complement}`
         : ""}</span
     ><br />
     <span class="neighborhood"
-      >{order?.address?.neighborhood}<br />
+      >{order?.address?.neighborhood ?? "-"}<br />
       <span class="city"
-        >{order?.address?.city}/{order?.address?.stat} CEP: {order?.address
-          ?.postalCode}</span
+        >{order?.address?.city ?? "-"}/{order?.address?.stat ?? "-"} CEP: {order
+          ?.address?.postalCode ?? "-"}</span
       >
     </span>
   </div>
@@ -262,11 +267,14 @@
     >
     <span class="brand">
       {#if order?.payment.type === Types.PaymentMethodType.CREDIT_CARD_ONLINE}
-        <img
-          style="object-fit: cover;"
-          src="/Assets/cardBrand/{order?.payment.brand}.svg"
-          alt={order?.payment.brand}
-        />
+        {#if showCardBrand}
+          <img
+            on:error={hideCardBrand}
+            style="object-fit: cover;"
+            src="/assets/cardBrand/{order?.payment.brand}.svg"
+            alt={order?.payment.brand}
+          />
+        {/if}
         **** {order?.payment.lastDigits}
       {/if}
     </span>
@@ -329,7 +337,7 @@
   <div class="signature {screenShot ? 'screenShot' : ''}">
     <Views.Divider height="30" />
     <span>Feito com carinho por</span><img
-      src="/Assets/Icons/transparent-logo-1.png"
+      src="/assets/Icons/transparent-logo-1.png"
       alt="iKomida"
     />
   </div>

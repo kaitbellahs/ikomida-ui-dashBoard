@@ -67,7 +67,7 @@
 {/if}
 <main>
   <div class="avatar">
-    <img src="/Assets/Icons/transparent-logo-1.svg" alt="iKomida" />
+    <img src="/assets/Icons/transparent-logo-1.svg" alt="iKomida" />
   </div>
   <small>Digite aqui o ID do seu estabelecimento</small>
   <Views.TextEdit

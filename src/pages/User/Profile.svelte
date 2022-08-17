@@ -96,7 +96,7 @@
       leftMargin="30"
     />
     <Views.TextValue
-      text="mail:"
+      text="email:"
       value={userInfo.email}
       fontSize="1.3em"
       leftMargin="30"
