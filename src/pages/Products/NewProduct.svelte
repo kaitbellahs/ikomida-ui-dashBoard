@@ -3,7 +3,7 @@
   import Fa from "svelte-fa";
   import { faEdit } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
-  import { Views, Types, Utils } from "@ikomida/components";
+  import { Views, Types, Utils, Logics } from "@ikomida/components";
   import {
     newProduct,
     updateProduct,
@@ -11,7 +11,7 @@
   } from "../../network/Products";
   import { onMount } from "svelte";
 
-  let { item, edit } = Utils.Objects.copy($Router.options);
+  let { item, edit } = Logics.Objects.deepCopy($Router.options);
   let isLoading = true;
   let categoriesOptions = [];
   let firstLaunch = true;
@@ -39,11 +39,13 @@
     item?.weight &&
     Number(item?.weight || 0) <= 99999999.99 &&
     item?.price &&
-    Utils.Numbers.toFinanceNumber(item?.price || 0) <= 99999999.99 &&
+    Utils.Numbers.Logics.Finances.toFinanceNumber(item?.price || 0) <=
+      99999999.99 &&
     (selectedDiscountType &&
     selectedDiscountType.name !== Types.DiscountTypes.NO
       ? item?.discount &&
-        Utils.Numbers.toFinanceNumber(item?.discount || 0) <= 99999999.99
+        Utils.Numbers.Logics.Finances.toFinanceNumber(item?.discount || 0) <=
+          99999999.99
       : true) &&
     item?.serves &&
     Number(item?.serves || 0) <= 2147483647 &&
@@ -59,8 +61,8 @@
       item.category = result.length > 0 ? result[0] : null;
     }
 
-    if(!item?.image){
-      item.image = null
+    if (!item?.image) {
+      item.image = null;
     }
 
     if (Types.DiscountTypes.list.length > 0) {

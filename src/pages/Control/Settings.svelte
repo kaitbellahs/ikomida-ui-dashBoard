@@ -1,6 +1,6 @@
 <script>
   import { Title, Router } from "../../stores/Navigation";
-  import { Views, Utils } from "@ikomida/components";
+  import { Views, Utils, Logics } from "@ikomida/components";
   import {
     getSettings,
     updatePaymentGateway,
@@ -11,12 +11,7 @@
   } from "../../network/Settings";
   import { StatusBar, Settings } from "../../stores/Setup";
   import Fa from "svelte-fa";
-  import {
-    faAt,
-    faKey,
-    faClock,
-    faTrashAlt,
-  } from "@fortawesome/free-solid-svg-icons";
+  import { faClock, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
   import { AppLauncher } from "@capacitor/app-launcher";
   import { Clipboard } from "@capacitor/clipboard";
   import { onMount } from "svelte";
@@ -112,10 +107,10 @@
       return false;
     }
     if (
-      Number(Utils.Numbers.toNumber(timeArray?.[0])) < 0 ||
-      Number(Utils.Numbers.toNumber(timeArray?.[0])) >= 24 ||
-      Number(Utils.Numbers.toNumber(timeArray?.[1])) >= 60 ||
-      Number(Utils.Numbers.toNumber(timeArray?.[1])) < 0
+      Number(Logics.Finances.toNumber(timeArray?.[0])) < 0 ||
+      Number(Logics.Finances.toNumber(timeArray?.[0])) >= 24 ||
+      Number(Logics.Finances.toNumber(timeArray?.[1])) >= 60 ||
+      Number(Logics.Finances.toNumber(timeArray?.[1])) < 0
     ) {
       return false;
     }

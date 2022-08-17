@@ -2,7 +2,7 @@
   import { Title, Navigation, Router, Routes } from "../../stores/Navigation";
   import Fa from "svelte-fa";
   import { faEdit, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
-  import { Views, Utils, Types } from "@ikomida/components";
+  import { Views, Utils, Types, Logics } from "@ikomida/components";
   import { deleteProduct } from "../../network/Products";
   import { StatusBar } from "../../stores/Setup";
 
@@ -52,7 +52,7 @@
   <h2>{item.title}</h2>
   <p>{item.description}</p>
   <span class="serves"
-    >Aproximadamente {Utils.Numbers.formatWeight(item.weight)}</span
+    >Aproximadamente {Logics.Finances.formatWeight(item.weight)}</span
   >
 
   <div class="price">
@@ -62,7 +62,7 @@
     <span class="current"
       >{Utils.Strings.currency(
         item.price -
-          Utils.Numbers.calcDiscount(
+          Logics.Finances.calcDiscount(
             item.price,
             item.discount,
             item.discountType
