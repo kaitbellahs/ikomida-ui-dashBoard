@@ -177,7 +177,7 @@
 </main>
 <Views.NavigationBar
   {MenuHamburger}
-  logo="/assets/Icons/transparent-logo-1.svg"
+  logo="/assets/icons/transparent-logo-1.svg"
   {Menu}
   {Title}
   paddingTop={$StatusBar.height}

@@ -337,7 +337,7 @@
   <div class="signature {screenShot ? 'screenShot' : ''}">
     <Views.Divider height="30" />
     <span>Feito com carinho por</span><img
-      src="/assets/Icons/transparent-logo-1.png"
+      src="/assets/icons/transparent-logo-1.png"
       alt="iKomida"
     />
   </div>
