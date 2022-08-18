@@ -76,7 +76,7 @@ body {
     padding-top: 1px;
     background: #dfdfdf;
     display: flex;
-    flex: 1
+    overflow: hidden;
 }
 
 a {
@@ -148,7 +148,7 @@ img {
 main {
     display: flex;
     flex-direction: column;
-    flex: 1;
+    flex: 1 0 100%;
     padding: 20px;
     width: 100%;
     overflow: scroll;
