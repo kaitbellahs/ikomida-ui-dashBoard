@@ -117,7 +117,42 @@
 
   $: styleHeight = `${Number($StatusBar.height) + 60}px`;
   $: route = $Router.route;
+  let firstLaunch = true;
 
+  function easeIn(node, { duration = 6000 }) {
+    // node.style.display = "none";
+    // setTimeout(() => (node.style.display = "flex"), duration / 2);
+    // return {
+    //   duration,
+    //   css: (t) => {
+    //     // if (firstLaunch && t === 1) {
+    //     //   firstLaunch = false;
+    //     // }
+    //     // if (!firstLaunch && t > 0.5) {
+    //     //   return;
+    //     // }
+    //     const localStyle = `
+    // left: -${(t * 100).toFixed(0)}%;
+    // `;
+    //     console.log("easeIn:", localStyle);
+    //     return localStyle;
+    //   },
+    // };
+  }
+
+  function easeOut(node, { duration = 6000 }) {
+    // node.style.display = "flex";
+    // setTimeout(() => (node.style.display = "none"), duration / 2);
+    // return {
+    //   duration,
+    //   css: (t) => {
+    //     const localStyle = `
+    // `;
+    //     console.log("easeOut:", localStyle);
+    //     return localStyle;
+    //   },
+    // };
+  }
   onMount(async () => {
     userInfo = await Utils.Jws.extractToken($Auth);
   });
@@ -126,55 +161,92 @@
     MenuHamburger.reset();
     menuHamburgerItems?.forEach((page) => MenuHamburger.addItem(page));
   }
-  $: console.log("$StatusBar.bottomPadding:", $StatusBar.bottomPadding);
+  $: style = `--paddingTop:${styleHeight};--paddingBottom: ${
+    70 + $StatusBar.bottomPadding
+  }px; overflow: scroll;`;
 </script>
 
-<main
-  style="--paddingTop:{styleHeight};--paddingBottom: {70 +
-    $StatusBar.bottomPadding}px; overflow: scroll;max-width: 100%;"
->
-  {#if route == Routes.home}
+{#if route == Routes.home}
+  <main in:easeIn out:easeOut {style}>
     <Home />
-  {:else if route == Routes.orders}
+  </main>
+{:else if route == Routes.orders}
+  <main in:easeIn out:easeOut {style}>
     <Orders />
-  {:else if route == Routes.order}
+  </main>
+{:else if route == Routes.order}
+  <main in:easeIn out:easeOut {style}>
     <Order />
-  {:else if route == Routes.settings}
+  </main>
+{:else if route == Routes.settings}
+  <main in:easeIn out:easeOut {style}>
     <Settings />
-  {:else if route == Routes.company}
+  </main>
+{:else if route == Routes.company}
+  <main in:easeIn out:easeOut {style}>
     <CompanyProfile />
-  {:else if route == Routes.profile}
+  </main>
+{:else if route == Routes.profile}
+  <main in:easeIn out:easeOut {style}>
     <Profile />
-  {:else if route == Routes.products}
+  </main>
+{:else if route == Routes.products}
+  <main in:easeIn out:easeOut {style}>
     <Products />
-  {:else if route == Routes.product}
+  </main>
+{:else if route == Routes.product}
+  <main in:easeIn out:easeOut {style}>
     <Product />
-  {:else if route == Routes.editProduct}
+  </main>
+{:else if route == Routes.editProduct}
+  <main in:easeIn out:easeOut {style}>
     <NewProduct />
-  {:else if route == Routes.editCategory}
+  </main>
+{:else if route == Routes.editCategory}
+  <main in:easeIn out:easeOut {style}>
     <NewCategory />
-  {:else if route == Routes.coupons}
+  </main>
+{:else if route == Routes.coupons}
+  <main in:easeIn out:easeOut {style}>
     <Coupons />
-  {:else if route == Routes.newCoupon}
+  </main>
+{:else if route == Routes.newCoupon}
+  <main in:easeIn out:easeOut {style}>
     <NewCoupon />
-  {:else if route == Routes.pushNotifications}
+  </main>
+{:else if route == Routes.pushNotifications}
+  <main in:easeIn out:easeOut {style}>
     <PushNotifications />
-  {:else if route == Routes.newPushNotification}
+  </main>
+{:else if route == Routes.newPushNotification}
+  <main in:easeIn out:easeOut {style}>
     <NewPushNotification />
-  {:else if route == Routes.layout}
+  </main>
+{:else if route == Routes.layout}
+  <main in:easeIn out:easeOut {style}>
     <Layout />
-  {:else if route == Routes.subscription}
+  </main>
+{:else if route == Routes.subscription}
+  <main in:easeIn out:easeOut {style}>
     <Subscription />
-  {:else if route == Routes.staff}
+  </main>
+{:else if route == Routes.staff}
+  <main in:easeIn out:easeOut {style}>
     <Staff />
-  {:else if route == Routes.newStaff}
+  </main>
+{:else if route == Routes.newStaff}
+  <main in:easeIn out:easeOut {style}>
     <NewStaff />
-  {:else if route == Routes.limits}
+  </main>
+{:else if route == Routes.limits}
+  <main in:easeIn out:easeOut {style}>
     <Limits />
-  {:else}
+  </main>
+{:else}
+  <main in:easeIn out:easeOut {style}>
     <Home />
-  {/if}
-</main>
+  </main>
+{/if}
 <Views.NavigationBar
   {MenuHamburger}
   logo="/assets/icons/transparent-logo-1.svg"
@@ -197,7 +269,7 @@
     /* padding-bottom: calc(55px + var(--marginBottom)); */
     display: flex;
     flex-direction: column;
-    flex: 1;
+    /* flex: 1; */
     padding-bottom: var(--paddingBottom);
   }
   :global(*, *:before, *:after) {

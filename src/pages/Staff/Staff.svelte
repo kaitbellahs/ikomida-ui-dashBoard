@@ -86,7 +86,7 @@
   <Views.Divider />
   {#if items.length > 0}
     <section>
-      {#each items as staff}
+      {#each items as staff (staff?.id)}
         <article>
           {#if userInfo?.id !== staff?.id}
             <Views.FloatRemove callback={() => onRemoveClick(staff?.id)} />

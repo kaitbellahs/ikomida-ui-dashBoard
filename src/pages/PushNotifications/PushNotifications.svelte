@@ -57,7 +57,7 @@
   <Views.Divider />
   {#if items && (items?.length ?? 0) > 0}
     <section>
-      {#each items as pushNotification}
+      {#each items as pushNotification (pushNotification?.createdAt)}
         <article>
           <h2>{pushNotification?.title}</h2>
           <div>{pushNotification?.body}</div>

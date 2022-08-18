@@ -96,7 +96,7 @@
 <Views.Divider />
 <h2>Ciclo de pagamento</h2>
 {#if subscription?.charges}
-  {#each subscription?.charges?.sort((i1, i2) => new Date(i2?.dueDate) - new Date(i1?.dueDate)) as charges}
+  {#each subscription?.charges?.sort((i1, i2) => new Date(i2?.dueDate) - new Date(i1?.dueDate)) as charges (charges?.invoiceUrl)}
     <div class="charge">
       {#if charges?.invoiceUrl}
         <span
@@ -130,6 +130,7 @@
         fontSize="0.9em"
         leftMargin="50"
       />
+
       <Views.TextValue
         text="Data de pagamento:"
         value={Utils.Strings.dateToDateString(charges?.confirmedDate)}

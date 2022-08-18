@@ -59,7 +59,12 @@ function createMenu() {
     return {
         subscribe,
         reset: () => set([]),
-        addItem: (item) => update(items => [...items, item])
+        addItem: (item) => {
+            if (item && !item?.uuid) {
+                item.uuid = uuidV4()
+            }
+            return update(items => [...items, item])
+        }
     };
 }
 

@@ -23,7 +23,7 @@
   let deliveryInputs = { value: null, min: null };
   let preparation = { min: 0, max: 0 };
   let preparationInputs = { min: null, max: null };
-  let isLoading = false;
+  let isLoading = true;
   let errorAlert;
   let showAlert = false;
   let popupNewOrder = $Settings?.popups?.newOrder;
@@ -215,17 +215,22 @@
     isLoading = true;
     userInfo = await Utils.Jws.extractToken($Auth);
     const response = await getSettings();
-    paymentGateway = { ...paymentGateway, ...response?.paymentGateway };
-    business = { ...business, ...response?.business };
-    for (const index of business?.days || []) {
-      days[index].checked = true;
+    const data = response?.data;
+    if (response?.success) {
+      paymentGateway = { ...paymentGateway, ...data?.paymentGateway };
+      business = { ...business, ...data?.business };
+      for (const index of business?.days || []) {
+        days[index].checked = true;
+      }
+      delivery = { ...delivery, ...data?.delivery };
+      deliveryInputs?.min?.updateValue(delivery?.min);
+      deliveryInputs?.value?.updateValue(delivery?.value);
+      preparation = { ...preparation, ...data?.preparation };
+      preparationInputs?.min?.updateValue(preparation?.min);
+      preparationInputs?.max?.updateValue(preparation?.max);
+    } else {
+      toggleErrorAlert(data);
     }
-    delivery = { ...delivery, ...response?.delivery };
-    deliveryInputs?.min?.updateValue(delivery?.min);
-    deliveryInputs?.value?.updateValue(delivery?.value);
-    preparation = { ...preparation, ...response?.preparation };
-    preparationInputs?.min?.updateValue(preparation?.min);
-    preparationInputs?.max?.updateValue(preparation?.max);
     isLoading = false;
   });
 
@@ -323,7 +328,7 @@
       mais você paga seus entregadores ficaram felizes e seus clientes tristes e
       vice versa)</small
     >
-    <Views.Switch placeHolder="Frete grátis" bind:checked={delivery.free} />
+    <Views.Switch name="Frete grátis" bind:checked={delivery.free} />
     {#if !(delivery?.free || false)}
       <Views.TextEdit
         type="currency"

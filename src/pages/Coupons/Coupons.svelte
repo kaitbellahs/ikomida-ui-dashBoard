@@ -75,7 +75,7 @@
   <Views.Divider />
   {#if items && items.length > 0}
     <section>
-      {#each items as coupon}
+      {#each items as coupon (coupon?.id)}
         <article>
           <span on:click={removeCoupon(coupon.id)} class="remove"
             ><Fa icon={faTrashAlt} /></span
