@@ -1,9 +1,9 @@
 <script>
-  import { Title, Navigation, Router, Routes } from "../../stores/Navigation";
+  import Routes from "../../stores/Routes";
   import Fa from "svelte-fa";
   import { faEdit } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
-  import { Views, Types, Utils, Logics } from "@ikomida/components";
+  import { Views, Types, Stores, Utils } from "@ikomida/components";
   import {
     newProduct,
     updateProduct,
@@ -11,7 +11,8 @@
   } from "../../network/Products";
   import { onMount } from "svelte";
 
-  let { item, edit } = Logics.Objects.deepCopy($Router.options);
+  const router = Stores.Navigation.instance.router;
+  let { item, edit } = $router.options;
   let isLoading = true;
   let categoriesOptions = [];
   let firstLaunch = true;
@@ -19,6 +20,16 @@
   let showAlert = false;
   let selectedDiscountType;
   let oldSelectedDiscountType = null;
+
+  let itemsValidation = {
+    title: false,
+    description: false,
+    weight: false,
+    price: false,
+    discount: false,
+    serves: false,
+    quantity: false,
+  };
 
   $: if (
     selectedDiscountType &&
@@ -32,29 +43,20 @@
 
   $: canContinue =
     item?.category &&
-    item?.title &&
-    (item?.title?.length ?? 0) <= 255 &&
-    item?.description &&
-    (item?.lastName?.length ?? 0) <= 1000 &&
-    item?.weight &&
-    Number(item?.weight || 0) <= 99999999.99 &&
-    item?.price &&
-    Logics.Finances.toFinanceNumber(item?.price || 0) <= 99999999.99 &&
-    (selectedDiscountType && selectedDiscountType.id !== Types.DiscountTypes.NO
-      ? item?.discount &&
-        Logics.Finances.toFinanceNumber(item?.discount || 0) <= 99999999.99
-      : true) &&
-    item?.serves &&
-    Number(item?.serves || 0) <= 2147483647 &&
-    item?.quantity &&
-    Number(item?.quantity || 0) <= 2147483647;
+    itemsValidation?.title &&
+    itemsValidation?.description &&
+    itemsValidation?.weight &&
+    itemsValidation?.price &&
+    (itemsValidation?.discount ||
+      selectedDiscountType.id === Types.DiscountTypes.NO) &&
+    itemsValidation?.serves &&
+    itemsValidation?.quantity;
 
   $: if (firstLaunch) {
     if ((categoriesOptions?.length ?? 0) > 0) {
       const result = categoriesOptions.filter(
         (option) => option.id == item.categoryID
       );
-
       item.category = result.length > 0 ? result[0] : null;
     }
 
@@ -78,6 +80,9 @@
   }
 
   async function submit() {
+    if (!canContinue) {
+      return;
+    }
     isLoading = true;
     let response;
     if (edit) {
@@ -86,7 +91,7 @@
       response = await newProduct(item);
     }
     if (response?.success) {
-      Navigation.reset(Routes.products);
+      Stores.Navigation.instance.reset(Routes.products);
     } else {
       toggleErrorAlert(response?.data);
     }
@@ -114,11 +119,12 @@
     if (!item.category) {
       item.category = null;
     }
+    isLoading = false;
   });
 
   generateOptions();
 
-  Title.set(edit ? "Editar produto" : "Novo produto");
+  Stores.Title.instance.set(edit ? "Editar produto" : "Novo produto");
 </script>
 
 {#if isLoading}
@@ -138,37 +144,55 @@
     <Views.TextEdit
       placeHolder="Nome do produto"
       bind:value={item.title}
+      bind:isValid={itemsValidation.title}
       initialValue={item.title}
+      min="3"
+      max="255"
     />
     <Views.TextEdit
       type="text"
       placeHolder="Descrição do produto"
       bind:value={item.description}
+      bind:isValid={itemsValidation.description}
       initialValue={item.description}
+      min="1"
+      max="500"
     />
     <Views.TextEdit
       type="number"
       placeHolder="Peso do produto em gramas (g)"
       bind:value={item.weight}
+      bind:isValid={itemsValidation.weight}
       initialValue={item.weight}
+      min="1"
+      max="9"
     />
     <Views.TextEdit
       type="number"
       placeHolder="Serve quantas pessoas?"
       bind:value={item.serves}
+      bind:isValid={itemsValidation.serves}
       initialValue={item.serves}
+      min="1"
+      max="9"
     />
     <Views.TextEdit
       type="number"
       placeHolder="Quantos itens você tem?"
       bind:value={item.quantity}
+      bind:isValid={itemsValidation.quantity}
       initialValue={item.quantity}
+      min="1"
+      max="9"
     />
     <Views.TextEdit
       type="currency"
       placeHolder="Preço"
       bind:value={item.price}
+      bind:isValid={itemsValidation.price}
       initialValue={item.price}
+      min="1"
+      max="9"
     />
     <Views.Divider />
     <Views.Selector
@@ -182,15 +206,27 @@
           type="percent"
           placeHolder="Disconto"
           bind:value={item.discount}
+          bind:isValid={itemsValidation.discount}
           initialValue={item.discount}
+          validation={(value) => {
+            return Number(value) > 0 && Number(value) < 10000;
+          }}
+          error="A percentagem do desconto deve ser maior que % 0,00 e menor que % 100,00"
         />
         <Views.Divider />
       {:else if selectedDiscountType.id === Types.DiscountTypes.VALUE}
         <Views.TextEdit
           placeHolder="Disconto"
           bind:value={item.discount}
+          bind:isValid={itemsValidation.discount}
           initialValue={item.discount}
           type="currency"
+          validation={(value) => {
+            return Number(value) > 0 && Number(value) < item.price;
+          }}
+          error="O valor do desconto deve ser maior que R$ 0,00 e menor que o valor do produto que é {Utils.Strings.currency(
+            item.price
+          )}"
         />
         <Views.Divider />
       {/if}

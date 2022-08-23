@@ -1,23 +1,17 @@
 <script>
-  import {
-    Title,
-    Navigation,
-    Router,
-    Routes,
-    Menu,
-  } from "../../stores/Navigation";
+  import Routes from "../../stores/Routes";
   import Fa from "svelte-fa";
   import {
     faEdit,
     faTrashAlt,
     faSync,
   } from "@fortawesome/free-solid-svg-icons";
-  import { Views, Utils } from "@ikomida/components";
+  import { Views, Utils, Stores } from "@ikomida/components";
   import { getCoupons, deleteCoupon } from "../../network/Payment";
   import { StatusBar } from "../../stores/Setup";
   import { onMount } from "svelte";
   let items;
-  let isLoading = false;
+  let isLoading = true;
   let errorAlert;
   let showAlert = false;
   let localLoading = false;
@@ -39,14 +33,17 @@
   }
 
   onMount(async () => {
-    Menu.addItem({ name: "Atualizar", icon: faSync, callback: refresh });
-    isLoading = true;
+    Stores.Menu.instance.addItem({
+      name: "Atualizar",
+      icon: faSync,
+      callback: refresh,
+    });
     [canGetMore, items] = await getCoupons();
     isLoading = false;
   });
 
   const newCoupon = async () => {
-    Navigation.goTo(Routes.newCoupon);
+    Stores.Navigation.instance.goTo(Routes.newCoupon);
   };
 
   async function removeCoupon(id) {
@@ -60,7 +57,7 @@
     isLoading = false;
   }
 
-  Title.set("Cupons");
+  Stores.Title.instance.set("Cupons");
 </script>
 
 {#if isLoading}

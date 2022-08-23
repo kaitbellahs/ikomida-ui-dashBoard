@@ -1,31 +1,27 @@
 import {
     Network,
-    Types
+    Types,
+    Stores,
 } from "@ikomida/components";
-import {
-    get
-} from 'svelte/store';
-import {
-    Auth
-} from '../stores/Auth';
+
 
 export async function getOrders(refresh = false) {
-    return await Network.instance.loadMore(Network.cacheTypes.ORDERS, '/orders', get(Auth), refresh)
+    return await Network.instance.loadMore(Stores.Cache.Types.ORDERS, '/orders', true, refresh)
 }
 
 export async function ChangeOrderStatus(id, status) {
-    let response = await Network.instance.put("/order", get(Auth), {
+    let response = await Network.instance.put("/order", true, {
         id,
         status
     }, "editOrder");
     if (response?.success) {
-        await Network.instance.clearCache(Network.cacheTypes.ORDERS)
+        await Network.instance.clearCache(Stores.Cache.Types.ORDERS)
     }
     return response
 }
 
 export async function countOrders() {
-    let response = await Network.instance.get("/ordersCount", get(Auth));
+    let response = await Network.instance.get("/ordersCount", true);
     if (response?.success) {
         return response?.data
     }

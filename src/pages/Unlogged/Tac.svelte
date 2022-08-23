@@ -1,21 +1,19 @@
 <script>
-  import { Title } from "../../stores/Navigation";
   import { StatusBar } from "../../stores/Setup";
-  import { Views, Utils } from "@ikomida/components";
+  import { Views, Utils, Stores } from "@ikomida/components";
   import { onMount } from "svelte";
-  import { getTermsOfUse } from "../../network/Terms"
+  import { getTermsOfUse } from "../../network/Terms";
 
-  Title.set("Termos de uso");
+  Stores.Title.instance.set("Termos de uso");
 
   $: styleHeight = `${Number($StatusBar.height) + 50}px`;
   let term;
-  let isLoading = false;
+  let isLoading = true;
 
   onMount(async () => {
-    isLoading = true;
     term = await getTermsOfUse();
     if (term) {
-      Title.set(term?.name);
+      Stores.Title.instance.set(term?.name);
     }
     isLoading = false;
   });

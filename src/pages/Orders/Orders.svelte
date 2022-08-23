@@ -1,14 +1,14 @@
 <script>
-  import { Title, Navigation, Menu, Routes } from "../../stores/Navigation";
+  import Routes from "../../stores/Routes";
   import { getOrders, OrderStatus } from "../../network/Orders";
-  import { Views, Utils, Types } from "@ikomida/components";
+  import { Views, Utils, Types, Stores } from "@ikomida/components";
   import { ChangeOrderStatus } from "../../network/Orders";
   import { StatusBar } from "../../stores/Setup";
   import { faSync } from "@fortawesome/free-solid-svg-icons";
   import { onMount } from "svelte";
 
   let items;
-  let isLoading = false;
+  let isLoading = true;
   let errorAlert;
   let showAlert = false;
   let localLoading = false;
@@ -25,8 +25,11 @@
   }
 
   onMount(async () => {
-    isLoading = true;
-    Menu.addItem({ name: "Atualizar", icon: faSync, callback: refresh });
+    Stores.Menu.instance.addItem({
+      name: "Atualizar",
+      icon: faSync,
+      callback: refresh,
+    });
     [canGetMore, items] = await getOrders(false);
     isLoading = false;
   });
@@ -87,10 +90,10 @@
   }
 
   function goToOrder(order) {
-    Navigation.goTo(Routes.order, order);
+    Stores.Navigation.instance.goTo(Routes.order, order);
   }
 
-  Title.set("Pedidos");
+  Stores.Title.instance.set("Pedidos");
 </script>
 
 {#if isLoading}

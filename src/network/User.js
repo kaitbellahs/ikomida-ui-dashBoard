@@ -1,15 +1,9 @@
 import {
-    get
-} from 'svelte/store';
-import {
-    Auth
-} from '../stores/Auth';
-import {
-    Network
+    Network,
 } from "@ikomida/components";
 
 export async function countUsers() {
-    let response = await Network.instance.get("/usersCount", get(Auth));
+    let response = await Network.instance.get("/usersCount", true);
     if (response?.success) {
         return response?.data
     }

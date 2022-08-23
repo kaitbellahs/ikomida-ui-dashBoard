@@ -1,6 +1,5 @@
 <script>
-  import { Title } from "../../stores/Navigation";
-  import { Views, Utils } from "@ikomida/components";
+  import { Views, Utils, Stores } from "@ikomida/components";
   import { getSettings, setSettings } from "../../network/Settings";
   import { StatusBar } from "../../stores/Setup";
   import { onMount } from "svelte";
@@ -22,7 +21,6 @@
       stat: null,
     },
   };
-  $: console.log(profile);
   let profileInputs = {
     phone: null,
     email: null,
@@ -117,7 +115,7 @@
     isLoading = false;
   });
 
-  Title.set("O estabelecimento");
+  Stores.Title.instance.set("O estabelecimento");
 </script>
 
 <div class="profile">

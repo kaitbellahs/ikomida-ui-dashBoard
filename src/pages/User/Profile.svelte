@@ -1,13 +1,12 @@
 <script>
-  import { Auth } from "../../stores/Auth";
-  import { Title } from "../../stores/Navigation";
-  import { Views, Utils, Network } from "@ikomida/components";
+  import { Views, Utils, Stores } from "@ikomida/components";
   import { onMount } from "svelte";
   import { StatusBar } from "../../stores/Setup";
-  import { updatePassword } from "../../network/Auth";
+  import { updatePassword, logout } from "../../network/Auth";
 
   let userInfo;
-  let isLoading = false;
+  let isLoading = true;
+  let auth;
 
   let passwordObject = {
     oldPass: null,
@@ -30,6 +29,12 @@
     showAlert = true;
   }
 
+  async function out() {
+    isLoading = true;
+    await logout();
+    isLoading = false;
+  }
+
   async function editPassword() {
     if (!passwordValidationObject.newPass) {
       toggleErrorAlert("A nova senha não está correta!");
@@ -50,16 +55,13 @@
     isLoading = false;
   }
 
-  async function logout() {
-    Auth.setToken(null);
-    await Network.instance.clearAllCache();
-  }
-
   onMount(async () => {
-    userInfo = await Utils.Jws.extractToken($Auth);
+    auth = await Stores.Auth.instance.store();
+    userInfo = await Utils.Jws.extractToken($auth);
+    isLoading = false;
   });
 
-  Title.set("Perfil");
+  Stores.Title.instance.set("Perfil");
 </script>
 
 {#if userInfo}
@@ -127,7 +129,7 @@
     <Views.Divider />
   </div>
   <Views.Button on:click={editPassword}>Atualizar senha</Views.Button>
-  <Views.Button type="transparent" on:click={logout}>Logout</Views.Button>
+  <Views.Button type="transparent" on:click={out}>Logout</Views.Button>
   <Views.GTerms />
   <Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 {/if}

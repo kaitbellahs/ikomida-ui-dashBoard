@@ -2,24 +2,19 @@
   import { Share } from "@capacitor/share";
   import { onMount } from "svelte";
   import html2canvas from "html2canvas";
-  import { Views, Utils, Types, Logics } from "@ikomida/components";
+  import { Views, Utils, Types, Logics, Stores } from "@ikomida/components";
   import { faShare } from "@fortawesome/free-solid-svg-icons";
   import { Filesystem, Directory } from "@capacitor/filesystem";
-  import {
-    Navigation,
-    Title,
-    Router,
-    Routes,
-    Menu,
-  } from "../../stores/Navigation";
+  import Routes from "../../stores/Routes";
   import { OrderStatus, ChangeOrderStatus } from "../../network/Orders";
   import { getOrder } from "../../network/Products";
   import { StatusBar } from "../../stores/Setup";
   import { Settings } from "../../stores/Setup";
   import { getSettings } from "../../network/Settings";
 
-  const order = $Router.options;
-  let isLoading = false;
+  const router = Stores.Navigation.instance.router;
+  const order = $router.options;
+  let isLoading = true;
   let screenShot = false;
   let showImage = true;
   let orderScreen;
@@ -94,7 +89,7 @@
     const response = await getOrder(id);
     if (response?.success) {
       const product = response?.data;
-      Navigation?.goTo(Routes.product, product);
+      Stores.Navigation.instance?.goTo(Routes.product, product);
     } else {
       toggleErrorAlert(response?.data);
     }
@@ -131,9 +126,12 @@
     });
   }
   onMount(async () => {
-    isLoading = true;
     if (await Share.canShare()) {
-      Menu.addItem({ name: "Compartilhar", icon: faShare, callback: share });
+      Stores.Menu.instance.addItem({
+        name: "Compartilhar",
+        icon: faShare,
+        callback: share,
+      });
     }
     if (!("profile" in $Settings) || !$Settings?.profile) {
       const response = await getSettings();
@@ -147,7 +145,7 @@
   function erroLoadImage(event) {
     showImage = false;
   }
-  Title.set("Detalhes do predido");
+  Stores.Title.instance.set("Detalhes do predido");
 </script>
 
 <div class="order {screenShot ? 'screenShot' : ''}" bind:this={orderScreen}>

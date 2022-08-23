@@ -1,6 +1,5 @@
 <script>
-  import { Title } from "../../stores/Navigation";
-  import { Views, Utils } from "@ikomida/components";
+  import { Views, Utils, Stores } from "@ikomida/components";
   import { StatusBar } from "../../stores/Setup";
   import { getLimits } from "../../network/Settings";
   import { onMount } from "svelte";
@@ -16,7 +15,7 @@
   } from "@fortawesome/free-solid-svg-icons";
 
   let limits;
-  let isLoading = false;
+  let isLoading = true;
   let errorAlert;
   let showAlert = false;
 
@@ -26,7 +25,6 @@
   }
 
   onMount(async () => {
-    isLoading = true;
     const response = await getLimits();
     if (response?.success) {
       limits = response.data;
@@ -36,7 +34,7 @@
     isLoading = false;
   });
 
-  Title.set("Limites");
+  Stores.Title.instance.set("Limites");
   function color(percent) {
     return `rgb(${percent < 50 ? (255 / 100) * (percent * 2) : 255}, ${
       percent >= 50 ? (255 / 100) * ((100 - percent) * 2) : 255

@@ -1,13 +1,15 @@
 <script>
-  import { Title, Navigation, Router, Routes } from "../../stores/Navigation";
+  import Routes from "../../stores/Routes";
   import Fa from "svelte-fa";
   import { faEdit, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
-  import { Views, Utils, Types, Logics } from "@ikomida/components";
+  import { Views, Utils, Types, Logics, Stores } from "@ikomida/components";
   import { deleteProduct } from "../../network/Products";
   import { StatusBar } from "../../stores/Setup";
+  import { onMount } from "svelte";
 
-  const item = $Router.options;
-  let isLoading = false;
+  const router = Stores.Navigation.instance.router;
+  const item = $router.options;
+  let isLoading = true;
 
   let errorAlert;
   let showAlert = false;
@@ -18,25 +20,35 @@
   }
 
   const edit = async () => {
-    Navigation.goTo(Routes.editProduct, { item, edit: true });
+    Stores.Navigation.instance.goTo(Routes.editProduct, {
+      item,
+      edit: true,
+    });
   };
 
   const newProduct = async () => {
-    Navigation.goTo(Routes.editProduct, { item, edit: false });
+    Stores.Navigation.instance.goTo(Routes.editProduct, {
+      item,
+      edit: false,
+    });
   };
 
   async function removeProduct() {
     isLoading = true;
     const response = await deleteProduct(item.id);
     if (response?.success) {
-      Navigation.pop();
+      Stores.Navigation.instance.pop();
     } else {
       toggleErrorAlert(response?.data);
     }
     isLoading = false;
   }
 
-  Title.set(item.title);
+  onMount(() => {
+    isLoading = false;
+  });
+
+  Stores.Title.instance.set(item.title);
 </script>
 
 {#if isLoading}

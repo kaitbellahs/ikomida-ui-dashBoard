@@ -1,13 +1,6 @@
 <script>
-  import {
-    Routes,
-    Router,
-    Navigation,
-    Title,
-    Menu,
-    MenuHamburger,
-  } from "../stores/Navigation";
-  import { Views, Utils } from "@ikomida/components";
+  import Routes from "../stores/Routes";
+  import { Views, Utils, Stores } from "@ikomida/components";
   import Home from "./Products/Home.svelte";
   import Orders from "./Orders/Orders.svelte";
   import Order from "./Orders/Order.svelte";
@@ -28,7 +21,6 @@
   import Staff from "./Staff/Staff.svelte";
   import NewStaff from "./Staff/NewStaff.svelte";
   import { StatusBar } from "../stores/Setup";
-  import { Auth } from "../stores/Auth";
   import {
     faHome,
     faList,
@@ -43,7 +35,9 @@
     faShop,
   } from "@fortawesome/free-solid-svg-icons";
   import { onMount } from "svelte";
+
   let userInfo;
+  let router = Stores.Navigation.instance.router;
   const tabs = [
     {
       name: "Home",
@@ -64,200 +58,125 @@
   $: menuHamburgerItems = [
     {
       name: "Home",
-      callback: () => Navigation.reset(Routes.home),
+      callback: () => Stores.Navigation.instance.reset(Routes.home),
       icon: faHome,
     },
     {
       name: "Perfil",
-      callback: () => Navigation.goTo(Routes.profile),
+      callback: () => Stores.Navigation.instance.goTo(Routes.profile),
       icon: faUser,
     },
     userInfo?.role === "vendor"
       ? {
           name: "Estabelecimento",
-          callback: () => Navigation.goTo(Routes.company),
+          callback: () => Stores.Navigation.instance.goTo(Routes.company),
           icon: faShop,
         }
       : null,
     userInfo?.role === "vendor"
       ? {
           name: "Assinatura",
-          callback: () => Navigation.goTo(Routes.subscription),
+          callback: () => Stores.Navigation.instance.goTo(Routes.subscription),
           icon: faMoneyBill1Wave,
         }
       : null,
     {
       name: "Configurações",
-      callback: () => Navigation.goTo(Routes.settings),
+      callback: () => Stores.Navigation.instance.goTo(Routes.settings),
       icon: faSlidersH,
     },
     {
       name: "Limites",
-      callback: () => Navigation.goTo(Routes.limits),
+      callback: () => Stores.Navigation.instance.goTo(Routes.limits),
       icon: faChartColumn,
     },
     {
       name: "Comunicação",
-      callback: () => Navigation.goTo(Routes.pushNotifications),
+      callback: () => Stores.Navigation.instance.goTo(Routes.pushNotifications),
       icon: faMessage,
     },
     userInfo?.role === "vendor"
       ? {
           name: "Colaboradores",
-          callback: () => Navigation.goTo(Routes.staff),
+          callback: () => Stores.Navigation.instance.goTo(Routes.staff),
           icon: faUserGroup,
         }
       : null,
     {
       name: "Layout",
-      callback: () => Navigation.goTo(Routes.layout),
+      callback: () => Stores.Navigation.instance.goTo(Routes.layout),
       icon: faIdCard,
     },
   ];
 
   $: styleHeight = `${Number($StatusBar.height) + 60}px`;
-  $: route = $Router.route;
-  let firstLaunch = true;
+  $: route = $router.route;
 
-  function easeIn(node, { duration = 6000 }) {
-    // node.style.display = "none";
-    // setTimeout(() => (node.style.display = "flex"), duration / 2);
-    // return {
-    //   duration,
-    //   css: (t) => {
-    //     // if (firstLaunch && t === 1) {
-    //     //   firstLaunch = false;
-    //     // }
-    //     // if (!firstLaunch && t > 0.5) {
-    //     //   return;
-    //     // }
-    //     const localStyle = `
-    // left: -${(t * 100).toFixed(0)}%;
-    // `;
-    //     console.log("easeIn:", localStyle);
-    //     return localStyle;
-    //   },
-    // };
-  }
-
-  function easeOut(node, { duration = 6000 }) {
-    // node.style.display = "flex";
-    // setTimeout(() => (node.style.display = "none"), duration / 2);
-    // return {
-    //   duration,
-    //   css: (t) => {
-    //     const localStyle = `
-    // `;
-    //     console.log("easeOut:", localStyle);
-    //     return localStyle;
-    //   },
-    // };
-  }
   onMount(async () => {
-    userInfo = await Utils.Jws.extractToken($Auth);
+    userInfo = await Utils.Jws.extractToken(Stores.Auth.instance.data());
   });
 
   $: if (menuHamburgerItems) {
-    MenuHamburger.reset();
-    menuHamburgerItems?.forEach((page) => MenuHamburger.addItem(page));
+    Stores.MenuHamburger.instance.reset();
+    menuHamburgerItems?.forEach((page) =>
+      Stores.MenuHamburger.instance.addItem(page)
+    );
   }
   $: style = `--paddingTop:${styleHeight};--paddingBottom: ${
     70 + $StatusBar.bottomPadding
   }px; overflow: scroll;`;
 </script>
 
-{#if route == Routes.home}
-  <main in:easeIn out:easeOut {style}>
+<main {style}>
+  {#if route == Routes.home}
     <Home />
-  </main>
-{:else if route == Routes.orders}
-  <main in:easeIn out:easeOut {style}>
+  {:else if route == Routes.orders}
     <Orders />
-  </main>
-{:else if route == Routes.order}
-  <main in:easeIn out:easeOut {style}>
+  {:else if route == Routes.order}
     <Order />
-  </main>
-{:else if route == Routes.settings}
-  <main in:easeIn out:easeOut {style}>
+  {:else if route == Routes.settings}
     <Settings />
-  </main>
-{:else if route == Routes.company}
-  <main in:easeIn out:easeOut {style}>
+  {:else if route == Routes.company}
     <CompanyProfile />
-  </main>
-{:else if route == Routes.profile}
-  <main in:easeIn out:easeOut {style}>
+  {:else if route == Routes.profile}
     <Profile />
-  </main>
-{:else if route == Routes.products}
-  <main in:easeIn out:easeOut {style}>
+  {:else if route == Routes.products}
     <Products />
-  </main>
-{:else if route == Routes.product}
-  <main in:easeIn out:easeOut {style}>
+  {:else if route == Routes.product}
     <Product />
-  </main>
-{:else if route == Routes.editProduct}
-  <main in:easeIn out:easeOut {style}>
+  {:else if route == Routes.editProduct}
     <NewProduct />
-  </main>
-{:else if route == Routes.editCategory}
-  <main in:easeIn out:easeOut {style}>
+  {:else if route == Routes.editCategory}
     <NewCategory />
-  </main>
-{:else if route == Routes.coupons}
-  <main in:easeIn out:easeOut {style}>
+  {:else if route == Routes.coupons}
     <Coupons />
-  </main>
-{:else if route == Routes.newCoupon}
-  <main in:easeIn out:easeOut {style}>
+  {:else if route == Routes.newCoupon}
     <NewCoupon />
-  </main>
-{:else if route == Routes.pushNotifications}
-  <main in:easeIn out:easeOut {style}>
+  {:else if route == Routes.pushNotifications}
     <PushNotifications />
-  </main>
-{:else if route == Routes.newPushNotification}
-  <main in:easeIn out:easeOut {style}>
+  {:else if route == Routes.newPushNotification}
     <NewPushNotification />
-  </main>
-{:else if route == Routes.layout}
-  <main in:easeIn out:easeOut {style}>
+  {:else if route == Routes.layout}
     <Layout />
-  </main>
-{:else if route == Routes.subscription}
-  <main in:easeIn out:easeOut {style}>
+  {:else if route == Routes.subscription}
     <Subscription />
-  </main>
-{:else if route == Routes.staff}
-  <main in:easeIn out:easeOut {style}>
+  {:else if route == Routes.staff}
     <Staff />
-  </main>
-{:else if route == Routes.newStaff}
-  <main in:easeIn out:easeOut {style}>
+  {:else if route == Routes.newStaff}
     <NewStaff />
-  </main>
-{:else if route == Routes.limits}
-  <main in:easeIn out:easeOut {style}>
+  {:else if route == Routes.limits}
     <Limits />
-  </main>
-{:else}
-  <main in:easeIn out:easeOut {style}>
+  {:else}
     <Home />
-  </main>
-{/if}
+  {/if}
+</main>
 <Views.NavigationBar
-  {MenuHamburger}
   logo="/assets/icons/transparent-logo-1.svg"
-  {Menu}
-  {Title}
   paddingTop={$StatusBar.height}
   topMargin={$StatusBar.height}
   paddingBottom={$StatusBar.bottomPadding}
-  {Navigation}
 />
-<Views.Tabs {tabs} {Navigation} bottomPadding={$StatusBar.bottomPadding} />
+<Views.Tabs {tabs} bottomPadding={$StatusBar.bottomPadding} />
 
 <style>
   main {

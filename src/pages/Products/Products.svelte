@@ -1,12 +1,12 @@
 <script>
-  import { Title, Navigation, Routes, Menu } from "../../stores/Navigation";
+  import Routes from "../../stores/Routes";
   import {
     search,
     all,
     deleteProduct,
     deleteCategory,
   } from "../../network/Products";
-  import { Views } from "@ikomida/components";
+  import { Views, Stores } from "@ikomida/components";
   import { faSearch, faEdit, faGift } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
   import { onMount } from "svelte";
@@ -15,7 +15,7 @@
   let value = "";
   let oldValue;
   let error = false;
-  let isLoading = false;
+  let isLoading = true;
   let items = [];
   let products = [];
 
@@ -40,15 +40,14 @@
     }
   }
 
-  Title.set("Produtos");
+  Stores.Title.instance.set("Produtos");
   onMount(async () => {
-    isLoading = true;
     products = await all();
     isLoading = false;
   });
 
   function newProduct() {
-    Navigation.goTo(Routes.editProduct, {
+    Stores.Navigation.instance.goTo(Routes.editProduct, {
       item: {
         id: null,
         title: null,
@@ -66,7 +65,7 @@
   }
 
   function newCategory() {
-    Navigation.goTo(Routes.editCategory, {
+    Stores.Navigation.instance.goTo(Routes.editCategory, {
       item: {
         id: null,
         title: null,
@@ -97,14 +96,21 @@
   }
 
   async function editCategory(item) {
-    Navigation.goTo(Routes.editCategory, { item, edit: true });
+    Stores.Navigation.instance.goTo(Routes.editCategory, {
+      item,
+      edit: true,
+    });
   }
 
   async function goToCoupons() {
-    Navigation.goTo(Routes.coupons);
+    Stores.Navigation.instance.goTo(Routes.coupons);
   }
 
-  Menu.addItem({ name: "Cupons", icon: faGift, callback: goToCoupons });
+  Stores.Menu.instance.addItem({
+    name: "Cupons",
+    icon: faGift,
+    callback: goToCoupons,
+  });
 </script>
 
 {#if isLoading}
@@ -128,12 +134,7 @@
   >
   <Views.Divider />
   {#if (items.length > 0 || value) && !error}
-    <Views.ItemsList
-      {items}
-      productPage={Routes.product}
-      {Navigation}
-      {removeProduct}
-    />
+    <Views.ItemsList {items} productPage={Routes.product} {removeProduct} />
   {:else if error}
     <h2>Nenhum produto foi encontrado</h2>
     <h3>Tente usar outro termo para pequisar</h3>
@@ -143,7 +144,6 @@
       {editCategory}
       items={products}
       productPage={Routes.product}
-      {Navigation}
       {removeProduct}
     />
   {:else}

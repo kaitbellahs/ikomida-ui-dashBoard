@@ -1,15 +1,11 @@
 import {
-    Network
+    Network,
+    Stores,
 } from "@ikomida/components";
-import {
-    get
-} from 'svelte/store';
-import {
-    Auth
-} from '../stores/Auth';
+
 
 export async function GetPaymentMethods() {
-    return Network.get("/payments", get(Auth));
+    return Network.get("/payments", true);
 }
 
 export function PaymentType(type) {
@@ -28,19 +24,19 @@ export function PaymentType(type) {
 }
 
 export async function newCoupon(object) {
-    const response = await Network.instance.post("/coupon", get(Auth), object);
+    const response = await Network.instance.post("/coupon", true, object);
     if (response?.success) {
-        await Network.instance.clearCache(Network.cacheTypes.STAFF)
+        await Network.instance.clearCache(Stores.Cache.Types.STAFF)
     }
     return response
 }
 
 export async function getCoupons(refresh = false) {
-    return await Network.instance.loadMore(Network.cacheTypes.COUPONS, '/coupons', get(Auth), refresh)
+    return await Network.instance.loadMore(Stores.Cache.Types.COUPONS, '/coupons', true, refresh)
 }
 
 export async function countCoupons() {
-    let response = await Network.instance.get("/couponsCount", get(Auth));
+    let response = await Network.instance.get("/couponsCount", true);
     if (response?.success) {
         return response?.data
     }
@@ -48,11 +44,11 @@ export async function countCoupons() {
 }
 
 export async function deleteCoupon(id) {
-    return Network.instance.remove(`/coupon/${id}`, get(Auth));
+    return Network.instance.remove(`/coupon/${id}`, true);
 }
 
 export async function getSubscription() {
-    let response = await Network.instance.get("/vendor/subscription", get(Auth));
+    let response = await Network.instance.get("/vendor/subscription", true);
     if (response?.success) {
         return response?.data
     }

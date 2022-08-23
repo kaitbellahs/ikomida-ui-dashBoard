@@ -1,10 +1,11 @@
 <script>
-  import { Title, Navigation, Routes } from "../../stores/Navigation";
+  import Routes from "../../stores/Routes";
   import Fa from "svelte-fa";
   import { faEdit } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
-  import { Views, Types, Utils } from "@ikomida/components";
+  import { Views, Types, Utils, Stores } from "@ikomida/components";
   import { newCoupon } from "../../network/Payment";
+  import { onMount } from "svelte";
 
   let item = {
     name: null,
@@ -18,7 +19,7 @@
     quantity: null,
     validity: null,
   };
-  let isLoading = false;
+  let isLoading = true;
 
   let errorAlert;
   let showAlert = false;
@@ -45,13 +46,16 @@
     let response;
     response = await newCoupon(item);
     if (response?.success) {
-      Navigation.pop(Routes.coupons);
+      Stores.Navigation.instance.pop(Routes.coupons);
     } else {
       toggleErrorAlert(response?.data);
     }
     isLoading = false;
   };
-  Title.set("Novo cupom");
+  onMount(() => {
+    isLoading = false;
+  });
+  Stores.Title.instance.set("Novo cupom");
 </script>
 
 {#if isLoading}

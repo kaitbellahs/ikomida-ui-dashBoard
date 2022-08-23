@@ -1,10 +1,11 @@
 <script>
-  import { Title, Navigation, Routes } from "../../stores/Navigation";
+  import Routes from "../../stores/Routes";
   import Fa from "svelte-fa";
   import { faRocket } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
-  import { Views, Utils } from "@ikomida/components";
+  import { Views, Utils, Stores } from "@ikomida/components";
   import { newPushNotification } from "../../network/PushNotification";
+  import { onMount } from "svelte";
 
   let item = {
     title: null,
@@ -15,7 +16,7 @@
     title: false,
     body: false,
   };
-  let isLoading = false;
+  let isLoading = true;
 
   let errorAlert;
   let showAlert = false;
@@ -42,13 +43,16 @@
     let response;
     response = await newPushNotification(item);
     if (response?.success) {
-      Navigation.reset(Routes.pushNotifications);
+      Stores.Navigation.instance.reset(Routes.pushNotifications);
     } else {
       toggleErrorAlert(response?.data);
     }
     isLoading = false;
   };
-  Title.set("Novo cupom");
+  onMount(() => {
+    isLoading = false;
+  });
+  Stores.Title.instance.set("Novo cupom");
 </script>
 
 {#if isLoading}

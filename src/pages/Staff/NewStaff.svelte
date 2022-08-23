@@ -1,10 +1,11 @@
 <script>
-  import { Title, Navigation } from "../../stores/Navigation";
+  import Routes from "../../stores/Routes";
   import Fa from "svelte-fa";
   import { faEdit, faSearch } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
-  import { Views, Utils } from "@ikomida/components";
+  import { Views, Utils, Stores } from "@ikomida/components";
   import { addStaff, GetAddressByCep } from "../../network/Staff";
+  import { onMount } from "svelte";
 
   let items = {
     name: null,
@@ -55,7 +56,7 @@
       stat: false,
     },
   };
-  let isLoading = false;
+  let isLoading = true;
   let currentPostalCode = null;
   let errorAlert;
   let showAlert = false;
@@ -100,13 +101,16 @@
     isLoading = true;
     let response = await addStaff(items);
     if (response.success) {
-      Navigation.pop();
+      Stores.Navigation.instance.pop();
     } else {
       toggleErrorAlert(response?.data);
     }
     isLoading = false;
   };
-  Title.set("Novo colaborador");
+  onMount(() => {
+    isLoading = false;
+  });
+  Stores.Title.instance.set("Novo colaborador");
 </script>
 
 {#if isLoading}

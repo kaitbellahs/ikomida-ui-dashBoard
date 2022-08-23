@@ -1,19 +1,14 @@
 <script>
-  import { Title } from "../../stores/Navigation";
-  import { Views, Utils, Types } from "@ikomida/components";
+  import { Views, Utils, Types, Stores } from "@ikomida/components";
   import { StatusBar } from "../../stores/Setup";
   import { getSubscription } from "../../network/Payment";
   import { onMount } from "svelte";
   import Fa from "svelte-fa";
-  import {
-    faReceipt,
-    faFileInvoice,
-    faSterlingSign,
-  } from "@fortawesome/free-solid-svg-icons";
+  import { faReceipt, faFileInvoice } from "@fortawesome/free-solid-svg-icons";
   import { AppLauncher } from "@capacitor/app-launcher";
 
   let subscription;
-  let isLoading = false;
+  let isLoading = true;
   let errorAlert;
   let showAlert = false;
 
@@ -35,6 +30,7 @@
 
   onMount(async () => {
     subscription = await getSubscription();
+    isLoading = false;
   });
 
   function subscriptionStatus(status) {
@@ -64,7 +60,7 @@
     return "-";
   }
 
-  Title.set("Assinatura");
+  Stores.Title.instance.set("Assinatura");
 </script>
 
 <h2>dados da sua assinatura</h2>

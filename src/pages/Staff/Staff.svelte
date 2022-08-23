@@ -1,23 +1,19 @@
 <script>
-  import { Title, Navigation, Routes, Menu } from "../../stores/Navigation";
+  import Routes from "../../stores/Routes";
   import { getStaff, removeStaff } from "../../network/Staff";
-  import { Views, Utils } from "@ikomida/components";
+  import { Views, Utils, Stores } from "@ikomida/components";
   import { StatusBar } from "../../stores/Setup";
   import { onMount } from "svelte";
   import Fa from "svelte-fa";
-  import { Auth } from "../../stores/Auth";
-  import {
-    faEdit,
-    faSync,
-    faTrashAlt,
-  } from "@fortawesome/free-solid-svg-icons";
+  import { faEdit, faSync } from "@fortawesome/free-solid-svg-icons";
   let items;
   let userInfo;
-  let isLoading = false;
+  let isLoading = true;
   let errorAlert;
   let showAlert = false;
   let localLoading = false;
   let canGetMore = true;
+  let auth;
 
   async function getMore(e, refresh = false) {
     localLoading = true;
@@ -37,10 +33,14 @@
   }
 
   onMount(async () => {
-    isLoading = true;
-    Menu.addItem({ name: "Atualizar", icon: faSync, callback: refresh });
+    auth = await Stores.Auth.instance.store();
+    Stores.Menu.instance.addItem({
+      name: "Atualizar",
+      icon: faSync,
+      callback: refresh,
+    });
     [canGetMore, items] = await getStaff();
-    userInfo = await Utils.Jws.extractToken($Auth);
+    userInfo = await Utils.Jws.extractToken($auth);
     isLoading = false;
   });
 
@@ -58,7 +58,7 @@
   }
 
   async function newStaff() {
-    Navigation.goTo(Routes.newStaff);
+    Stores.Navigation.instance.goTo(Routes.newStaff);
   }
 
   function roleName(role) {
@@ -71,7 +71,7 @@
         return "-";
     }
   }
-  Title.set("Lista de colaboradores");
+  Stores.Title.instance.set("Lista de colaboradores");
 </script>
 
 {#if !items}

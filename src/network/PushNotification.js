@@ -1,24 +1,20 @@
 import {
-    Network
+    Network,
+    Stores,
 } from "@ikomida/components";
-import {
-    get
-} from 'svelte/store';
-import {
-    Auth
-} from '../stores/Auth';
+
 
 export async function registerPushNotificationToken(object) {
-    return Network.instance.post("/notification/register", get(Auth), object);
+    return Network.instance.post("/notification/register", true, object);
 }
 export async function getPushNotifications(refresh = false) {
-    return await Network.instance.loadMore(Network.cacheTypes.PUSH_NOTIFICATIONS, '/vendor/pushNotifications', get(Auth), refresh)
+    return await Network.instance.loadMore(Stores.Cache.Types.PUSH_NOTIFICATIONS, '/vendor/pushNotifications', true, refresh)
 }
 
 export async function newPushNotification(object) {
-    const response = await Network.instance.post("/vendor/pushNotification", get(Auth), object);
+    const response = await Network.instance.post("/vendor/pushNotification", true, object);
     if (response?.success) {
-        await Network.instance.clearCache(Network.cacheTypes.STAFF)
+        await Network.instance.clearCache(Stores.Cache.Types.STAFF)
     }
     return response
 }

@@ -1,11 +1,10 @@
 <script>
-  import { Title } from "../../stores/Navigation";
-  import { Views, Utils } from "@ikomida/components";
+  import { Views, Utils, Stores } from "@ikomida/components";
   import { getLayout, updateLayout } from "../../network/Layout";
   import { StatusBar } from "../../stores/Setup";
   import { onMount } from "svelte";
 
-  let isLoading = false;
+  let isLoading = true;
   let errorAlert;
   let showAlert = false;
 
@@ -54,11 +53,12 @@
     let response = await getLayout();
     if (response?.success && response?.data) {
       layout = { ...layout, ...response?.data };
-      Utils?.Objects?.updateInputs(layoutInputs, layout)
+      Utils?.Objects?.updateInputs(layoutInputs, layout);
     }
+    isLoading = false;
   });
 
-  Title.set("Ajustes");
+  Stores.Title.instance.set("Ajustes");
 </script>
 
 <div class="settings">

@@ -1,22 +1,22 @@
 <script>
-  import { Title, Navigation, Router, Routes } from "../../stores/Navigation";
+  import Routes from "../../stores/Routes";
   import Fa from "svelte-fa";
   import { faEdit } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
-  import { Views } from "@ikomida/components";
+  import { Views, Stores } from "@ikomida/components";
   import { newCategory, updateCategory } from "../../network/Products";
+  import { onMount } from "svelte";
 
-  let { item, edit } = $Router.options;
-  let isLoading = false;
+  const router = Stores.Navigation.instance.router;
+  let { item, edit } = $router.options;
+  let isLoading = true;
   let errorAlert;
   let showAlert = false;
 
-  $: canContinue =
-    item?.title &&
-    (item?.title?.length ?? 0) <= 255 &&
-    item?.description &&
-    (item?.lastName?.length ?? 0) <= 1000;
-
+  $: canContinue = itemValidation?.title;
+  let itemValidation = {
+    title,
+  };
   function toggleErrorAlert(messageObject) {
     errorAlert = messageObject;
     showAlert = true;
@@ -31,14 +31,18 @@
       response = await newCategory(item);
     }
     if (response?.success) {
-      Navigation.reset(Routes.products);
+      Stores.Navigation.instance.reset(Routes.products);
     } else {
       toggleErrorAlert(response?.data);
     }
     isLoading = false;
   };
 
-  Title.set(edit ? "Editar categoria" : "Novo categoria");
+  onMount(() => {
+    isLoading = false;
+  });
+
+  Stores.Title.instance.set(edit ? "Editar categoria" : "Novo categoria");
 </script>
 
 {#if isLoading}
@@ -48,13 +52,21 @@
   />
 {/if}
 <div class="category">
-  <Views.TextEdit placeHolder="Nome da categoria" bind:value={item.title}
-    initialValue={item.title} />
+  <Views.TextEdit
+    placeHolder="Nome da categoria"
+    bind:value={item.title}
+    bind:isValid={itemValidation.title}
+    initialValue={item.title}
+    min="3"
+    max="255"
+  />
   <Views.TextEdit
     type="text"
     placeHolder="Descrição da categoria"
     bind:value={item.description}
     initialValue={item.description}
+    min="1"
+    max="500"
   />
   <Views.Divider />
   <Views.Divider />

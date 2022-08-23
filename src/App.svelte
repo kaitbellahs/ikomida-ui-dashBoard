@@ -1,20 +1,26 @@
 <script>
   import { App } from "@capacitor/app";
-  import { Auth, ikomidaID, PushNotificationToken } from "./stores/Auth";
+  import ikomidaID from "./stores/ikomidaID";
   import { Network } from "@capacitor/network";
   import { onMount } from "svelte";
-  import { Navigation, Router, Routes } from "./stores/Navigation";
+  import Routes from "./stores/Routes";
   import { StatusBar as _StatusBar, Settings } from "./stores/Setup";
   import { StatusBar } from "@ikomida/capacitor-plugin-status-bar";
-  import { PushNotification, Utils, Views } from "@ikomida/components";
+  import {
+    PushNotification,
+    Utils,
+    Views,
+    Network as iKomidaNetwork,
+    Stores,
+  } from "@ikomida/components";
   import { registerPushNotificationToken } from "./network/PushNotification";
-  import { Network as iNetwork } from "@ikomida/components";
-
   import Main from "./pages/Main.svelte";
   import Login from "./pages/Unlogged/Login.svelte";
   import Tac from "./pages/Unlogged/Tac.svelte";
   import ForgotPassword from "./pages/Unlogged/ForgotPassword.svelte";
 
+  let auth;
+  let router = Stores.Navigation.instance.router;
   let notificationIds = [];
   let networkStatus = null;
   let logedIn = false;
@@ -41,23 +47,25 @@
     alert("App opened with URL: " + url);
   };
 
-  $: route = $Router.route;
+  $: route = $router.route;
   $: if (logedIn) {
-    Utils.Jws.extractToken($Auth).then(async (token) => {
+    Utils.Jws.extractToken($auth).then(async (token) => {
       await ikomidaID.set(token?.ikomidaID);
-      iNetwork.instance.setIkomidaID(token?.ikomidaID);
+      iKomidaNetwork.instance.setIkomidaID(token?.ikomidaID);
     });
   }
-  $: if ($Auth) {
+  $: if ($auth) {
     logedIn = false;
-    Utils.Jws.extractToken($Auth).then(async (token) => {
+    Utils.Jws.extractToken($auth).then(async (token) => {
       logedIn = token !== null;
     });
   } else {
     ikomidaID
       .get()
       .then((id) =>
-        id && id !== "undefined" ? iNetwork.instance.setIkomidaID(id) : null
+        id && id !== "undefined"
+          ? iKomidaNetwork.instance.setIkomidaID(id)
+          : null
       );
     logedIn = false;
   }
@@ -65,15 +73,17 @@
   async function openNotification(notification) {
     if (logedIn) {
       if (["/order/", "/orders/"].includes(notification?.data?.uri)) {
-        await Network.instance.clearCache(Network.cacheTypes.ORDERS);
-        Navigation.goTo(Routes.orders, false);
+        await iKomidaNetwork.instance.clearStores.Cache(
+          Stores.Cache.Types.ORDERS
+        );
+        Stores.Navigation.instance.goTo(Routes.orders, false);
       }
     }
   }
 
   async function hasRegisteredCallBack(token, platform) {
     const tokenObject = { platform, token };
-    PushNotificationToken.setToken(tokenObject);
+    Stores.PushNotificationToken.setToken(tokenObject);
     await registerPushNotificationToken(tokenObject);
   }
 
@@ -128,11 +138,11 @@
   }
 
   onMount(async () => {
+    auth = await Stores.Auth.instance.store();
     networkStatus = await Network.getStatus();
     if (Capacitor.isNativePlatform()) {
       pushNotification.init();
       const sbarInfo = await StatusBar.getInfo();
-      console.log("await StatusBar.getInfo():", sbarInfo);
       _StatusBar.setStatusBar(sbarInfo);
     }
   });
@@ -146,7 +156,10 @@
     //   level: "info",
     //   message: `App opened with URL: ${JSON.stringify(data)}`,
     // });
-    Navigation.goTo(Routes.settings, { callback: true, ...data });
+    Stores.Navigation.instance.goTo(Routes.settings, {
+      callback: true,
+      ...data,
+    });
   });
 </script>
 
@@ -159,8 +172,6 @@
 
 {#if logedIn}
   <Main />
-{:else if route == Routes.Auth}
-  <Login />
 {:else if route == Routes.forgotPassword}
   <ForgotPassword />
 {:else if route == Routes.tac}

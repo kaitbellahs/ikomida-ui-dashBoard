@@ -1,6 +1,5 @@
 <script>
-  import { Title, Router } from "../../stores/Navigation";
-  import { Views, Utils, Logics } from "@ikomida/components";
+  import { Views, Utils, Logics, Stores } from "@ikomida/components";
   import {
     getSettings,
     updatePaymentGateway,
@@ -16,7 +15,6 @@
   import { Clipboard } from "@capacitor/clipboard";
   import { onMount } from "svelte";
   import { v4 as uuid } from "uuid";
-  import { Auth } from "../../stores/Auth";
 
   let paymentGateway = { type: null, data: null };
   let delivery = { value: 0, min: 0, free: false };
@@ -28,6 +26,8 @@
   let showAlert = false;
   let popupNewOrder = $Settings?.popups?.newOrder;
   let userInfo;
+  let auth;
+  const router = Stores.Navigation.instance.router;
 
   const days = [
     { name: "Domingo", checked: false },
@@ -51,8 +51,11 @@
     Settings.set($Settings);
   }
 
-  $: if ($Router.options) {
-    integratePagSeguro = { ...integratePagSeguro, ...$Router.options };
+  $: if ($router.options) {
+    integratePagSeguro = {
+      ...integratePagSeguro,
+      ...$router.options,
+    };
   }
 
   $: if (integratePagSeguro?.callback && !paymentGateway?.type) {
@@ -212,8 +215,8 @@
   }
 
   onMount(async () => {
-    isLoading = true;
-    userInfo = await Utils.Jws.extractToken($Auth);
+    auth = await Stores.Auth.instance.store();
+    userInfo = await Utils.Jws.extractToken($auth);
     const response = await getSettings();
     const data = response?.data;
     if (response?.success) {
@@ -234,7 +237,7 @@
     isLoading = false;
   });
 
-  Title.set("Seus ajustes");
+  Stores.Title.instance.set("Seus ajustes");
 </script>
 
 <div class="settings">

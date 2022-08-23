@@ -1,11 +1,10 @@
 <script>
-  import { Title } from "../../stores/Navigation";
   import { countProducts } from "../../network/Products";
   import { countOrders } from "../../network/Orders";
   import { countUsers } from "../../network/User";
   import { countCoupons } from "../../network/Payment";
-  import { Views } from "@ikomida/components";
-  Title.set("iKomida - Dashboard");
+  import { Views, Stores } from "@ikomida/components";
+  Stores.Title.instance.set("iKomida - Dashboard");
 </script>
 
 <h2>Estatísticas</h2>

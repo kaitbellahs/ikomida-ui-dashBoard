@@ -1,8 +1,8 @@
 <script>
-  import { Auth, ikomidaID, PushNotificationToken } from "../../stores/Auth";
+  import ikomidaID from "../../stores/ikomidaID";
   import * as AuthNetwork from "../../network/Auth";
-  import { Routes, Navigation } from "../../stores/Navigation";
-  import { Views } from "@ikomida/components";
+  import Routes from "../../stores/Routes";
+  import { Views, Stores } from "@ikomida/components";
   import {
     faPhone,
     faUnlock,
@@ -12,7 +12,7 @@
   import { registerPushNotificationToken } from "../../network/PushNotification";
   import { onMount } from "svelte";
 
-  let isLoading = false;
+  let isLoading = true;
   let ikomidaid = "com.ikomida.br.";
   let ikomidaidInput;
   let phone;
@@ -21,11 +21,12 @@
   let errorAlert;
   let showAlert = false;
   let isValidPhone = false;
+  let pushNotificationToken = Stores.PushNotificationToken.instance?.store();
 
   $: canLogin = isValidPhone;
 
   async function forgotPassword() {
-    Navigation.goTo(Routes.forgotPassword);
+    Stores.Navigation.instance.goTo(Routes.forgotPassword);
   }
 
   function toggleErrorAlert(messageObject) {
@@ -41,11 +42,11 @@
     if (response?.success) {
       const token = await Utils.Jws.extractToken(response?.data);
       if (token !== null) {
-        Auth.setToken(response?.data);
-        if ($PushNotificationToken && $PushNotificationToken !== {}) {
-          await registerPushNotificationToken($PushNotificationToken);
+        Stores.Auth.instance.setToken(response?.data);
+        if ($pushNotificationToken && $pushNotificationToken !== {}) {
+          await registerPushNotificationToken($pushNotificationToken);
         }
-        Navigation.reset(Routes.home);
+        Stores.Navigation.instance.reset(Routes.home);
       } else {
         toggleErrorAlert("O token de acesso não é válido");
       }
@@ -59,6 +60,7 @@
     const value = await ikomidaID.get();
     ikomidaid = value && value !== undefined ? value : ikomidaid;
     ikomidaidInput.updateValue(ikomidaid);
+    isLoading = false;
   });
 </script>
 

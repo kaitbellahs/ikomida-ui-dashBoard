@@ -1,14 +1,14 @@
 <script>
-  import { Title, Navigation, Routes, Menu } from "../../stores/Navigation";
+  import Routes from "../../stores/Routes";
   import Fa from "svelte-fa";
   import { faSync, faRocket } from "@fortawesome/free-solid-svg-icons";
-  import { Views, Utils } from "@ikomida/components";
+  import { Views, Utils, Stores } from "@ikomida/components";
   import { getPushNotifications } from "../../network/PushNotification";
   import { StatusBar } from "../../stores/Setup";
   import { onMount } from "svelte";
 
   let items;
-  let isLoading = false;
+  let isLoading = true;
   let errorAlert;
   let showAlert = false;
   let localLoading = false;
@@ -25,8 +25,11 @@
   }
 
   onMount(async () => {
-    Menu.addItem({ name: "Atualizar", icon: faSync, callback: refresh });
-    isLoading = true;
+    Stores.Menu.instance.addItem({
+      name: "Atualizar",
+      icon: faSync,
+      callback: refresh,
+    });
     [canGetMore, items] = await getPushNotifications();
     isLoading = false;
   });
@@ -37,10 +40,10 @@
   }
 
   const newPushNotification = async () => {
-    Navigation.goTo(Routes.newPushNotification);
+    Stores.Navigation.instance.goTo(Routes.newPushNotification);
   };
 
-  Title.set("Mensagens push");
+  Stores.Title.instance.set("Mensagens push");
 </script>
 
 {#if isLoading}
