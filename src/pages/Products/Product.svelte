@@ -9,15 +9,6 @@
 
   const router = Stores.Navigation.instance.router;
   const item = $router.options;
-  let isLoading = true;
-
-  let errorAlert;
-  let showAlert = false;
-
-  function toggleErrorAlert(messageObject) {
-    errorAlert = messageObject;
-    showAlert = true;
-  }
 
   const edit = async () => {
     Stores.Navigation.instance.goTo(Routes.editProduct, {
@@ -34,29 +25,23 @@
   };
 
   async function removeProduct() {
-    isLoading = true;
+    Stores.Loading.instance.start();
     const response = await deleteProduct(item.id);
     if (response?.success) {
       Stores.Navigation.instance.pop();
     } else {
-      toggleErrorAlert(response?.data);
+      Stores.MessageAlert.instance.show(response?.data);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   }
 
   onMount(() => {
-    isLoading = false;
+    Stores.Loading.instance.stop();
   });
 
   Stores.Title.instance.set(item.title);
 </script>
 
-{#if isLoading}
-  <Views.Loading
-    topPadding={$StatusBar.height}
-    bottomPadding={$StatusBar.bottomPadding}
-  />
-{/if}
 <div class="product">
   {#if item.image}
     <img src={item.image} alt={item.title} />
@@ -97,7 +82,6 @@
     ><Fa icon={faEdit} /> <span>Novo produto Similar</span></Views.Button
   >
 </div>
-<Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 
 <style>
   .product {
@@ -145,7 +129,7 @@
   img {
     width: 100%;
     max-width: 100%;
-    object-fit: cover;
+    object-fit: contain;
     border-radius: 4px;
   }
 </style>

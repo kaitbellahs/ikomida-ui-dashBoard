@@ -8,21 +8,13 @@
   import { AppLauncher } from "@capacitor/app-launcher";
 
   let subscription;
-  let isLoading = true;
-  let errorAlert;
-  let showAlert = false;
-
-  function toggleErrorAlert(messageObject) {
-    errorAlert = messageObject;
-    showAlert = true;
-  }
 
   async function open(url) {
     const { value } = await AppLauncher.canOpenUrl({ url });
     await AppLauncher.openUrl({ url });
     if (!value) {
       await Clipboard.write({ string: url });
-      toggleErrorAlert(
+      Stores.MessageAlert.instance.show(
         `Se o navegador externo no for aberto automaticamente, por favor o abra e digita esa URL: ${url}, que também foi copiado para sua área de transferência para colar-lo!`
       );
     }
@@ -30,7 +22,7 @@
 
   onMount(async () => {
     subscription = await getSubscription();
-    isLoading = false;
+    Stores.Loading.instance.stop();
   });
 
   function subscriptionStatus(status) {
@@ -147,14 +139,6 @@
     </div>
   {/each}
 {/if}
-
-{#if !subscription || isLoading}
-  <Views.Loading
-    topPadding={$StatusBar.height}
-    bottomPadding={$StatusBar.bottomPadding}
-  />
-{/if}
-<Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 
 <style>
   .charge {

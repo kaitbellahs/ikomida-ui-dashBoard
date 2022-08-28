@@ -21,9 +21,6 @@
   let deliveryInputs = { value: null, min: null };
   let preparation = { min: 0, max: 0 };
   let preparationInputs = { min: null, max: null };
-  let isLoading = true;
-  let errorAlert;
-  let showAlert = false;
   let popupNewOrder = $Settings?.popups?.newOrder;
   let userInfo;
   let auth;
@@ -61,19 +58,21 @@
   $: if (integratePagSeguro?.callback && !paymentGateway?.type) {
     integratePagSeguro.callback = false;
     if (integratePagSeguro?.url) {
-      isLoading = true;
+      Stores.Loading.instance.start();
       const url = new URL(integratePagSeguro?.url);
       const code = url.searchParams.get("code");
       const state = url.searchParams.get("state");
       const payload = { code, state };
       updatePaymentGateway(payload).then((response) => {
         if (!response?.success) {
-          toggleErrorAlert(response?.data);
+          Stores.MessageAlert.instance.show(response?.data);
         } else {
           paymentGateway = { ...paymentGateway, ...response?.data };
-          toggleErrorAlert(`${response?.data?.type} foi integrado com sucesso`);
+          Stores.MessageAlert.instance.show(
+            `${response?.data?.type} foi integrado com sucesso`
+          );
         }
-        isLoading = false;
+        Stores.Loading.instance.stop();
       });
     }
   }
@@ -81,11 +80,6 @@
   $: integrateButtonName = paymentGateway?.type
     ? "Cancelar a integgração com pagseguro"
     : "Integrar sua conta pagseguro";
-
-  function toggleErrorAlert(messageObject) {
-    errorAlert = messageObject;
-    showAlert = true;
-  }
 
   const addHours = () => {
     if (!business?.hours) {
@@ -121,26 +115,26 @@
   }
 
   async function updateHours() {
-    isLoading = true;
+    Stores.Loading.instance.start();
     if (business.hours === null || business.hours.length < 1) {
-      toggleErrorAlert(
+      Stores.MessageAlert.instance.show(
         "Precisa escolher pelo menos um horário de funcionamento!"
       );
-      isLoading = false;
+      Stores.Loading.instance.stop();
       return;
     }
     for (const businessHour of business?.hours) {
       if (!validateTime(businessHour?.start)) {
-        toggleErrorAlert(
+        Stores.MessageAlert.instance.show(
           "O horário de abertura é inválida, o formato deve ser HH:mm e entre 00:00 e 23:59!"
         );
-        isLoading = false;
+        Stores.Loading.instance.stop();
         return;
       } else if (!validateTime(businessHour?.end)) {
-        toggleErrorAlert(
+        Stores.MessageAlert.instance.show(
           "O horário de fechamento é inválida, o formato deve ser HH:mm e entre 00:00 e 23:59!"
         );
-        isLoading = false;
+        Stores.Loading.instance.stop();
         return;
       }
     }
@@ -151,40 +145,44 @@
       }
     }
     if (business.days === null || business.days.length < 1) {
-      toggleErrorAlert("Precisa escolher pelo menos um dia de funcionamento!");
-      isLoading = false;
+      Stores.MessageAlert.instance.show(
+        "Precisa escolher pelo menos um dia de funcionamento!"
+      );
+      Stores.Loading.instance.stop();
       return;
     }
     let response = await updateBusinessHours(business);
     if (response.success) {
-      toggleErrorAlert("O horário de funcionamento atualizado com sucesso!");
+      Stores.MessageAlert.instance.show(
+        "O horário de funcionamento atualizado com sucesso!"
+      );
     } else {
-      toggleErrorAlert(response?.data);
-      isLoading = false;
+      Stores.MessageAlert.instance.show(response?.data);
+      Stores.Loading.instance.stop();
       return;
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   }
 
   async function updateDelivery() {
-    isLoading = true;
+    Stores.Loading.instance.start();
     const response = await setDelivery(preparation, delivery);
     if (!response?.success) {
-      toggleErrorAlert(response?.data);
+      Stores.MessageAlert.instance.show(response?.data);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   }
 
   async function requestPagSeguroIntegration() {
-    isLoading = true;
+    Stores.Loading.instance.start();
     if (paymentGateway?.type) {
       const response = await revokePaymentGateway();
       if (response?.success) {
-        toggleErrorAlert(
+        Stores.MessageAlert.instance.show(
           `A integração dos nossos nossos sistemas com o pagseguro foi revogado com sucesso!`
         );
       } else {
-        toggleErrorAlert(
+        Stores.MessageAlert.instance.show(
           `Não foi possível revogar a integração, tente novamente mais tarde!`
         );
       }
@@ -193,7 +191,7 @@
       if (response?.success) {
         const url = response?.data?.url;
         if (!url) {
-          toggleErrorAlert(
+          Stores.MessageAlert.instance.show(
             `Não foi possível obter a url de integração, tente novamente mais tarde!`
           );
           return;
@@ -204,13 +202,13 @@
         } else {
           await AppLauncher.openUrl({ url });
           await Clipboard.write({ string: url });
-          toggleErrorAlert(
+          Stores.MessageAlert.instance.show(
             `Se o navegador externo no for aberto automaticamente, por favor o abra e digita esa URL: ${url}, que também foi copiado para sua área de transferência!`
           );
         }
       }
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
     return null;
   }
 
@@ -232,9 +230,9 @@
       preparationInputs?.min?.updateValue(preparation?.min);
       preparationInputs?.max?.updateValue(preparation?.max);
     } else {
-      toggleErrorAlert(data);
+      Stores.MessageAlert.instance.show(data);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   });
 
   Stores.Title.instance.set("Seus ajustes");
@@ -358,13 +356,6 @@
 </div>
 
 <Views.GTerms />
-{#if !paymentGateway || isLoading}
-  <Views.Loading
-    topPadding={$StatusBar.height}
-    bottomPadding={$StatusBar.bottomPadding}
-  />
-{/if}
-<Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 
 <style>
   .settings {

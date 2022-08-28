@@ -56,14 +56,10 @@
       stat: false,
     },
   };
-  let isLoading = true;
+
   let currentPostalCode = null;
   let errorAlert;
   let showAlert = false;
-  function toggleErrorAlert(messageObject) {
-    errorAlert = messageObject;
-    showAlert = true;
-  }
 
   $: if (
     (items?.address?.postalCode?.length ?? 0) === 8 &&
@@ -73,7 +69,7 @@
   }
 
   function findAddress() {
-    isLoading = true;
+    Stores.Loading.instance.start();
     currentPostalCode = items?.address?.postalCode;
     GetAddressByCep(items.address.postalCode)
       .then((response) => {
@@ -83,42 +79,36 @@
           items.address = { ...items?.address, ...address };
           Utils?.Objects?.updateInputs(itemsInputs, items);
         } else {
-          toggleErrorAlert(response?.data);
+          Stores.MessageAlert.instance.show(response?.data);
         }
-        isLoading = false;
+        Stores.Loading.instance.stop();
       })
       .catch((exception) => {
-        toggleErrorAlert(exception);
+        Stores.MessageAlert.instance.show(exception);
       });
   }
   const submit = async () => {
     if (!Utils.Objects.validateFields(itemsValidation)) {
-      toggleErrorAlert(
+      Stores.MessageAlert.instance.show(
         "Por favor preenche os dados do formulario corretamente"
       );
       return;
     }
-    isLoading = true;
+    Stores.Loading.instance.start();
     let response = await addStaff(items);
     if (response.success) {
       Stores.Navigation.instance.pop();
     } else {
-      toggleErrorAlert(response?.data);
+      Stores.MessageAlert.instance.show(response?.data);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   };
   onMount(() => {
-    isLoading = false;
+    Stores.Loading.instance.stop();
   });
   Stores.Title.instance.set("Novo colaborador");
 </script>
 
-{#if isLoading}
-  <Views.Loading
-    topPadding={$StatusBar.height}
-    bottomPadding={$StatusBar.bottomPadding}
-  />
-{/if}
 <div class="staff">
   <h2>Dados pessoais</h2>
   <Views.TextEdit
@@ -228,7 +218,6 @@
     bottomPadding={$StatusBar.bottomPadding}
     ><Fa icon={faEdit} /> <span>Adicionar</span></Views.Button
   >
-  <Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 </div>
 
 <style>

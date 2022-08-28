@@ -46,9 +46,6 @@
       stat: false,
     },
   };
-  let isLoading = true;
-  let errorAlert;
-  let showAlert = false;
   let currentPostalCode = null;
 
   $: canProceed = Utils.Objects.validateFields(profileValidation);
@@ -61,7 +58,7 @@
   }
 
   function findAddress() {
-    isLoading = true;
+    Stores.Loading.instance.start();
     currentPostalCode = profile?.address?.postalCode;
     GetAddressByCep(profile.address.postalCode)
       .then((response) => {
@@ -71,48 +68,43 @@
           profile.address = { ...profile?.address, ...address };
           Utils?.Objects?.updateInputs(profileInputs, profile);
         } else {
-          toggleErrorAlert(response?.data);
+          Stores.MessageAlert.instance.show(response?.data);
         }
-        isLoading = false;
+        Stores.Loading.instance.stop();
       })
       .catch((exception) => {
-        toggleErrorAlert(exception);
+        Stores.MessageAlert.instance.show(exception);
       });
-  }
-
-  function toggleErrorAlert(messageObject) {
-    errorAlert = messageObject;
-    showAlert = true;
   }
 
   const submit = async () => {
     if (!Utils.Objects.validateFields(profileValidation)) {
-      toggleErrorAlert(
+      Stores.MessageAlert.instance.show(
         "Por favor preenche os dados do formulario corretamente"
       );
       return;
     }
-    isLoading = true;
+    Stores.Loading.instance.start();
     let response = await setSettings(profile);
-    toggleErrorAlert(
+    Stores.MessageAlert.instance.show(
       response?.success
         ? "As informações do estabelecimento foram atualizadas com sucesso"
         : response?.data
     );
-    isLoading = false;
+    Stores.Loading.instance.stop();
   };
 
   onMount(async () => {
-    isLoading = true;
+    Stores.Loading.instance.start();
     const response = await getSettings();
     if (response?.success) {
       currentPostalCode = response?.data?.profile?.address?.postalCode;
       profile = { ...profile, ...response?.data?.profile };
       Utils.Objects.updateInputs(profileInputs, profile);
     } else {
-      toggleErrorAlert(response?.data);
+      Stores.MessageAlert.instance.show(response?.data);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   });
 
   Stores.Title.instance.set("O estabelecimento");
@@ -122,10 +114,10 @@
   <Views.UploadablePhoto
     type="vendor"
     bind:image={profile.mainPicture}
-    title={profile?.restaurantName}
+    title={profile?.contractName}
   />
   <div class="data">
-    <h2>{profile?.restaurantName}</h2>
+    <h2>{profile?.contractName}</h2>
     <Views.Divider />
     <Views.TextValue
       text="CNPJ:"
@@ -231,7 +223,6 @@
     bottomPadding={$StatusBar.bottomPadding}
   />
 {/if}
-<Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 
 <style>
   .profile > div {

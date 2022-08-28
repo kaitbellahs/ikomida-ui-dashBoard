@@ -13,7 +13,7 @@
 
   const router = Stores.Navigation.instance.router;
   let { item, edit } = $router.options;
-  let isLoading = true;
+
   let categoriesOptions = [];
   let firstLaunch = true;
   let errorAlert;
@@ -74,16 +74,11 @@
     firstLaunch = false;
   }
 
-  function toggleErrorAlert(messageObject) {
-    errorAlert = messageObject;
-    showAlert = true;
-  }
-
   async function submit() {
     if (!canContinue) {
       return;
     }
-    isLoading = true;
+    Stores.Loading.instance.start();
     let response;
     if (edit) {
       response = await updateProduct(item);
@@ -93,13 +88,13 @@
     if (response?.success) {
       Stores.Navigation.instance.reset(Routes.products);
     } else {
-      toggleErrorAlert(response?.data);
+      Stores.MessageAlert.instance.show(response?.data);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   }
 
   async function generateOptions() {
-    isLoading = true;
+    Stores.Loading.instance.start();
     const response = await getCategories();
     if (response) {
       categoriesOptions = response?.map((item) => {
@@ -112,27 +107,21 @@
         item.category = result.length > 0 ? result[0] : null;
       }
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   }
 
   onMount(async () => {
     if (!item.category) {
       item.category = null;
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   });
 
   generateOptions();
 
-  Stores.Title.instance.set(edit ? "Editar produto" : "Novo produto");
+  $: Stores.Title.instance.set(edit ? "Editar produto" : "Novo produto");
 </script>
 
-{#if isLoading}
-  <Views.Loading
-    topPadding={$StatusBar.height}
-    bottomPadding={$StatusBar.bottomPadding}
-  />
-{/if}
 {#if (categoriesOptions?.length ?? 0) > 0}
   <div class="product">
     <Views.UploadablePhoto bind:image={item.image} title={item?.title} />
@@ -244,7 +233,6 @@
     text="Precisa adicionar pelo menos uma categoria antes de adicionar um novo produto!"
   />
 {/if}
-<Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 
 <style>
   .product {

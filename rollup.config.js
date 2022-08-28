@@ -38,19 +38,27 @@ function serve() {
 }
 
 export default {
+	onwarn(warning, warn) {
+		if (warning.code === 'CIRCULAR_DEPENDENCY') {
+			if (warning.message.includes('\\luxon\\')) {
+				return;
+			}
+		}
+		warn(warning);
+	},
 	input: 'src/main.js',
 	output: {
 		inlineDynamicImports: true,
 		sourcemap: !production,
 		format: 'iife',
 		name: 'app',
-		file: 'public/build/bundle.js'
+		file: 'App/build/bundle.js'
 	},
 	plugins: [
-        replace({
+		replace({
 			preventAssignment: true,
-            isProduction: process.env.ENV === 'prod',
-        }),
+			isProduction: process.env.ENV === 'prod',
+		}),
 		svelte({
 			preprocess: [
 				// obfuscatorPlugin({

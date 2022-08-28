@@ -16,10 +16,6 @@
     title: false,
     body: false,
   };
-  let isLoading = true;
-
-  let errorAlert;
-  let showAlert = false;
   let selectedDiscountType;
   let oldSelectedDiscountType = null;
   $: if (
@@ -33,34 +29,23 @@
   }
   $: canContinue = Utils.Objects.validateFields(itemsValidation);
 
-  function toggleErrorAlert(messageObject) {
-    errorAlert = messageObject;
-    showAlert = true;
-  }
-
   const submit = async () => {
-    isLoading = true;
+    Stores.Loading.instance.start();
     let response;
     response = await newPushNotification(item);
     if (response?.success) {
       Stores.Navigation.instance.reset(Routes.pushNotifications);
     } else {
-      toggleErrorAlert(response?.data);
+      Stores.MessageAlert.instance.show(response?.data);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   };
   onMount(() => {
-    isLoading = false;
+    Stores.Loading.instance.stop();
   });
   Stores.Title.instance.set("Novo cupom");
 </script>
 
-{#if isLoading}
-  <Views.Loading
-    topPadding={$StatusBar.height}
-    bottomPadding={$StatusBar.bottomPadding}
-  />
-{/if}
 <div class="pushNotification">
   <Views.TextEdit
     placeHolder="Título"
@@ -85,7 +70,6 @@
     ><Fa icon={faRocket} /> <span>Enviar</span></Views.Button
   >
 </div>
-<Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 
 <style>
   .pushNotification {

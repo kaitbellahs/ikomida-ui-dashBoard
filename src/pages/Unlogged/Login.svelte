@@ -12,16 +12,12 @@
   import { registerPushNotificationToken } from "../../network/PushNotification";
   import { onMount } from "svelte";
 
-  let isLoading = true;
   let ikomidaid = "com.ikomida.br.";
   let ikomidaidInput;
   let phone;
   let password;
-
-  let errorAlert;
-  let showAlert = false;
   let isValidPhone = false;
-  let pushNotificationToken = Stores.PushNotificationToken.instance?.store();
+  let pushNotificationToken = Stores.PushNotificationToken.instance.store;
 
   $: canLogin = isValidPhone;
 
@@ -29,13 +25,8 @@
     Stores.Navigation.instance.goTo(Routes.forgotPassword);
   }
 
-  function toggleErrorAlert(messageObject) {
-    errorAlert = messageObject;
-    showAlert = true;
-  }
-
   async function doLogin() {
-    isLoading = true;
+    Stores.Loading.instance.start();
     await ikomidaID.set(ikomidaid);
     Network.instance.setIkomidaID(ikomidaid);
     const response = await AuthNetwork.doLogin(55, phone, password);
@@ -48,25 +39,22 @@
         }
         Stores.Navigation.instance.reset(Routes.home);
       } else {
-        toggleErrorAlert("O token de acesso não é válido");
+        Stores.MessageAlert.instance.show("O token de acesso não é válido");
       }
     } else {
-      toggleErrorAlert(response?.data);
+      Stores.MessageAlert.instance.show(response?.data);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   }
 
   onMount(async () => {
     const value = await ikomidaID.get();
     ikomidaid = value && value !== undefined ? value : ikomidaid;
     ikomidaidInput.updateValue(ikomidaid);
-    isLoading = false;
+    Stores.Loading.instance.stop();
   });
 </script>
 
-{#if isLoading}
-  <Views.Loading />
-{/if}
 <main>
   <div class="avatar">
     <img src="/assets/icons/transparent-logo-1.svg" alt="iKomida" />
@@ -91,7 +79,6 @@
     bind:value={password}
     icon={faUnlock}
     placeHolder="Sua senha"
-    secret={true}
     type="password"
   />
   <div />
@@ -100,7 +87,6 @@
     >Recuperar a senha</Views.Button
   >
   <Views.GTerms />
-  <Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 </main>
 
 <style>
@@ -126,11 +112,11 @@
   .avatar > img {
     font-size: 3em;
     width: 100%;
-    max-width: 100%;
-    border-radius: 45px;
+    max-width: 500px;
+    border-radius: 40px;
+    height: 210px;
     line-height: 90px;
-    vertical-align: middle;
-    display: table-cell;
     overflow: hidden;
+    object-fit: contain;
   }
 </style>

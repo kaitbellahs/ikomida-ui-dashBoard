@@ -4,10 +4,6 @@
   import { StatusBar } from "../../stores/Setup";
   import { onMount } from "svelte";
 
-  let isLoading = true;
-  let errorAlert;
-  let showAlert = false;
-
   let layout = {
     link: "#e8d130",
     background: "#dfdfdf",
@@ -35,18 +31,13 @@
     dialog: { background: null, color: null },
   };
 
-  function toggleErrorAlert(messageObject) {
-    errorAlert = messageObject;
-    showAlert = true;
-  }
-
   async function setLaout() {
-    isLoading = true;
+    Stores.Loading.instance.start();
     const response = await updateLayout(layout);
     if (!response?.success) {
-      toggleErrorAlert(response?.data);
+      Stores.MessageAlert.instance.show(response?.data);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   }
 
   onMount(async () => {
@@ -55,7 +46,7 @@
       layout = { ...layout, ...response?.data };
       Utils?.Objects?.updateInputs(layoutInputs, layout);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   });
 
   Stores.Title.instance.set("Ajustes");
@@ -195,14 +186,6 @@
     <Views.Button on:click={setLaout}>Atualizar o layout</Views.Button>
   </div>
 </div>
-
-{#if !layout || isLoading}
-  <Views.Loading
-    topPadding={$StatusBar.height}
-    bottomPadding={$StatusBar.bottomPadding}
-  />
-{/if}
-<Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 
 <style>
   .settings {

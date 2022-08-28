@@ -19,10 +19,6 @@
     quantity: null,
     validity: null,
   };
-  let isLoading = true;
-
-  let errorAlert;
-  let showAlert = false;
   let selectedDiscountType;
   let oldSelectedDiscountType = null;
   $: if (
@@ -36,34 +32,23 @@
   }
   $: canContinue = Utils.Objects.validateFields(itemsValidation);
 
-  function toggleErrorAlert(messageObject) {
-    errorAlert = messageObject;
-    showAlert = true;
-  }
-
   const submit = async () => {
-    isLoading = true;
+    Stores.Loading.instance.start();
     let response;
     response = await newCoupon(item);
     if (response?.success) {
       Stores.Navigation.instance.pop(Routes.coupons);
     } else {
-      toggleErrorAlert(response?.data);
+      Stores.MessageAlert.instance.show(response?.data);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   };
   onMount(() => {
-    isLoading = false;
+    Stores.Loading.instance.stop();
   });
   Stores.Title.instance.set("Novo cupom");
 </script>
 
-{#if isLoading}
-  <Views.Loading
-    topPadding={$StatusBar.height}
-    bottomPadding={$StatusBar.bottomPadding}
-  />
-{/if}
 <div class="coupon">
   <Views.TextEdit
     type="alphanumeric"
@@ -126,7 +111,6 @@
     ><Fa icon={faEdit} /> <span>Salvar</span></Views.Button
   >
 </div>
-<Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 
 <style>
   .coupon {

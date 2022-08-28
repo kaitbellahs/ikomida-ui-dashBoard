@@ -9,21 +9,14 @@
 
   const router = Stores.Navigation.instance.router;
   let { item, edit } = $router.options;
-  let isLoading = true;
-  let errorAlert;
-  let showAlert = false;
 
   $: canContinue = itemValidation?.title;
   let itemValidation = {
     title,
   };
-  function toggleErrorAlert(messageObject) {
-    errorAlert = messageObject;
-    showAlert = true;
-  }
 
   const submit = async () => {
-    isLoading = true;
+    Stores.Loading.instance.start();
     let response;
     if (edit) {
       response = await updateCategory(item);
@@ -33,24 +26,18 @@
     if (response?.success) {
       Stores.Navigation.instance.reset(Routes.products);
     } else {
-      toggleErrorAlert(response?.data);
+      Stores.MessageAlert.instance.show(response?.data);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   };
 
   onMount(() => {
-    isLoading = false;
+    Stores.Loading.instance.stop();
   });
 
   Stores.Title.instance.set(edit ? "Editar categoria" : "Novo categoria");
 </script>
 
-{#if isLoading}
-  <Views.Loading
-    topPadding={$StatusBar.height}
-    bottomPadding={$StatusBar.bottomPadding}
-  />
-{/if}
 <div class="category">
   <Views.TextEdit
     placeHolder="Nome da categoria"
@@ -77,7 +64,6 @@
     ><Fa icon={faEdit} /> <span>Salvar</span></Views.Button
   >
 </div>
-<Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 
 <style>
   .category {

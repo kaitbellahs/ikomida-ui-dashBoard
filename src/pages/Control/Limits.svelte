@@ -15,23 +15,15 @@
   } from "@fortawesome/free-solid-svg-icons";
 
   let limits;
-  let isLoading = true;
-  let errorAlert;
-  let showAlert = false;
-
-  function toggleErrorAlert(messageObject) {
-    errorAlert = messageObject;
-    showAlert = true;
-  }
 
   onMount(async () => {
     const response = await getLimits();
     if (response?.success) {
       limits = response.data;
     } else {
-      toggleErrorAlert(response?.data);
+      Stores.MessageAlert.instance.show(response?.data);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   });
 
   Stores.Title.instance.set("Limites");
@@ -162,14 +154,6 @@
     </article>
   {/if}
 </section>
-
-{#if isLoading}
-  <Views.Loading
-    topPadding={$StatusBar.height}
-    bottomPadding={$StatusBar.bottomPadding}
-  />
-{/if}
-<Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 
 <style>
   section > article > .chart {

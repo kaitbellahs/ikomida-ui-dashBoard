@@ -8,9 +8,6 @@
   import { faEdit, faSync } from "@fortawesome/free-solid-svg-icons";
   let items;
   let userInfo;
-  let isLoading = true;
-  let errorAlert;
-  let showAlert = false;
   let localLoading = false;
   let canGetMore = true;
   let auth;
@@ -22,14 +19,9 @@
   }
 
   async function refresh() {
-    isLoading = true;
+    Stores.Loading.instance.start();
     await getMore(null, true);
-    isLoading = false;
-  }
-
-  function toggleErrorAlert(messageObject) {
-    errorAlert = messageObject;
-    showAlert = true;
+    Stores.Loading.instance.stop();
   }
 
   onMount(async () => {
@@ -41,20 +33,20 @@
     });
     [canGetMore, items] = await getStaff();
     userInfo = await Utils.Jws.extractToken($auth);
-    isLoading = false;
+    Stores.Loading.instance.stop();
   });
 
   async function onRemoveClick(id) {
-    isLoading = true;
+    Stores.Loading.instance.start();
     let response = await removeStaff(id);
     if (response.success) {
       await getMore(null, true);
     } else {
-      toggleErrorAlert(response?.data);
-      isLoading = false;
+      Stores.MessageAlert.instance.show(response?.data);
+      Stores.Loading.instance.stop();
       return;
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   }
 
   async function newStaff() {
@@ -111,7 +103,6 @@
   {/if}
 {/if}
 
-<Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 {#if isLoading || !items}
   <Views.Loading
     topPadding={$StatusBar.height}

@@ -7,37 +7,9 @@
   import { StatusBar } from "../../stores/Setup";
   import { onMount } from "svelte";
 
-  let items;
-  let isLoading = true;
-  let errorAlert;
-  let showAlert = false;
-  let localLoading = false;
-  let canGetMore = true;
-
-  async function getMore(e, refresh = false) {
-    localLoading = true;
-    [canGetMore, items] = await getPushNotifications(refresh);
-    localLoading = false;
-  }
-
-  async function refresh() {
-    await getMore(null, true);
-  }
-
   onMount(async () => {
-    Stores.Menu.instance.addItem({
-      name: "Atualizar",
-      icon: faSync,
-      callback: refresh,
-    });
-    [canGetMore, items] = await getPushNotifications();
-    isLoading = false;
+    Stores.Loading.instance.stop();
   });
-
-  function toggleErrorAlert(messageObject) {
-    errorAlert = messageObject;
-    showAlert = true;
-  }
 
   const newPushNotification = async () => {
     Stores.Navigation.instance.goTo(Routes.newPushNotification);
@@ -46,51 +18,32 @@
   Stores.Title.instance.set("Mensagens push");
 </script>
 
-{#if isLoading}
-  <Views.Loading
-    topPadding={$StatusBar.height}
-    bottomPadding={$StatusBar.bottomPadding}
-  />
-{:else}
-  <Views.Button
-    on:click={newPushNotification}
-    bottomPadding={$StatusBar.bottomPadding}
-    ><Fa icon={faRocket} /> <span>Enviar mensagem</span></Views.Button
-  >
-  <Views.Divider />
-  {#if items && (items?.length ?? 0) > 0}
-    <section>
-      {#each items as pushNotification (pushNotification?.createdAt)}
-        <article>
-          <h2>{pushNotification?.title}</h2>
-          <div>{pushNotification?.body}</div>
-          <div>Enviados: {pushNotification?.sends}</div>
-          <div>Falhas: {pushNotification?.fails}</div>
-          <div>Abertos: {pushNotification?.opens}</div>
-          <div>
-            {Utils.Strings.dateToDateString(pushNotification?.createdAt)}
-          </div>
-        </article>
-      {/each}
-      <Views.Divider />
-      {#if localLoading}
-        <Views.LocalLoading />
-      {/if}
-      {#if canGetMore}
-        <Views.Button on:click={getMore}>carregar mais</Views.Button>
-      {/if}
-    </section>
-  {:else}
-    <Views.CentredMessage
-      text="Não há mensagens para exibir por enquanto, Aproveite e mande uma mensagem com um cupom de desconto para incentivar seus clientes!"
-    />
-  {/if}
-{/if}
-
-<Views.MessageAlert object={errorAlert} bind:show={showAlert} />
+<Views.Button
+  on:click={newPushNotification}
+  bottomPadding={$StatusBar.bottomPadding}
+  ><Fa icon={faRocket} /> <span>Enviar mensagem</span></Views.Button
+>
+<Views.Divider />
+<Views.LoadMore
+  noItems="Não há mensagens para exibir por enquanto, Aproveite e mande uma mensagem com um cupom de desconto para incentivar seus clientes!"
+  cache={Stores.Cache.Types.PUSH_NOTIFICATIONS}
+  url="/vendor/pushNotifications"
+  let:item
+>
+  <article>
+    <h2>{item?.title}</h2>
+    <div>{item?.body}</div>
+    <div>Enviados: {item?.sends}</div>
+    <div>Falhas: {item?.fails}</div>
+    <div>Abertos: {item?.opens}</div>
+    <div>
+      {Utils.Strings.dateToDateString(item?.createdAt)}
+    </div>
+  </article></Views.LoadMore
+>
 
 <style>
-  section > article {
+  article {
     position: relative;
     border: 1px solid #ccc;
     border-radius: 4px;

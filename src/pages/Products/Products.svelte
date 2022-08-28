@@ -5,6 +5,7 @@
     all,
     deleteProduct,
     deleteCategory,
+    updateProduct,
   } from "../../network/Products";
   import { Views, Stores } from "@ikomida/components";
   import { faSearch, faEdit, faGift } from "@fortawesome/free-solid-svg-icons";
@@ -15,25 +16,17 @@
   let value = "";
   let oldValue;
   let error = false;
-  let isLoading = true;
+
   let items = [];
   let products = [];
-
-  let errorAlert;
-  let showAlert = false;
-
-  function toggleErrorAlert(messageObject) {
-    errorAlert = messageObject;
-    showAlert = true;
-  }
 
   $: if (value != oldValue) {
     error = false;
     if (value.length > 0) {
-      isLoading = true;
+      Stores.Loading.instance.start();
       search(value).then((result) => (items = result));
       oldValue = value;
-      isLoading = false;
+      Stores.Loading.instance.stop();
     } else {
       items = [];
       oldValue = "";
@@ -43,7 +36,9 @@
   Stores.Title.instance.set("Produtos");
   onMount(async () => {
     products = await all();
-    isLoading = false;
+    // order();
+    sortItems();
+    Stores.Loading.instance.stop();
   });
 
   function newProduct() {
@@ -76,23 +71,23 @@
   }
 
   async function removeProduct(item) {
-    isLoading = true;
+    Stores.Loading.instance.start();
     const response = await deleteProduct(item.id);
     if (!response?.success) {
-      toggleErrorAlert(response?.data);
+      Stores.MessageAlert.instance.show(response?.data);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   }
 
   async function removeCategory(id) {
-    isLoading = true;
+    Stores.Loading.instance.start();
     const response = await deleteCategory(id);
     if (!response?.success) {
-      toggleErrorAlert(response?.data);
+      Stores.MessageAlert.instance.show(response?.data);
       return;
     }
     products = await all();
-    isLoading = false;
+    Stores.Loading.instance.stop();
   }
 
   async function editCategory(item) {
@@ -105,6 +100,74 @@
   async function goToCoupons() {
     Stores.Navigation.instance.goTo(Routes.coupons);
   }
+  function sortItems() {
+    products = products
+      .map((category) => {
+        category.products = category.products.sort(
+          (i1, i2) => (i1?.order ?? 0) - (i2?.order ?? 0)
+        );
+        return category;
+      })
+      .sort((i1, i2) => (i1?.order ?? 0) - (i2?.order ?? 0));
+  }
+  async function itemUp(id, categoryId) {
+    const category = products?.filter(
+      (category) => category.id === categoryId
+    )?.[0];
+    const indexOfCategory = products?.indexOf(category);
+    const product = category?.products?.filter((item) => item.id === id)?.[0];
+    const indexOfProduct = category?.products?.indexOf(product);
+    const itemOrder = product?.order ?? indexOfProduct;
+    const beforItemOrder =
+      category?.products?.[indexOfProduct - 1]?.order ?? indexOfProduct - 1;
+    let objects = [];
+    objects.push({ id: product.id, order: itemOrder - 1 });
+    objects.push({
+      id: category?.products?.[indexOfProduct - 1]?.id,
+      order: beforItemOrder + 1,
+    });
+    const response = await updateProduct(objects);
+    if (response?.success) {
+      products[indexOfCategory].products[indexOfProduct - 1].order =
+        beforItemOrder + 1;
+      products[indexOfCategory].products[indexOfProduct].order = itemOrder - 1;
+      sortItems();
+    } else {
+      Stores.MessageAlert.instance.show(response?.data);
+    }
+  }
+  async function itemDown(id, categoryId) {
+    const category = products?.filter(
+      (category) => category.id === categoryId
+    )?.[0];
+    const indexOfCategory = products?.indexOf(category);
+    const product = category?.products?.filter((item) => item.id === id)?.[0];
+    const indexOfProduct = category?.products?.indexOf(product);
+    const itemOrder = product?.order ?? indexOfProduct;
+    const nextItemOrder =
+      category?.products?.[indexOfProduct + 1]?.order ?? indexOfProduct + 1;
+    let objects = [];
+    objects.push({ id: product.id, order: itemOrder + 1 });
+    objects.push({
+      id: category?.products?.[indexOfProduct + 1]?.id,
+      order: nextItemOrder - 1,
+    });
+    const response = await updateProduct(objects);
+    if (response?.success) {
+      products[indexOfCategory].products[indexOfProduct + 1].order =
+        nextItemOrder - 1;
+      products[indexOfCategory].products[indexOfProduct].order = itemOrder + 1;
+      sortItems();
+    } else {
+      Stores.MessageAlert.instance.show(response?.data);
+    }
+  }
+  async function categoryUp(id) {
+    console.log("categoryUp:", id);
+  }
+  async function categoryDown(id) {
+    console.log("categoryDown:", id);
+  }
 
   Stores.Menu.instance.addItem({
     name: "Cupons",
@@ -113,44 +176,39 @@
   });
 </script>
 
-{#if isLoading}
-  <Views.Loading
-    topPadding={$StatusBar.height}
-    bottomPadding={$StatusBar.bottomPadding}
+<Views.TextEdit
+  marginTop="0"
+  icon={faSearch}
+  bind:value
+  placeHolder="Buscar no cardápio"
+/>
+<Views.Divider />
+<Views.Button on:click={newProduct} bottomPadding={$StatusBar.bottomPadding}
+  ><Fa icon={faEdit} /> <span>Novo produto</span></Views.Button
+>
+<Views.Button on:click={newCategory} bottomPadding={$StatusBar.bottomPadding}
+  ><Fa icon={faEdit} /> <span>Nova categoria</span></Views.Button
+>
+<Views.Divider />
+{#if (items.length > 0 || value) && !error}
+  <Views.ItemsList {items} productPage={Routes.product} {removeProduct} />
+{:else if error}
+  <h2>Nenhum produto foi encontrado</h2>
+  <h3>Tente usar outro termo para pequisar</h3>
+{:else if products.length > 0}
+  <Views.ItemsList
+    {itemUp}
+    {itemDown}
+    {categoryUp}
+    {categoryDown}
+    {removeCategory}
+    {editCategory}
+    items={products}
+    productPage={Routes.product}
+    {removeProduct}
   />
 {:else}
-  <Views.TextEdit
-    marginTop="0"
-    icon={faSearch}
-    bind:value
-    placeHolder="Buscar no cardápio"
-  />
-  <Views.Divider />
-  <Views.Button on:click={newProduct} bottomPadding={$StatusBar.bottomPadding}
-    ><Fa icon={faEdit} /> <span>Novo produto</span></Views.Button
-  >
-  <Views.Button on:click={newCategory} bottomPadding={$StatusBar.bottomPadding}
-    ><Fa icon={faEdit} /> <span>Nova categoria</span></Views.Button
-  >
-  <Views.Divider />
-  {#if (items.length > 0 || value) && !error}
-    <Views.ItemsList {items} productPage={Routes.product} {removeProduct} />
-  {:else if error}
-    <h2>Nenhum produto foi encontrado</h2>
-    <h3>Tente usar outro termo para pequisar</h3>
-  {:else if products.length > 0}
-    <Views.ItemsList
-      {removeCategory}
-      {editCategory}
-      items={products}
-      productPage={Routes.product}
-      {removeProduct}
-    />
-  {:else}
-    <Views.CentredMessage text="Nenhum produto foi encontrad">
-      <h3>Tente usar outro termo para pequisar ou cadastre novos produtos</h3>
-    </Views.CentredMessage>
-  {/if}
+  <Views.CentredMessage text="Nenhum produto foi encontrad">
+    <h3>Tente usar outro termo para pequisar ou cadastre novos produtos</h3>
+  </Views.CentredMessage>
 {/if}
-
-<Views.MessageAlert object={errorAlert} bind:show={showAlert} />

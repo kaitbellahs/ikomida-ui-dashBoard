@@ -4,6 +4,12 @@
   import { countUsers } from "../../network/User";
   import { countCoupons } from "../../network/Payment";
   import { Views, Stores } from "@ikomida/components";
+  import { onMount, tick } from "svelte";
+
+  onMount(async () => {
+    await tick();
+    Stores.Loading.instance.stop();
+  });
   Stores.Title.instance.set("iKomida - Dashboard");
 </script>
 

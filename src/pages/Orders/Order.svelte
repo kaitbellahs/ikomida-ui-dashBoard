@@ -1,6 +1,6 @@
 <script>
   import { Share } from "@capacitor/share";
-  import { onMount } from "svelte";
+  import { onMount, tick } from "svelte";
   import html2canvas from "html2canvas";
   import { Views, Utils, Types, Logics, Stores } from "@ikomida/components";
   import { faShare } from "@fortawesome/free-solid-svg-icons";
@@ -8,16 +8,21 @@
   import Routes from "../../stores/Routes";
   import { OrderStatus, ChangeOrderStatus } from "../../network/Orders";
   import { getOrder } from "../../network/Products";
-  import { StatusBar } from "../../stores/Setup";
   import { Settings } from "../../stores/Setup";
   import { getSettings } from "../../network/Settings";
 
   const router = Stores.Navigation.instance.router;
   const order = $router.options;
-  let isLoading = true;
-  let screenShot = false;
+
+  let screenShot = true;
   let showImage = true;
   let orderScreen;
+  let showCardBrand = false;
+
+  $: total =
+    Number(order?.subtotal ?? 0) +
+    Number(order?.delivery ?? 0) -
+    Number(order?.discount ?? 0);
 
   const nextButtonText = (order) => {
     switch (order?.status) {
@@ -37,22 +42,22 @@
   };
 
   async function cancel() {
-    isLoading = true;
+    Stores.Loading.instance.start();
     const response = await ChangeOrderStatus(
       order?.id,
       Types.OrderStatusType.CANCELED
     );
     if (response?.success) {
       order.status = Types.OrderStatusType.CANCELED;
-      toggleErrorAlert("O pedido foi atualizado com sucesso!");
+      Stores.MessageAlert.instance.show("O pedido foi atualizado com sucesso!");
     } else {
-      toggleErrorAlert(response?.data);
+      Stores.MessageAlert.instance.show(response?.data);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   }
 
   async function next() {
-    isLoading = true;
+    Stores.Loading.instance.start();
     let newStatus =
       Types.OrderStatusType.keys[
         Types.OrderStatusType.keys.indexOf(order?.status) + 1
@@ -60,48 +65,32 @@
     const response = await ChangeOrderStatus(order?.id, newStatus);
     if (response?.success) {
       order.status = newStatus;
-      toggleErrorAlert("O pedido foi atualizado com sucesso!");
+      Stores.MessageAlert.instance.show("O pedido foi atualizado com sucesso!");
     } else {
-      toggleErrorAlert(response?.data);
+      Stores.MessageAlert.instance.show(response?.data);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   }
-
-  let errorAlert;
-  let showAlert = false;
-  let showCardBrand = false;
-  $: total =
-    Number(order?.subtotal ?? 0) +
-    Number(order?.delivery ?? 0) -
-    Number(order?.discount ?? 0);
 
   function hideCardBrand() {
     showCardBrand = false;
   }
 
-  function toggleErrorAlert(messageObject) {
-    errorAlert = messageObject;
-    showAlert = true;
-  }
-
   async function goToProduct(id) {
-    isLoading = true;
+    Stores.Loading.instance.start();
     const response = await getOrder(id);
     if (response?.success) {
       const product = response?.data;
       Stores.Navigation.instance?.goTo(Routes.product, product);
     } else {
-      toggleErrorAlert(response?.data);
+      Stores.MessageAlert.instance.show(response?.data);
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   }
   async function share() {
-    isLoading = true;
+    Stores.Loading.instance.start();
     screenShot = true;
-    async function sleep(ms) {
-      return new Promise((resolve) => setTimeout(resolve, ms));
-    }
-    await sleep(3);
+    await tick();
     const canvas = await html2canvas(orderScreen, {
       logging: false,
       backgroundColor: "#fff",
@@ -109,7 +98,7 @@
       useCORS: true,
     });
     screenShot = false;
-    isLoading = false;
+    Stores.Loading.instance.stop();
     const data = canvas.toDataURL("image/jpeg", 1.0).split(",");
     const screenShotFile = await Filesystem.writeFile({
       path: `screenshots/order-${order?.customID}.jpg`,
@@ -135,12 +124,12 @@
     }
     if (!("profile" in $Settings) || !$Settings?.profile) {
       const response = await getSettings();
-      if (response) {
-        $Settings.profile = response?.profile;
+      if (response?.success) {
+        $Settings.profile = response?.data?.profile;
         Settings.set($Settings);
       }
     }
-    isLoading = false;
+    Stores.Loading.instance.stop();
   });
   function erroLoadImage(event) {
     showImage = false;
@@ -148,20 +137,23 @@
   Stores.Title.instance.set("Detalhes do predido");
 </script>
 
-<div class="order {screenShot ? 'screenShot' : ''}" bind:this={orderScreen}>
+<div
+  class="order screenShot {screenShot ? 'screenShot' : ''}"
+  bind:this={orderScreen}
+>
   <div class="avatar {screenShot ? 'screenShot' : ''}">
     {#if $Settings?.profile?.mainPicture && showImage}
       <img
         on:error={erroLoadImage}
         src={$Settings?.profile?.mainPicture ??
-          "Assets/icons/transparent-logo-1.svg"}
-        alt={$Settings?.profile?.restaurantName ?? "iKomida"}
+          "assets/icons/transparent-logo-1.svg"}
+        alt={$Settings?.profile?.contractName ?? "iKomida"}
       />
-    {:else if $Settings?.profile?.restaurantName}
-      <h1>{$Settings?.profile?.restaurantName}</h1>
+    {:else if $Settings?.profile?.contractName}
+      <h1>{$Settings?.profile?.contractName}</h1>
     {:else}
-      <img src="Assets/icons/transparent-logo-1_144x45.png" alt="iKomida" />
-      <h2>{$Settings?.profile?.restaurantName}</h2>
+      <img src="assets/icons/transparent-logo-1_144x45.png" alt="iKomida" />
+      <h2>{$Settings?.profile?.contractName}</h2>
     {/if}
     <Views.Divider height="30" />
   </div>
@@ -209,7 +201,7 @@
     >Data: {Utils.Strings.timestampToString(order?.createdAt)}</span
   >
   <Views.Divider />
-  <h3>Itens a entregar</h3>
+  <h3>Itens do pedido</h3>
   {#each order?.products as { id, title, price, quantity, discount, discountType }, index (id)}
     <div class="product" on:click={goToProduct(id)}>
       <span class="quantity">{quantity}</span><span class="title">{title}</span
@@ -268,7 +260,7 @@
         {#if showCardBrand}
           <img
             on:error={hideCardBrand}
-            style="object-fit: cover;"
+            style="object-fit: contain;"
             src="/assets/cardBrand/{order?.payment.brand}.svg"
             alt={order?.payment.brand}
           />
@@ -341,16 +333,14 @@
   </div>
 </div>
 <Views.GTerms />
-<Views.MessageAlert object={errorAlert} bind:show={showAlert} />
 
-{#if isLoading}
+<!-- {#if isLoading}
   <Views.Loading
     opacity="0.99"
     topPadding={$StatusBar.height}
     bottomPadding={$StatusBar.bottomPadding}
   />
-{/if}
-
+{/if} -->
 <style>
   .order {
     display: flex;
@@ -489,12 +479,12 @@
   .avatar > img {
     font-size: 3em;
     width: 100%;
-    max-width: 100%;
-    border-radius: 45px;
+    max-width: 500px;
+    border-radius: 40px;
+    height: 210px;
     line-height: 90px;
-    vertical-align: middle;
-    display: table-cell;
     overflow: hidden;
+    object-fit: contain;
   }
   .signature {
     display: none;

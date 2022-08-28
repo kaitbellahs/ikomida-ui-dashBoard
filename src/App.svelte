@@ -187,6 +187,11 @@
     buttons={notificationPopup?.buttons}
   />
 {/if}
+<Views.Loading
+  topPadding={$_StatusBar.height}
+  bottomPadding={$_StatusBar.bottomPadding}
+/>
+<Views.MessageAlert />
 
 <style>
   :global(.grecaptcha-badge) {

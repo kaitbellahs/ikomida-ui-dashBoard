@@ -11,7 +11,7 @@
     "build": "rollup -c --environment ENV:prod",
     "dev": "rollup -c -w",
     "prod": "rollup -c -w --environment ENV:prod",
-    "start": "sirv public --no-clear",
+    "start": "sirv App --no-clear",
     "build:android": "run-s build cap-run:android",
     "build:ios": "run-s build:app cap-run:ios",
     "cap-run:android": "cap sync android && cap open android",
