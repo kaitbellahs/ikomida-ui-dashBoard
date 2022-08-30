@@ -1,7 +1,6 @@
 <script>
   import { Views, Utils, Stores } from "@ikomida/components";
   import { onMount } from "svelte";
-  import { StatusBar } from "../../stores/Setup";
   import { updatePassword, logout } from "../../network/Auth";
 
   let userInfo;
@@ -17,8 +16,6 @@
     newPass: false,
     reNewPass: false,
   };
-  let errorAlert;
-  let showAlert = false;
 
   $: if (userInfo?.avatar) {
     // update()

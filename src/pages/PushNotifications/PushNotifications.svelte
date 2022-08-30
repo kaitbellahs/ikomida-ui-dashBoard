@@ -1,9 +1,8 @@
 <script>
   import Routes from "../../stores/Routes";
   import Fa from "svelte-fa";
-  import { faSync, faRocket } from "@fortawesome/free-solid-svg-icons";
+  import { faRocket } from "@fortawesome/free-solid-svg-icons";
   import { Views, Utils, Stores } from "@ikomida/components";
-  import { getPushNotifications } from "../../network/PushNotification";
   import { StatusBar } from "../../stores/Setup";
   import { onMount } from "svelte";
 
@@ -24,7 +23,7 @@
   ><Fa icon={faRocket} /> <span>Enviar mensagem</span></Views.Button
 >
 <Views.Divider />
-<Views.LoadMore
+<Views.LoadMoreReusableList
   noItems="Não há mensagens para exibir por enquanto, Aproveite e mande uma mensagem com um cupom de desconto para incentivar seus clientes!"
   cache={Stores.Cache.Types.PUSH_NOTIFICATIONS}
   url="/vendor/pushNotifications"
@@ -39,8 +38,8 @@
     <div>
       {Utils.Strings.dateToDateString(item?.createdAt)}
     </div>
-  </article></Views.LoadMore
->
+  </article>
+</Views.LoadMoreReusableList>
 
 <style>
   article {

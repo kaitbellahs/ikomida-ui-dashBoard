@@ -113,7 +113,7 @@
   $: route = $router.route;
 
   onMount(async () => {
-    userInfo = await Utils.Jws.extractToken(Stores.Auth.instance.data());
+    userInfo = await Utils.Jws.extractToken(await Stores.Auth.instance.data());
   });
 
   $: if (menuHamburgerItems) {

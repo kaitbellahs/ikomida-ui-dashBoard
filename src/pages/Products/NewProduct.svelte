@@ -16,11 +16,8 @@
 
   let categoriesOptions = [];
   let firstLaunch = true;
-  let errorAlert;
-  let showAlert = false;
   let selectedDiscountType;
   let oldSelectedDiscountType = null;
-
   let itemsValidation = {
     title: false,
     description: false,

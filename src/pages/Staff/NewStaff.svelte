@@ -1,5 +1,4 @@
 <script>
-  import Routes from "../../stores/Routes";
   import Fa from "svelte-fa";
   import { faEdit, faSearch } from "@fortawesome/free-solid-svg-icons";
   import { StatusBar } from "../../stores/Setup";
@@ -40,7 +39,6 @@
       stat: null,
     },
   };
-  $: canProceed = Utils.Objects.validateFields(itemsValidation);
   let itemsValidation = {
     name: false,
     lastName: false,
@@ -56,10 +54,7 @@
       stat: false,
     },
   };
-
   let currentPostalCode = null;
-  let errorAlert;
-  let showAlert = false;
 
   $: if (
     (items?.address?.postalCode?.length ?? 0) === 8 &&
@@ -67,6 +62,7 @@
   ) {
     findAddress();
   }
+  $: canProceed = Utils.Objects.validateFields(itemsValidation);
 
   function findAddress() {
     Stores.Loading.instance.start();
@@ -87,6 +83,7 @@
         Stores.MessageAlert.instance.show(exception);
       });
   }
+
   const submit = async () => {
     if (!Utils.Objects.validateFields(itemsValidation)) {
       Stores.MessageAlert.instance.show(
@@ -103,9 +100,11 @@
     }
     Stores.Loading.instance.stop();
   };
+
   onMount(() => {
     Stores.Loading.instance.stop();
   });
+
   Stores.Title.instance.set("Novo colaborador");
 </script>
 

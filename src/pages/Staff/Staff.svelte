@@ -1,37 +1,17 @@
 <script>
   import Routes from "../../stores/Routes";
-  import { getStaff, removeStaff } from "../../network/Staff";
+  import { removeStaff } from "../../network/Staff";
   import { Views, Utils, Stores } from "@ikomida/components";
   import { StatusBar } from "../../stores/Setup";
   import { onMount } from "svelte";
   import Fa from "svelte-fa";
-  import { faEdit, faSync } from "@fortawesome/free-solid-svg-icons";
-  let items;
+  import { faEdit } from "@fortawesome/free-solid-svg-icons";
+
   let userInfo;
-  let localLoading = false;
-  let canGetMore = true;
   let auth;
-
-  async function getMore(e, refresh = false) {
-    localLoading = true;
-    [canGetMore, items] = await getStaff(refresh);
-    localLoading = false;
-  }
-
-  async function refresh() {
-    Stores.Loading.instance.start();
-    await getMore(null, true);
-    Stores.Loading.instance.stop();
-  }
 
   onMount(async () => {
     auth = await Stores.Auth.instance.store();
-    Stores.Menu.instance.addItem({
-      name: "Atualizar",
-      icon: faSync,
-      callback: refresh,
-    });
-    [canGetMore, items] = await getStaff();
     userInfo = await Utils.Jws.extractToken($auth);
     Stores.Loading.instance.stop();
   });
@@ -40,7 +20,7 @@
     Stores.Loading.instance.start();
     let response = await removeStaff(id);
     if (response.success) {
-      await getMore(null, true);
+      Stores.LoadMore.instance.refresh();
     } else {
       Stores.MessageAlert.instance.show(response?.data);
       Stores.Loading.instance.stop();
@@ -66,52 +46,28 @@
   Stores.Title.instance.set("Lista de colaboradores");
 </script>
 
-{#if !items}
-  <Views.Loading
-    topPadding={$StatusBar.height}
-    bottomPadding={$StatusBar.bottomPadding}
-  />
-{:else}
-  <Views.Button on:click={newStaff} bottomPadding={$StatusBar.bottomPadding}
-    ><Fa icon={faEdit} /> <span>Novo colaborador</span></Views.Button
-  >
-  <Views.Divider />
-  {#if items.length > 0}
-    <section>
-      {#each items as staff (staff?.id)}
-        <article>
-          {#if userInfo?.id !== staff?.id}
-            <Views.FloatRemove callback={() => onRemoveClick(staff?.id)} />
-          {/if}
-          <h2>{staff?.name} {staff?.lastName}</h2>
-          <div>Telefone: {Utils?.Strings?.formatAsPhone(staff?.phone)}</div>
-          <div>Título: {roleName(staff?.role)}</div>
-        </article>
-      {/each}
-      <Views.Divider />
-      {#if localLoading}
-        <Views.LocalLoading />
-      {/if}
-      {#if canGetMore}
-        <Views.Button on:click={getMore}>carregar mais</Views.Button>
-      {/if}
-    </section>
-  {:else}
-    <Views.CentredMessage
-      text="Não há colaboradores cadastrados para exibir!"
-    />
-  {/if}
-{/if}
-
-{#if isLoading || !items}
-  <Views.Loading
-    topPadding={$StatusBar.height}
-    bottomPadding={$StatusBar.bottomPadding}
-  />
-{/if}
+<Views.Button on:click={newStaff} bottomPadding={$StatusBar.bottomPadding}
+  ><Fa icon={faEdit} /> <span>Novo colaborador</span></Views.Button
+>
+<Views.Divider />
+<Views.LoadMoreReusableList
+  noItems="Não há colaboradores cadastrados para exibir!"
+  cache={Stores.Cache.Types.STAFF}
+  url="/vendor/staff"
+  let:item
+>
+  <article>
+    {#if userInfo?.id !== item?.id}
+      <Views.FloatRemove callback={() => onRemoveClick(item?.id)} />
+    {/if}
+    <h2>{item?.name} {item?.lastName}</h2>
+    <div>Telefone: {Utils?.Strings?.formatAsPhone(item?.phone)}</div>
+    <div>Título: {roleName(item?.role)}</div>
+  </article>
+</Views.LoadMoreReusableList>
 
 <style>
-  section > article {
+  article {
     position: relative;
     border: 1px solid #ccc;
     border-radius: 4px;

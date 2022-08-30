@@ -31,10 +31,6 @@ export async function newCoupon(object) {
     return response
 }
 
-export async function getCoupons(refresh = false) {
-    return await Network.instance.loadMore(Stores.Cache.Types.COUPONS, '/coupons', true, refresh)
-}
-
 export async function countCoupons() {
     let response = await Network.instance.get("/couponsCount", true);
     if (response?.success) {

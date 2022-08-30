@@ -4,11 +4,6 @@ import {
     Stores,
 } from "@ikomida/components";
 
-
-export async function getOrders(refresh = false) {
-    return await Network.instance.loadMore(Stores.Cache.Types.ORDERS, '/orders', true, refresh)
-}
-
 export async function ChangeOrderStatus(id, status) {
     let response = await Network.instance.put("/order", true, {
         id,

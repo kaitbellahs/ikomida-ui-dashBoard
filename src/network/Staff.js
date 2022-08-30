@@ -3,11 +3,6 @@ import {
     Stores,
 } from "@ikomida/components";
 
-
-export async function getStaff(refresh = false) {
-    return await Network.instance.loadMore(Stores.Cache.Types.STAFF, '/vendor/staff', true, refresh)
-}
-
 export async function addStaff(object) {
     const response = await Network.instance.post("/vendor/staff", true, object);
     if (response?.success) {

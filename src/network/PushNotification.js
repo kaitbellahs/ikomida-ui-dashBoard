@@ -7,9 +7,6 @@ import {
 export async function registerPushNotificationToken(object) {
     return Network.instance.post("/notification/register", true, object);
 }
-export async function getPushNotifications(refresh = false) {
-    return await Network.instance.loadMore(Stores.Cache.Types.PUSH_NOTIFICATIONS, '/vendor/pushNotifications', true, refresh)
-}
 
 export async function newPushNotification(object) {
     const response = await Network.instance.post("/vendor/pushNotification", true, object);

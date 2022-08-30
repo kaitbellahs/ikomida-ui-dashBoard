@@ -66,10 +66,11 @@
   Stores.Title.instance.set("Pedidos");
 </script>
 
-<Views.LoadMore
+<Views.LoadMoreReusableList
   noItems="Não há pedido para exibir por enquanto, aproveite e divulgue seu app para seus clientes, e se precisar de ajuda para fazer suas campanhas de propaganda nos dê um toque pra gente, que vamos te ajudar a turbinar suas vendas!"
   cache={Stores.Cache.Types.ORDERS}
   url="/orders"
+  hasRecaptcha={true}
   let:item
 >
   <div class="leftShadow orderContainer">
@@ -166,9 +167,8 @@
         {/if}
       </div>
     {/if}
-  </div></Views.LoadMore
+  </div></Views.LoadMoreReusableList
 >
-<Views.GTerms />
 
 <!-- <Views.Link url="https://ikomida.com/contact"
       >Solicite seu orçamento agora!</Views.Link

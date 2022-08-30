@@ -18,6 +18,7 @@ Stores.Menu.createInstance()
 Stores.Title.createInstance()
 Stores.PushNotificationToken.createInstance()
 Stores.Navigation.createInstance(Routes);
+Stores.LoadMore.createInstance();
 
 const app = new App({
     target: document.body

@@ -3,7 +3,7 @@
   import Fa from "svelte-fa";
   import { faEdit } from "@fortawesome/free-solid-svg-icons";
   import { Views, Utils, Stores } from "@ikomida/components";
-  import { getCoupons, deleteCoupon } from "../../network/Payment";
+  import { deleteCoupon } from "../../network/Payment";
   import { StatusBar } from "../../stores/Setup";
   import { onMount } from "svelte";
 
@@ -19,7 +19,7 @@
     Stores.Loading.instance.start();
     const response = await deleteCoupon(id);
     if (response?.success) {
-      await getMore(null, true);
+      Stores.LoadMore.instance.refresh();
     } else {
       Stores.MessageAlert.instance.show(response?.data);
     }
@@ -33,7 +33,7 @@
   ><Fa icon={faEdit} /> <span>Novo cupom</span></Views.Button
 >
 <Views.Divider />
-<Views.LoadMore
+<Views.LoadMoreReusableList
   noItems="Não há cupons para exibir por enquanto, aproveite e cadastre novos cupons para agradar seus clientes!"
   cache={Stores.Cache.Types.COUPONS}
   url="/coupons"
@@ -45,7 +45,7 @@
     <div>{Utils.Strings.currency(item?.value)}</div>
     <div>{Utils.Strings.dateToDateString(item?.validity)}</div>
   </article>
-</Views.LoadMore>
+</Views.LoadMoreReusableList>
 
 <style>
   article {
