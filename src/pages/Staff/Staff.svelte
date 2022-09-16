@@ -1,17 +1,17 @@
 <script>
-  import Routes from "../../stores/Routes";
-  import { removeStaff } from "../../network/Staff";
-  import { Views, Utils, Stores } from "@ikomida/components";
-  import { StatusBar } from "../../stores/Setup";
-  import { onMount } from "svelte";
-  import Fa from "svelte-fa";
-  import { faEdit } from "@fortawesome/free-solid-svg-icons";
+  import Routes from '../../stores/Routes';
+  import { removeStaff } from '../../network/Staff';
+  import { Views, Utils, Stores } from '@ikomida/shared-frontend';
+  import { StatusBar } from '../../stores/Setup';
+  import { onMount } from 'svelte';
+  import Fa from 'svelte-fa';
+  import { faEdit } from '@fortawesome/free-solid-svg-icons';
 
   let userInfo;
   let auth;
 
   onMount(async () => {
-    auth = await Stores.Auth.instance.store();
+    auth = await Stores.Auth.Auth.instance.store();
     userInfo = await Utils.Jws.extractToken($auth);
     Stores.Loading.instance.stop();
   });
@@ -35,15 +35,15 @@
 
   function roleName(role) {
     switch (role.toLowerCase()) {
-      case "vendor":
-        return "Responsável";
-      case "staff":
-        return "Colaborador";
+      case 'VENDOR':
+        return 'Responsável';
+      case 'STAFF':
+        return 'Colaborador';
       default:
-        return "-";
+        return '-';
     }
   }
-  Stores.Title.instance.set("Lista de colaboradores");
+  Stores.Title.instance.set('Lista de colaboradores');
 </script>
 
 <Views.Button on:click={newStaff} bottomPadding={$StatusBar.bottomPadding}

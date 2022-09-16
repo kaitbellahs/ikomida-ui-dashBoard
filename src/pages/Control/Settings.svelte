@@ -1,5 +1,5 @@
-<script>
-  import { Views, Utils, Logics, Stores } from "@ikomida/components";
+<script lang="ts">
+  import { Views, Utils, Logics, Stores, Types } from '@ikomida/shared-frontend';
   import {
     getSettings,
     updatePaymentGateway,
@@ -7,39 +7,39 @@
     setDelivery,
     getPagSeguroUrl,
     revokePaymentGateway,
-  } from "../../network/Settings";
-  import { StatusBar, Settings } from "../../stores/Setup";
-  import Fa from "svelte-fa";
-  import { faClock, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
-  import { AppLauncher } from "@capacitor/app-launcher";
-  import { Clipboard } from "@capacitor/clipboard";
-  import { onMount } from "svelte";
-  import { v4 as uuid } from "uuid";
+  } from '../../network/Settings';
+  import { Settings } from '../../stores/Setup';
+  import Fa from 'svelte-fa';
+  import { faClock, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+  import { AppLauncher } from '@capacitor/app-launcher';
+  import { Clipboard } from '@capacitor/clipboard';
+  import { onMount } from 'svelte';
+  import { v4 as uuid } from 'uuid';
 
-  let paymentGateway = { type: null, data: null };
-  let delivery = { value: 0, min: 0, free: false };
-  let deliveryInputs = { value: null, min: null };
-  let preparation = { min: 0, max: 0 };
-  let preparationInputs = { min: null, max: null };
+  let paymentGateway: any = { type: null, data: null };
+  let delivery = new Types.Interfaces.IVendorDelivery(false, 0, 0);
+  let deliveryInputs: { min?: Views.TextEdit; value?: Views.TextEdit } = { value: undefined, min: undefined };
+  let preparation = new Types.Interfaces.IVendorPreparation(0, 0);
+  let preparationInputs: { min?: Views.TextEdit; max?: Views.TextEdit } = { min: undefined, max: undefined };
   let popupNewOrder = $Settings?.popups?.newOrder;
-  let userInfo;
-  let auth;
+  let userInfo: Types.Interfaces.IUser;
+  let auth: Stores.Auth.IStore;
   const router = Stores.Navigation.instance.router;
 
   const days = [
-    { name: "Domingo", checked: false },
-    { name: "Segunda-feira", checked: false },
-    { name: "Terça-feira", checked: false },
-    { name: "Quarta-feira", checked: false },
-    { name: "Quinta-feira", checked: false },
-    { name: "Sexta-feira", checked: false },
-    { name: "Sabado", checked: false },
+    { name: 'Domingo', checked: false },
+    { name: 'Segunda-feira', checked: false },
+    { name: 'Terça-feira', checked: false },
+    { name: 'Quarta-feira', checked: false },
+    { name: 'Quinta-feira', checked: false },
+    { name: 'Sexta-feira', checked: false },
+    { name: 'Sabado', checked: false },
   ];
 
-  let business = {
+  let business: Types.Interfaces.IBusinessTime = Types.Interfaces.IBusinessTime.fromObject({
     days: [],
     hours: [],
-  };
+  });
 
   let integratePagSeguro = { callback: false, url: null };
 
@@ -60,17 +60,15 @@
     if (integratePagSeguro?.url) {
       Stores.Loading.instance.start();
       const url = new URL(integratePagSeguro?.url);
-      const code = url.searchParams.get("code");
-      const state = url.searchParams.get("state");
+      const code = url.searchParams.get('code');
+      const state = url.searchParams.get('state');
       const payload = { code, state };
       updatePaymentGateway(payload).then((response) => {
         if (!response?.success) {
           Stores.MessageAlert.instance.show(response?.data);
         } else {
-          paymentGateway = { ...paymentGateway, ...response?.data };
-          Stores.MessageAlert.instance.show(
-            `${response?.data?.type} foi integrado com sucesso`
-          );
+          paymentGateway = { ...paymentGateway, ...(response?.data as any) };
+          Stores.MessageAlert.instance.show(`${(response?.data as any)?.type} foi integrado com sucesso`);
         }
         Stores.Loading.instance.stop();
       });
@@ -78,28 +76,26 @@
   }
 
   $: integrateButtonName = paymentGateway?.type
-    ? "Cancelar a integgração com pagseguro"
-    : "Integrar sua conta pagseguro";
+    ? 'Cancelar a integgração com pagseguro'
+    : 'Integrar sua conta pagseguro';
 
   const addHours = () => {
     if (!business?.hours) {
       business.hours = [];
     }
-    business.hours.push({ id: uuid(), start: "08:00", end: "23:59" });
+    business.hours.push(new Types.Interfaces.IBusinessTimeHours({ id: uuid(), start: '08:00', end: '23:59' }));
     business.hours = business.hours;
   };
 
-  function onRemoveClick(id) {
-    business.hours = business?.hours?.filter(
-      (businessHour) => businessHour.id !== id
-    );
+  function onRemoveClick(id?: string) {
+    business.hours = business?.hours?.filter((businessHour) => businessHour.id !== id);
   }
 
-  function validateTime(timeString) {
-    if (timeString.length === 4 && !timeString?.includes(":")) {
-      timeString = timeString.slice(0, 2) + ":" + timeString.slice(2);
+  function validateTime(timeString?: string) {
+    if (timeString && timeString.length === 4 && !timeString?.includes(':')) {
+      timeString = timeString.slice(0, 2) + ':' + timeString.slice(2);
     }
-    const timeArray = timeString?.split(":") ?? [];
+    const timeArray = timeString?.split(':') ?? [];
     if ((timeArray?.length ?? 0) !== 2) {
       return false;
     }
@@ -116,23 +112,21 @@
 
   async function updateHours() {
     Stores.Loading.instance.start();
-    if (business.hours === null || business.hours.length < 1) {
-      Stores.MessageAlert.instance.show(
-        "Precisa escolher pelo menos um horário de funcionamento!"
-      );
+    if (business.hours === null || (business?.hours?.length ?? 0) < 1) {
+      Stores.MessageAlert.instance.show('Precisa escolher pelo menos um horário de funcionamento!');
       Stores.Loading.instance.stop();
       return;
     }
-    for (const businessHour of business?.hours) {
+    for (const businessHour of business?.hours ?? []) {
       if (!validateTime(businessHour?.start)) {
         Stores.MessageAlert.instance.show(
-          "O horário de abertura é inválida, o formato deve ser HH:mm e entre 00:00 e 23:59!"
+          'O horário de abertura é inválida, o formato deve ser HH:mm e entre 00:00 e 23:59!',
         );
         Stores.Loading.instance.stop();
         return;
       } else if (!validateTime(businessHour?.end)) {
         Stores.MessageAlert.instance.show(
-          "O horário de fechamento é inválida, o formato deve ser HH:mm e entre 00:00 e 23:59!"
+          'O horário de fechamento é inválida, o formato deve ser HH:mm e entre 00:00 e 23:59!',
         );
         Stores.Loading.instance.stop();
         return;
@@ -145,17 +139,13 @@
       }
     }
     if (business.days === null || business.days.length < 1) {
-      Stores.MessageAlert.instance.show(
-        "Precisa escolher pelo menos um dia de funcionamento!"
-      );
+      Stores.MessageAlert.instance.show('Precisa escolher pelo menos um dia de funcionamento!');
       Stores.Loading.instance.stop();
       return;
     }
     let response = await updateBusinessHours(business);
-    if (response.success) {
-      Stores.MessageAlert.instance.show(
-        "O horário de funcionamento atualizado com sucesso!"
-      );
+    if (response?.success) {
+      Stores.MessageAlert.instance.show('O horário de funcionamento atualizado com sucesso!');
     } else {
       Stores.MessageAlert.instance.show(response?.data);
       Stores.Loading.instance.stop();
@@ -179,21 +169,17 @@
       const response = await revokePaymentGateway();
       if (response?.success) {
         Stores.MessageAlert.instance.show(
-          `A integração dos nossos nossos sistemas com o pagseguro foi revogado com sucesso!`
+          `A integração dos nossos nossos sistemas com o pagseguro foi revogado com sucesso!`,
         );
       } else {
-        Stores.MessageAlert.instance.show(
-          `Não foi possível revogar a integração, tente novamente mais tarde!`
-        );
+        Stores.MessageAlert.instance.show(`Não foi possível revogar a integração, tente novamente mais tarde!`);
       }
     } else {
       const response = await getPagSeguroUrl();
       if (response?.success) {
-        const url = response?.data?.url;
+        const url = (response?.data as any)?.url;
         if (!url) {
-          Stores.MessageAlert.instance.show(
-            `Não foi possível obter a url de integração, tente novamente mais tarde!`
-          );
+          Stores.MessageAlert.instance.show(`Não foi possível obter a url de integração, tente novamente mais tarde!`);
           return;
         }
         const { value } = await AppLauncher.canOpenUrl({ url });
@@ -203,7 +189,7 @@
           await AppLauncher.openUrl({ url });
           await Clipboard.write({ string: url });
           Stores.MessageAlert.instance.show(
-            `Se o navegador externo no for aberto automaticamente, por favor o abra e digita esa URL: ${url}, que também foi copiado para sua área de transferência!`
+            `Se o navegador externo no for aberto automaticamente, por favor o abra e digita esa URL: ${url}, que também foi copiado para sua área de transferência!`,
           );
         }
       }
@@ -213,29 +199,29 @@
   }
 
   onMount(async () => {
-    auth = await Stores.Auth.instance.store();
+    auth = await Stores.Auth.Auth.instance.store();
     userInfo = await Utils.Jws.extractToken($auth);
     const response = await getSettings();
-    const data = response?.data;
+    const data = response?.data as Types.Interfaces.IVendorSettings;
     if (response?.success) {
       paymentGateway = { ...paymentGateway, ...data?.paymentGateway };
-      business = { ...business, ...data?.business };
+      business = Object.assign(business, data?.business);
       for (const index of business?.days || []) {
         days[index].checked = true;
       }
-      delivery = { ...delivery, ...data?.delivery };
-      deliveryInputs?.min?.updateValue(delivery?.min);
-      deliveryInputs?.value?.updateValue(delivery?.value);
-      preparation = { ...preparation, ...data?.preparation };
-      preparationInputs?.min?.updateValue(preparation?.min);
-      preparationInputs?.max?.updateValue(preparation?.max);
+      delivery = Object.assign(delivery, data?.delivery);
+      deliveryInputs?.min?.updateValue(String(delivery?.min));
+      deliveryInputs?.value?.updateValue(String(delivery?.value));
+      preparation = Object.assign(preparation, data?.preparation);
+      preparationInputs?.min?.updateValue(String(preparation?.min));
+      preparationInputs?.max?.updateValue(String(preparation?.max));
     } else {
       Stores.MessageAlert.instance.show(data);
     }
     Stores.Loading.instance.stop();
   });
 
-  Stores.Title.instance.set("Seus ajustes");
+  Stores.Title.instance.set('Seus ajustes');
 </script>
 
 <div class="settings">
@@ -244,9 +230,7 @@
     {#if (business?.hours?.length ?? 0) > 0}
       {#each business?.hours ?? [] as businessHour}
         <div class="busninessHours">
-          <span on:click={onRemoveClick(businessHour.id)} class="remove"
-            ><Fa icon={faTrashAlt} /></span
-          >
+          <span on:click={() => onRemoveClick(businessHour.id)} class="remove"><Fa icon={faTrashAlt} /></span>
           <div class="twoCells">
             <Views.TextEdit
               placeHolder="Abertura"
@@ -254,7 +238,7 @@
               initialValue={businessHour.start}
               bind:value={businessHour.start}
               type="number"
-              rightPadding="10px"
+              rightPadding={10}
             />
             <Views.TextEdit
               placeHolder="Fechamento"
@@ -262,7 +246,7 @@
               initialValue={businessHour.end}
               mask="__:__"
               type="number"
-              leftPadding="10px"
+              leftPadding={10}
             />
           </div>
         </div>
@@ -272,38 +256,26 @@
       <span>Você precisa definir seus horários de funcionamento</span>
     {/if}
     <Views.Divider />
-    <Views.Button on:click={addHours}
-      ><Fa icon={faClock} /><span>Adicionar horários</span></Views.Button
-    >
+    <Views.Button on:click={addHours}><Fa icon={faClock} /><span>Adicionar horários</span></Views.Button>
     <div class="days">
       {#each days as day}
         <div class="day">
-          <Views.Checkbox
-            marginTop="0"
-            bind:checked={day.checked}
-            label={day.name}
-          />
+          <Views.Checkbox marginTop={0} bind:checked={day.checked} label={day.name} />
         </div>
       {/each}
     </div>
-    <Views.Button on:click={updateHours}
-      ><Fa icon={faClock} /><span>Atualizar horários</span></Views.Button
-    >
-    {#if userInfo?.role === "vendor"}
+    <Views.Button on:click={updateHours}><Fa icon={faClock} /><span>Atualizar horários</span></Views.Button>
+    {#if userInfo?.role === 'VENDOR'}
       <Views.Divider />
       <h2>Portais de pagamentos</h2>
       <Views.Divider />
-      <Views.Button on:click={requestPagSeguroIntegration}
-        >{integrateButtonName}</Views.Button
-      >
+      <Views.Button on:click={requestPagSeguroIntegration}>{integrateButtonName}</Views.Button>
     {/if}
     <Views.Divider />
     <h2>A entrega</h2>
     <Views.Divider />
     <h3>Tempo de preparação em minutos</h3>
-    <small
-      >Quanto tempo você vai precisar para preparar seus pedidos em média?</small
-    >
+    <small>Quanto tempo você vai precisar para preparar seus pedidos em média?</small>
     <div class="twoCells">
       <Views.TextEdit
         placeHolder="Tempo mínimo"
@@ -311,7 +283,7 @@
         bind:this={preparationInputs.min}
         initialValue={preparation.min}
         type="number"
-        rightPadding="10px"
+        rightPadding={10}
       />
       <Views.TextEdit
         placeHolder="Tempo máximo"
@@ -319,15 +291,14 @@
         bind:this={preparationInputs.max}
         initialValue={preparation.max}
         type="number"
-        leftPadding="10px"
+        leftPadding={10}
       />
     </div>
     <Views.Divider />
     <h3>Valor de entrega</h3>
     <small
-      >Vai querer pagar seus entregador quanto por entrega por Km? (o quanto
-      mais você paga seus entregadores ficaram felizes e seus clientes tristes e
-      vice versa)</small
+      >Vai querer pagar seus entregador quanto por entrega por Km? (o quanto mais você paga seus entregadores ficaram
+      felizes e seus clientes tristes e vice versa)</small
     >
     <Views.Switch name="Frete grátis" bind:checked={delivery.free} />
     {#if !(delivery?.free || false)}

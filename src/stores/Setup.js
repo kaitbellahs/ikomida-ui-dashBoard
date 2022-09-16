@@ -29,6 +29,10 @@ function createSettings() {
 		popups: {
 			newOrder: true,
 			paymentStatus: true
+		},
+		profile: {
+			contractName: null,
+			mainPicture: null,
 		}
 	});
 

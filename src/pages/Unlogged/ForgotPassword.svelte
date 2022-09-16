@@ -1,13 +1,13 @@
 <script>
-  import Routes from "../../stores/Routes";
-  import { Views, Utils, Stores } from "@ikomida/components";
-  import { StatusBar } from "../../stores/Setup";
+  import Routes from '../../stores/Routes';
+  import { Views, Utils, Stores } from '@ikomida/shared-frontend';
+  import { StatusBar } from '../../stores/Setup';
   import {
     requestPasswordPhoneValidation,
     validatePasswordPhoneValidationCode,
     requestPassword,
-  } from "../../network/Auth";
-  import { onDestroy, onMount } from "svelte";
+  } from '../../network/Auth';
+  import { onDestroy, onMount } from 'svelte';
 
   const countdownWaitTime = 60;
 
@@ -63,9 +63,7 @@
     showRequestValidatingCodeAlert = false;
     Stores.Loading.instance.start();
     requestPasswordObject.phone = requestPasswordObject.phone;
-    const response = await requestPasswordPhoneValidation(
-      requestPasswordObject
-    );
+    const response = await requestPasswordPhoneValidation(requestPasswordObject);
     if (response?.success) {
       requestPasswordObject = {
         ...requestPasswordObject,
@@ -78,7 +76,7 @@
         countdown--;
       }, 1000);
       Stores.MessageAlert.instance.show(
-        `Digite o código que você receberá em instantes no seu celular no campo seguinte `
+        `Digite o código que você receberá em instantes no seu celular no campo seguinte `,
       );
     } else {
       Stores.MessageAlert.instance.show(response?.data);
@@ -88,13 +86,11 @@
 
   async function ValidatePhoneCode() {
     Stores.Loading.instance.start();
-    const response = await validatePasswordPhoneValidationCode(
-      requestPasswordObject
-    );
+    const response = await validatePasswordPhoneValidationCode(requestPasswordObject);
     if (response?.success) {
       canRequestPassword = true;
       Stores.MessageAlert.instance.show(
-        `O código inserido é correto!, agora é só clicar no botão “CONTINUAR” para gerar um nova senha aleatória!`
+        `O código inserido é correto!, agora é só clicar no botão “CONTINUAR” para gerar um nova senha aleatória!`,
       );
     } else {
       Stores.MessageAlert.instance.show(response?.data);
@@ -112,7 +108,7 @@
     }
   });
 
-  Stores.Title.instance.set("Recuperar senha");
+  Stores.Title.instance.set('Recuperar senha');
 </script>
 
 <main
@@ -120,9 +116,7 @@
 >
   <Views.Divider />
   <h2>Por favor informe seu número de telefone cadastrado</h2>
-  <small
-    >clique em "<b>Solicitar</b>" para solicitar o código de validação</small
-  >
+  <small>clique em "<b>Solicitar</b>" para solicitar o código de validação</small>
   <Views.TextEdit
     type="phone"
     bind:value={requestPasswordObject.phone}
@@ -133,10 +127,7 @@
     placeHolder="Número do telefone"
   />
   {#if !countdownCanRequestCode}
-    <small
-      >Caso não receber o código, espera {countdown} segundos para solicitar um novo
-      código!</small
-    >
+    <small>Caso não receber o código, espera {countdown} segundos para solicitar um novo código!</small>
   {/if}
   <Views.Divider />
   <Views.TextEdit
@@ -153,24 +144,22 @@
   />
   <Views.Divider />
   <Views.Divider />
-  <Views.Button on:click={requestNewPassword} disabled={!canRequestPassword}
-    >Solicitar nova senha</Views.Button
-  >
+  <Views.Button on:click={requestNewPassword} disabled={!canRequestPassword}>Solicitar nova senha</Views.Button>
   <Views.GTerms />
   {#if showRequestValidatingCodeAlert}
     <Views.Alert
       title="Alerta"
       message={`Verifica se seu número de telefone inserido ${Utils.Strings.formatAsPhone(
-        requestPasswordObject?.phone
+        requestPasswordObject?.phone,
       )} está correto para prosseguir`}
       closeCallBack={toggleshowRequestValidatingCodeAlert}
       buttons={[
         {
-          name: "Quero corrigir",
+          name: 'Quero corrigir',
           callback: toggleshowRequestValidatingCodeAlert,
         },
         {
-          name: "Está correto",
+          name: 'Está correto',
           callback: requestPhoneValidation,
           principal: true,
         },
@@ -184,7 +173,7 @@
       closeCallBack={toggleshowPasswordRequistedAlert}
       buttons={[
         {
-          name: "Fazer login",
+          name: 'Fazer login',
           callback: () => Stores.Navigation.instance.reset(Routes.login),
           principal: true,
         },

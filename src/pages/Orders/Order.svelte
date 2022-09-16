@@ -1,55 +1,49 @@
-<script>
-  import { Share } from "@capacitor/share";
-  import { onMount, tick } from "svelte";
-  import html2canvas from "html2canvas";
-  import { Views, Utils, Types, Logics, Stores } from "@ikomida/components";
-  import { faShare } from "@fortawesome/free-solid-svg-icons";
-  import { Filesystem, Directory } from "@capacitor/filesystem";
-  import Routes from "../../stores/Routes";
-  import { OrderStatus, ChangeOrderStatus } from "../../network/Orders";
-  import { getOrder } from "../../network/Products";
-  import { Settings } from "../../stores/Setup";
-  import { getSettings } from "../../network/Settings";
+<script lang="ts">
+  import { Share } from '@capacitor/share';
+  import { onMount, tick } from 'svelte';
+  import html2canvas from 'html2canvas';
+  import { Views, Utils, Types, Logics, Stores } from '@ikomida/shared-frontend';
+  import { faShare } from '@fortawesome/free-solid-svg-icons';
+  import { Filesystem, Directory } from '@capacitor/filesystem';
+  import Routes from '../../stores/Routes';
+  import { OrderStatus, ChangeOrderStatus } from '../../network/Orders';
+  import { getOrder } from '../../network/Products';
+  import { Settings } from '../../stores/Setup';
+  import { getSettings } from '../../network/Settings';
 
   const router = Stores.Navigation.instance.router;
-  const order = $router.options;
+  const order: Types.Interfaces.IOrder = $router.options;
 
   let screenShot = true;
   let showImage = true;
-  let orderScreen;
+  let orderScreen: HTMLElement;
   let showCardBrand = false;
 
-  $: total =
-    Number(order?.subtotal ?? 0) +
-    Number(order?.delivery ?? 0) -
-    Number(order?.discount ?? 0);
+  $: total = Number(order?.subtotal ?? 0) + Number(order?.delivery ?? 0) - Number(order?.discount ?? 0);
 
-  const nextButtonText = (order) => {
+  const nextButtonText = (order: Types.Interfaces.IOrder) => {
     switch (order?.status) {
-      case Types.OrderStatusType.WAITING_PAYMENT:
-        return "";
-      case Types.OrderStatusType.OPEN:
-        return "Aceitar o pedido";
-      case Types.OrderStatusType.ACCEPTED:
-        return "Esperando o entregador";
-      case Types.OrderStatusType.WAITING_DELIVERY:
-        return "Saiu para entrega";
-      case Types.OrderStatusType.IN_DELIVERY:
-        return "Pedido entrege";
+      case Types.Types.TOrderStatus.WAITING_PAYMENT:
+        return '';
+      case Types.Types.TOrderStatus.OPEN:
+        return 'Aceitar o pedido';
+      case Types.Types.TOrderStatus.ACCEPTED:
+        return 'Esperando o entregador';
+      case Types.Types.TOrderStatus.WAITING_DELIVERY:
+        return 'Saiu para entrega';
+      case Types.Types.TOrderStatus.IN_DELIVERY:
+        return 'Pedido entrege';
       default:
-        return "-";
+        return '-';
     }
   };
 
   async function cancel() {
     Stores.Loading.instance.start();
-    const response = await ChangeOrderStatus(
-      order?.id,
-      Types.OrderStatusType.CANCELED
-    );
+    const response = await ChangeOrderStatus(order?.id, Types.Types.TOrderStatus.CANCELED);
     if (response?.success) {
-      order.status = Types.OrderStatusType.CANCELED;
-      Stores.MessageAlert.instance.show("O pedido foi atualizado com sucesso!");
+      order.status = Types.Types.TOrderStatus.CANCELED;
+      Stores.MessageAlert.instance.show('O pedido foi atualizado com sucesso!');
     } else {
       Stores.MessageAlert.instance.show(response?.data);
     }
@@ -58,14 +52,11 @@
 
   async function next() {
     Stores.Loading.instance.start();
-    let newStatus =
-      Types.OrderStatusType.keys[
-        Types.OrderStatusType.keys.indexOf(order?.status) + 1
-      ];
+    let newStatus = order?.status;
     const response = await ChangeOrderStatus(order?.id, newStatus);
     if (response?.success) {
       order.status = newStatus;
-      Stores.MessageAlert.instance.show("O pedido foi atualizado com sucesso!");
+      Stores.MessageAlert.instance.show('O pedido foi atualizado com sucesso!');
     } else {
       Stores.MessageAlert.instance.show(response?.data);
     }
@@ -76,8 +67,11 @@
     showCardBrand = false;
   }
 
-  async function goToProduct(id) {
+  async function goToProduct(id?: string) {
     Stores.Loading.instance.start();
+    if (!id) {
+      return;
+    }
     const response = await getOrder(id);
     if (response?.success) {
       const product = response?.data;
@@ -93,13 +87,13 @@
     await tick();
     const canvas = await html2canvas(orderScreen, {
       logging: false,
-      backgroundColor: "#fff",
+      backgroundColor: '#fff',
       allowTaint: true,
       useCORS: true,
     });
     screenShot = false;
     Stores.Loading.instance.stop();
-    const data = canvas.toDataURL("image/jpeg", 1.0).split(",");
+    const data = canvas.toDataURL('image/jpeg', 1.0).split(',');
     const screenShotFile = await Filesystem.writeFile({
       path: `screenshots/order-${order?.customID}.jpg`,
       data: data?.[1],
@@ -107,22 +101,22 @@
       recursive: true,
     });
     //TODO: -- report identifier of the app that received the share action. Can be an empty string in some cases. On web it will be undefined.
-    const activityType = await Share.share({
+    await Share.share({
       title: `Pedido #${order?.customID}`,
       // text: "Eu estou compartilhando com você esse pedido",
       url: `file://${screenShotFile?.uri}`,
-      dialogTitle: "Compartilhar o pedido",
+      dialogTitle: 'Compartilhar o pedido',
     });
   }
   onMount(async () => {
     if (await Share.canShare()) {
       Stores.Menu.instance.addItem({
-        name: "Compartilhar",
+        name: 'Compartilhar',
         icon: faShare,
         callback: share,
       });
     }
-    if (!("profile" in $Settings) || !$Settings?.profile) {
+    if (!('PROFILE' in $Settings) || !$Settings?.profile) {
       const response = await getSettings();
       if (response?.success) {
         $Settings.profile = response?.data?.profile;
@@ -131,23 +125,19 @@
     }
     Stores.Loading.instance.stop();
   });
-  function erroLoadImage(event) {
+  function erroLoadImage() {
     showImage = false;
   }
-  Stores.Title.instance.set("Detalhes do predido");
+  Stores.Title.instance.set('Detalhes do predido');
 </script>
 
-<div
-  class="order screenShot {screenShot ? 'screenShot' : ''}"
-  bind:this={orderScreen}
->
+<div class="order screenShot {screenShot ? 'screenShot' : ''}" bind:this={orderScreen}>
   <div class="avatar {screenShot ? 'screenShot' : ''}">
     {#if $Settings?.profile?.mainPicture && showImage}
       <img
         on:error={erroLoadImage}
-        src={$Settings?.profile?.mainPicture ??
-          "assets/icons/transparent-logo-1.svg"}
-        alt={$Settings?.profile?.contractName ?? "iKomida"}
+        src={$Settings?.profile?.mainPicture ?? 'assets/icons/transparent-logo-1.svg'}
+        alt={$Settings?.profile?.contractName ?? 'iKomida'}
       />
     {:else if $Settings?.profile?.contractName}
       <h1>{$Settings?.profile?.contractName}</h1>
@@ -155,41 +145,35 @@
       <img src="assets/icons/transparent-logo-1_144x45.png" alt="iKomida" />
       <h2>{$Settings?.profile?.contractName}</h2>
     {/if}
-    <Views.Divider height="30" />
+    <Views.Divider height={30} />
   </div>
   <div class="orderStatus" data-html2canvas-ignore>
-    {#if [Types.OrderStatusType.WAITING_PAYMENT, Types.OrderStatusType.OPEN, Types.OrderStatusType.ACCEPTED, Types.OrderStatusType.WAITING_DELIVERY, Types.OrderStatusType.IN_DELIVERY].includes(order.status) && new Date(new Date(order?.createdAt).getTime() + order?.preparation?.max * 1000) < new Date()}
-      <Views.Status type={Views.Status.Types.ERROR} circle={true}
-        >Pedido atrasado</Views.Status
-      >
+    {#if order.status && [Types.Types.TOrderStatus.WAITING_PAYMENT, Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY].includes(order.status) && order?.createdAt && new Date(new Date(order?.createdAt).getTime() + (order?.preparation?.max ?? 0) * 1000) < new Date()}
+      <Views.Status type={Types.Status.ERROR} circle={true}>Pedido atrasado</Views.Status>
     {/if}
-    {#if [Types.OrderStatusType.DELIVERED].includes(order.status)}
-      <Views.Status type={Views.Status.Types.SUCCESS} circle={true}
-        >Pedido entregue</Views.Status
-      >
+    {#if order.status && [Types.Types.TOrderStatus.DELIVERED].includes(order.status)}
+      <Views.Status type={Types.Status.SUCCESS} circle={true}>Pedido entregue</Views.Status>
     {/if}
-    {#if [Types.OrderStatusType.CANCELED].includes(order.status)}
-      <Views.Status type={Views.Status.Types.ERROR}
-        >Pedido cancelado</Views.Status
-      >
+    {#if order.status && [Types.Types.TOrderStatus.CANCELED].includes(order.status)}
+      <Views.Status type={Types.Status.ERROR}>Pedido cancelado</Views.Status>
     {/if}
     <Views.Divider />
   </div>
   <h3 class="title">Pedido N˚: {order?.customID}</h3>
   <Views.Divider />
   <div class="info" data-html2canvas-ignore>
-    {#if [Types.OrderStatusType.WAITING_PAYMENT, Types.OrderStatusType.OPEN, Types.OrderStatusType.ACCEPTED, Types.OrderStatusType.WAITING_DELIVERY, Types.OrderStatusType.IN_DELIVERY].includes(order.status)}
-      <Views.Status showIcon={false} type={Views.Status.Types.WARNING}
+    {#if order.status && [Types.Types.TOrderStatus.WAITING_PAYMENT, Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY].includes(order.status)}
+      <Views.Status showIcon={false} type={Types.Status.WARNING}
         >Prepare o pedido antes de
         {Utils.Strings.dateToString(
-          new Date(order?.createdAt).getTime() + order?.preparation?.max * 1000
+          String(new Date(order?.createdAt ?? '').getTime() + (order?.preparation?.max ?? 0) * 1000),
         )}</Views.Status
       >
       <Views.Divider />
     {/if}
   </div>
 
-  {#if ![Types.OrderStatusType.DELIVERED, Types.OrderStatusType.CANCELED].includes(order.status)}
+  {#if !order.status || ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED].includes(order.status)}
     <div class="orderStatus" data-html2canvas-ignore>
       <Views.Status>
         Pedido {OrderStatus(order?.status)}
@@ -197,19 +181,14 @@
       <Views.Divider />
     </div>
   {/if}
-  <span class="time"
-    >Data: {Utils.Strings.timestampToString(order?.createdAt)}</span
-  >
+  <span class="time">Data: {Utils.Strings.timestampToString(order?.createdAt?.getTime() ?? 0)}</span>
   <Views.Divider />
   <h3>Itens do pedido</h3>
-  {#each order?.products as { id, title, price, quantity, discount, discountType }, index (id)}
-    <div class="product" on:click={goToProduct(id)}>
-      <span class="quantity">{quantity}</span><span class="title">{title}</span
-      ><span class="price"
+  {#each order?.products ?? [] as { id, title, price, quantity, discount, discountType }, index (id ?? index)}
+    <div class="product" on:click={() => goToProduct(id)}>
+      <span class="quantity">{quantity}</span><span class="title">{title}</span><span class="price"
         >{Utils.Strings.currency(
-          quantity *
-            (price -
-              Logics.Finances.calcDiscount(price, discount, discountType))
+          (quantity ?? 0) * ((price ?? 0) - Logics.Finances.calcDiscount(price ?? 0, discount ?? 0, discountType)),
         )}</span
       >
     </div>
@@ -218,30 +197,20 @@
   <h3>Dados da entrega</h3>
   <Views.Divider />
   <div class="user">
-    <span
-      >Nome: <b
-        >{Utils.Strings.formatAsName(
-          `${order?.user?.name} ${order?.user?.lastName}`
-        )}</b
-      ></span
-    >
-    <span
-      >Contato: <b>{Utils.Strings.formatAsPhone(order?.user?.phone)}</b></span
-    >
+    <span>Nome: <b>{Utils.Strings.formatAsName(`${order?.user?.name} ${order?.user?.lastName}`)}</b></span>
+    <span>Contato: <b>{Utils.Strings.formatAsPhone(order?.user?.phone)}</b></span>
   </div>
   <div class="address">
     Endereço:
     <span class="street"
-      >{order?.address?.street ?? "-"}, {order?.address?.number ?? "-"}{order
-        ?.address?.complement
+      >{order?.address?.street ?? '-'}, {order?.address?.number ?? '-'}{order?.address?.complement
         ? ` - ${order?.address?.complement}`
-        : ""}</span
+        : ''}</span
     ><br />
     <span class="neighborhood"
-      >{order?.address?.neighborhood ?? "-"}<br />
+      >{order?.address?.neighborhood ?? '-'}<br />
       <span class="city"
-        >{order?.address?.city ?? "-"}/{order?.address?.stat ?? "-"} CEP: {order
-          ?.address?.postalCode ?? "-"}</span
+        >{order?.address?.city ?? '-'}/{order?.address?.stat ?? '-'} CEP: {order?.address?.postalCode ?? '-'}</span
       >
     </span>
   </div>
@@ -251,12 +220,12 @@
   <div class="paymentMethod">
     <span
       >Pago com <b
-        >{new Types.PaymentMethodType(order?.payment.type).name}
-        {new Types.PaymentMethodType(order?.payment.type).description}</b
+        >{order?.payment?.type?.name}
+        {order?.payment?.type?.description}</b
       ></span
     >
     <span class="brand">
-      {#if order?.payment.type === Types.PaymentMethodType.CREDIT_CARD_ONLINE}
+      {#if order?.payment?.type === Types.Types.TPaymentMethod.CREDIT_CARD_ONLINE}
         {#if showCardBrand}
           <img
             on:error={hideCardBrand}
@@ -270,15 +239,11 @@
     </span>
   </div>
   <div data-html2canvas-ignore class="buttonGroup">
-    {#if ![Types.OrderStatusType.DELIVERED, Types.OrderStatusType.CANCELED].includes(order?.status)}
-      <Views.Button multiplier="0.8" type="secondary" on:click={cancel}
-        >Cancelar</Views.Button
-      >
+    {#if !order?.status || !order?.status || ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED].includes(order?.status)}
+      <Views.Button sizeMultiplier={0.8} type="secondary" on:click={cancel}>Cancelar</Views.Button>
     {/if}
-    {#if ![Types.OrderStatusType.DELIVERED, Types.OrderStatusType.CANCELED, Types.OrderStatusType.WAITING_PAYMENT].includes(order?.status)}
-      <Views.Button multiplier="0.8" on:click={next}
-        >{nextButtonText(order)}</Views.Button
-      >
+    {#if !order?.status || ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED, Types.Types.TOrderStatus.WAITING_PAYMENT].includes(order?.status)}
+      <Views.Button sizeMultiplier={0.8} on:click={next}>{nextButtonText(order)}</Views.Button>
     {/if}
   </div>
   <Views.Divider />
@@ -296,15 +261,10 @@
       {#if Number(order?.discount) > 0}
         <tr>
           <td class="resumeText">Desconto</td>
-          <td class="resumeValue"
-            ><span class="deliveryFree"
-              >- {Utils.Strings.currency(order?.discount)}</span
-            ></td
-          >
+          <td class="resumeValue"><span class="deliveryFree">- {Utils.Strings.currency(order?.discount)}</span></td>
         </tr><tr>
           <td class="coupon" colspan="2"
-            >{order?.coupon?.name?.toUpperCase()} (- {order?.coupon?.type?.toUpperCase() ===
-            Types?.DiscountTypes?.PERCENT?.toUpperCase()
+            >{order?.coupon?.name?.toUpperCase()} (- {order?.coupon?.valueType === Types.Types.TDiscount?.PERCENT
               ? Utils.Strings.percent(order?.coupon?.value)
               : Utils.Strings.currency(order?.coupon?.value)})</td
           >
@@ -313,9 +273,7 @@
       <tr>
         <td class="resumeText">Taxa de entrega</td>
         <td class="resumeValue"
-          ><span class:deliveryFree={order?.delivery == 0}
-            >{Utils.Strings.currency(order?.delivery)}</span
-          ></td
+          ><span class:deliveryFree={order?.delivery == 0}>{Utils.Strings.currency(order?.delivery)}</span></td
         >
       </tr>
       <tr>
@@ -325,11 +283,8 @@
     </tbody>
   </table>
   <div class="signature {screenShot ? 'screenShot' : ''}">
-    <Views.Divider height="30" />
-    <span>Feito com carinho por</span><img
-      src="/assets/icons/transparent-logo-1.png"
-      alt="iKomida"
-    />
+    <Views.Divider height={30} />
+    <span>Feito com carinho por</span><img src="/assets/icons/transparent-logo-1.png" alt="iKomida" />
   </div>
 </div>
 <Views.GTerms />
@@ -386,11 +341,11 @@
     margin-bottom: 10px;
   }
   .address > .street {
-    font-family: "RobotoMedium";
+    font-family: 'RobotoMedium';
     margin-bottom: 10px;
   }
   .address > .neighborhood {
-    font-family: "RobotoMedium";
+    font-family: 'RobotoMedium';
     font-size: 1em;
     width: 100%;
   }

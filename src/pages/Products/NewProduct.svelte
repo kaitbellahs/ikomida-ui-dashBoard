@@ -1,23 +1,21 @@
-<script>
-  import Routes from "../../stores/Routes";
-  import Fa from "svelte-fa";
-  import { faEdit } from "@fortawesome/free-solid-svg-icons";
-  import { StatusBar } from "../../stores/Setup";
-  import { Views, Types, Stores, Utils } from "@ikomida/components";
-  import {
-    newProduct,
-    updateProduct,
-    getCategories,
-  } from "../../network/Products";
-  import { onMount } from "svelte";
+<script lang="ts">
+  import Routes from '../../stores/Routes';
+  import Fa from 'svelte-fa';
+  import { faEdit } from '@fortawesome/free-solid-svg-icons';
+  import { StatusBar } from '../../stores/Setup';
+  import { Views, Types, Stores, Utils } from '@ikomida/shared-frontend';
+  import { newProduct, updateProduct, getCategories } from '../../network/Products';
+  import { onMount } from 'svelte';
 
   const router = Stores.Navigation.instance.router;
+  const discountTypeOptions = Types.Types.TDiscount.values() as Types.SelectorOptions[];
+
   let { item, edit } = $router.options;
 
-  let categoriesOptions = [];
+  let categoriesOptions: Types.SelectorOptions[] = [];
   let firstLaunch = true;
-  let selectedDiscountType;
-  let oldSelectedDiscountType = null;
+  let selectedDiscountType: Types.SelectorOptions;
+  let oldSelectedDiscountType: Types.SelectorOptions | null | undefined = null;
   let itemsValidation = {
     title: false,
     description: false,
@@ -30,8 +28,7 @@
 
   $: if (
     selectedDiscountType &&
-    (oldSelectedDiscountType === null ||
-      oldSelectedDiscountType?.id !== selectedDiscountType?.id)
+    (oldSelectedDiscountType === null || oldSelectedDiscountType?.id !== selectedDiscountType?.id)
   ) {
     item.discountType = selectedDiscountType?.id;
     item.discount = item.discount;
@@ -44,16 +41,13 @@
     itemsValidation?.description &&
     itemsValidation?.weight &&
     itemsValidation?.price &&
-    (itemsValidation?.discount ||
-      selectedDiscountType.id === Types.DiscountTypes.NO) &&
+    (itemsValidation?.discount || selectedDiscountType === Types.Types.TDiscount.NO) &&
     itemsValidation?.serves &&
     itemsValidation?.quantity;
 
   $: if (firstLaunch) {
     if ((categoriesOptions?.length ?? 0) > 0) {
-      const result = categoriesOptions.filter(
-        (option) => option.id == item.categoryID
-      );
+      const result = categoriesOptions.filter((option) => option.id == item.categoryID);
       item.category = result.length > 0 ? result[0] : null;
     }
 
@@ -61,13 +55,9 @@
       item.image = null;
     }
 
-    if (Types.DiscountTypes.list.length > 0) {
-      const result = Types.DiscountTypes.list.filter(
-        (option) => option.id == item.discountType
-      );
+    const result = [Types.Types.TDiscount].filter((option) => option == item.discountType);
 
-      selectedDiscountType = result.length > 0 ? result[0] : null;
-    }
+    selectedDiscountType = result?.[0] as unknown as Types.SelectorOptions;
     firstLaunch = false;
   }
 
@@ -95,17 +85,22 @@
     const response = await getCategories();
     if (response) {
       categoriesOptions = response?.map((item) => {
-        return { id: item.id, name: item.title };
+        return { id: item.id, name: item.title } as Types.SelectorOptions;
       });
       if (categoriesOptions.length > 0) {
-        const result = categoriesOptions.filter(
-          (option) => option.id == item.categoryID
-        );
+        const result = categoriesOptions.filter((option) => option.id == item.categoryID);
         item.category = result.length > 0 ? result[0] : null;
       }
     }
     Stores.Loading.instance.stop();
   }
+
+  const currencyValidation = (value: string) => {
+    return Number(value) > 0 && Number(value) < item.price;
+  };
+  const percentValidation = (value: string) => {
+    return Number(value) > 0 && Number(value) < 10000;
+  };
 
   onMount(async () => {
     if (!item.category) {
@@ -116,24 +111,20 @@
 
   generateOptions();
 
-  $: Stores.Title.instance.set(edit ? "Editar produto" : "Novo produto");
+  $: Stores.Title.instance.set(edit ? 'Editar produto' : 'Novo produto');
 </script>
 
 {#if (categoriesOptions?.length ?? 0) > 0}
   <div class="product">
     <Views.UploadablePhoto bind:image={item.image} title={item?.title} />
-    <Views.Selector
-      bind:selected={item.category}
-      name="Selecione uma opção"
-      options={categoriesOptions}
-    />
+    <Views.Selector bind:selected={item.category} name="Selecione uma opção" options={categoriesOptions} />
     <Views.TextEdit
       placeHolder="Nome do produto"
       bind:value={item.title}
       bind:isValid={itemsValidation.title}
       initialValue={item.title}
-      min="3"
-      max="255"
+      min={3}
+      max={255}
     />
     <Views.TextEdit
       type="text"
@@ -141,8 +132,8 @@
       bind:value={item.description}
       bind:isValid={itemsValidation.description}
       initialValue={item.description}
-      min="1"
-      max="500"
+      min={1}
+      max={500}
     />
     <Views.TextEdit
       type="number"
@@ -150,8 +141,8 @@
       bind:value={item.weight}
       bind:isValid={itemsValidation.weight}
       initialValue={item.weight}
-      min="1"
-      max="9"
+      min={1}
+      max={9}
     />
     <Views.TextEdit
       type="number"
@@ -159,8 +150,8 @@
       bind:value={item.serves}
       bind:isValid={itemsValidation.serves}
       initialValue={item.serves}
-      min="1"
-      max="9"
+      min={1}
+      max={9}
     />
     <Views.TextEdit
       type="number"
@@ -168,8 +159,8 @@
       bind:value={item.quantity}
       bind:isValid={itemsValidation.quantity}
       initialValue={item.quantity}
-      min="1"
-      max="9"
+      min={1}
+      max={9}
     />
     <Views.TextEdit
       type="currency"
@@ -177,58 +168,45 @@
       bind:value={item.price}
       bind:isValid={itemsValidation.price}
       initialValue={item.price}
-      min="1"
-      max="9"
+      min={1}
+      max={9}
     />
     <Views.Divider />
-    <Views.Selector
-      bind:selected={selectedDiscountType}
-      name="selecione uma opção"
-      options={Types.DiscountTypes.list}
-    />
+    <Views.Selector bind:selected={selectedDiscountType} name="selecione uma opção" options={discountTypeOptions} />
     {#if selectedDiscountType}
-      {#if selectedDiscountType.id === Types.DiscountTypes.PERCENT}
+      {#if selectedDiscountType.id === Types.Types.TDiscount.PERCENT}
         <Views.TextEdit
           type="percent"
           placeHolder="Disconto"
           bind:value={item.discount}
           bind:isValid={itemsValidation.discount}
           initialValue={item.discount}
-          validation={(value) => {
-            return Number(value) > 0 && Number(value) < 10000;
-          }}
+          validation={percentValidation}
           error="A percentagem do desconto deve ser maior que % 0,00 e menor que % 100,00"
         />
         <Views.Divider />
-      {:else if selectedDiscountType.id === Types.DiscountTypes.VALUE}
+      {:else if selectedDiscountType.id === Types.Types.TDiscount.VALUE}
         <Views.TextEdit
           placeHolder="Disconto"
           bind:value={item.discount}
           bind:isValid={itemsValidation.discount}
           initialValue={item.discount}
           type="currency"
-          validation={(value) => {
-            return Number(value) > 0 && Number(value) < item.price;
-          }}
+          validation={currencyValidation}
           error="O valor do desconto deve ser maior que R$ 0,00 e menor que o valor do produto que é {Utils.Strings.currency(
-            item.price
+            item.price,
           )}"
         />
         <Views.Divider />
       {/if}
     {/if}
     <Views.Divider />
-    <Views.Button
-      on:click={submit}
-      disabled={!canContinue}
-      bottomPadding={$StatusBar.bottomPadding}
+    <Views.Button on:click={submit} disabled={!canContinue} bottomPadding={$StatusBar.bottomPadding}
       ><Fa icon={faEdit} /> <span>Salvar</span></Views.Button
     >
   </div>
 {:else}
-  <Views.CentredMessage
-    text="Precisa adicionar pelo menos uma categoria antes de adicionar um novo produto!"
-  />
+  <Views.CentredMessage text="Precisa adicionar pelo menos uma categoria antes de adicionar um novo produto!" />
 {/if}
 
 <style>

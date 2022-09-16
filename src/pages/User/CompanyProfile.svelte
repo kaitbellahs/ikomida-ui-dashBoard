@@ -1,37 +1,25 @@
-<script>
-  import { Views, Utils, Stores } from "@ikomida/components";
-  import { getSettings, setSettings } from "../../network/Settings";
-  import { StatusBar } from "../../stores/Setup";
-  import { onMount } from "svelte";
-  import Fa from "svelte-fa";
-  import { faEdit, faSearch } from "@fortawesome/free-solid-svg-icons";
-  import { GetAddressByCep } from "../../network/Staff";
+<script lang="ts">
+  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend';
+  import { getSettings, setSettings } from '../../network/Settings';
+  import { StatusBar } from '../../stores/Setup';
+  import { onMount } from 'svelte';
+  import Fa from 'svelte-fa';
+  import { faEdit, faSearch } from '@fortawesome/free-solid-svg-icons';
+  import { GetAddressByCep } from '../../network/Staff';
 
-  let profile = {
-    phone: null,
-    email: null,
-    cpf: null,
-    address: {
-      postalCode: null,
-      street: null,
-      number: null,
-      complement: null,
-      neighborhood: null,
-      city: null,
-      stat: null,
-    },
-  };
+  let profile = Types.Interfaces.IVendorProfile.fromObject({});
+  let textEdit = new Views.TextEdit({ target: new Element() });
   let profileInputs = {
-    phone: null,
-    email: null,
+    phone: textEdit,
+    email: textEdit,
     address: {
-      postalCode: null,
-      street: null,
-      number: null,
-      complement: null,
-      neighborhood: null,
-      city: null,
-      stat: null,
+      postalCode: textEdit,
+      street: textEdit,
+      number: textEdit,
+      complement: textEdit,
+      neighborhood: textEdit,
+      city: textEdit,
+      stat: textEdit,
     },
   };
   let profileValidation = {
@@ -46,14 +34,11 @@
       stat: false,
     },
   };
-  let currentPostalCode = null;
+  let currentPostalCode: string | null = null;
 
   $: canProceed = Utils.Objects.validateFields(profileValidation);
 
-  $: if (
-    (profile?.address?.postalCode?.length ?? 0) === 8 &&
-    profile?.address?.postalCode != currentPostalCode
-  ) {
+  $: if ((profile.address?.postalCode?.length ?? 0) === 8 && profile?.address?.postalCode != currentPostalCode) {
     findAddress();
   }
 
@@ -79,17 +64,13 @@
 
   const submit = async () => {
     if (!Utils.Objects.validateFields(profileValidation)) {
-      Stores.MessageAlert.instance.show(
-        "Por favor preenche os dados do formulario corretamente"
-      );
+      Stores.MessageAlert.instance.show('Por favor preenche os dados do formulario corretamente');
       return;
     }
     Stores.Loading.instance.start();
     let response = await setSettings(profile);
     Stores.MessageAlert.instance.show(
-      response?.success
-        ? "As informações do estabelecimento foram atualizadas com sucesso"
-        : response?.data
+      response?.success ? 'As informações do estabelecimento foram atualizadas com sucesso' : response?.data,
     );
     Stores.Loading.instance.stop();
   };
@@ -107,28 +88,19 @@
     Stores.Loading.instance.stop();
   });
 
-  Stores.Title.instance.set("O estabelecimento");
+  Stores.Title.instance.set('O estabelecimento');
 </script>
 
 <div class="profile">
-  <Views.UploadablePhoto
-    type="vendor"
-    bind:image={profile.mainPicture}
-    title={profile?.contractName}
-  />
+  <Views.UploadablePhoto type="vendor" bind:image={profile.mainPicture} title={profile?.contractName} />
   <div class="data">
     <h2>{profile?.contractName}</h2>
     <Views.Divider />
     <Views.TextValue
       text="CNPJ:"
-      value={Utils?.Strings?.formatString(
-        /\d/gi,
-        "__.___.___/____-__",
-        "_",
-        profile?.cnpj
-      )}
+      value={Utils?.Strings?.formatString(/\d/gi, '__.___.___/____-__', '_', profile?.cnpj)}
       fontSize="1.3em"
-      leftMargin="30"
+      leftMargin={30}
     />
     <Views.TextEdit
       type="phone"
@@ -163,16 +135,16 @@
       bind:value={profile.address.street}
       bind:this={profileInputs.address.street}
       bind:isValid={profileValidation.address.street}
-      min="2"
-      max="255"
+      min={2}
+      max={255}
     />
     <Views.TextEdit
       placeHolder="Número"
       bind:value={profile.address.number}
       bind:this={profileInputs.address.number}
       bind:isValid={profileValidation.address.number}
-      min="1"
-      max="255"
+      min={1}
+      max={255}
       empty={!profileValidation.address.postalCode}
     />
     <Views.TextEdit
@@ -186,8 +158,8 @@
       bind:value={profile.address.neighborhood}
       bind:isValid={profileValidation.address.neighborhood}
       bind:this={profileInputs.address.neighborhood}
-      min="2"
-      max="255"
+      min={2}
+      max={255}
     />
     <Views.TextEdit
       disabled={true}
@@ -195,8 +167,8 @@
       bind:value={profile.address.city}
       bind:isValid={profileValidation.address.city}
       bind:this={profileInputs.address.city}
-      min="2"
-      max="255"
+      min={2}
+      max={255}
     />
     <Views.TextEdit
       disabled={true}
@@ -204,26 +176,22 @@
       bind:value={profile.address.stat}
       bind:this={profileInputs.address.stat}
       bind:isValid={profileValidation.address.stat}
-      min="2"
-      max="2"
+      min={2}
+      max={2}
     />
     <Views.Divider />
-    <Views.Button
-      disabled={!canProceed}
-      on:click={submit}
-      bottomPadding={$StatusBar.bottomPadding}
+    <Views.Button disabled={!canProceed} on:click={submit} bottomPadding={$StatusBar.bottomPadding}
       ><Fa icon={faEdit} /> <span>Atualizar</span></Views.Button
     >
   </div>
 </div>
 
-{#if profile === {} || isLoading}
+<!-- {#if profile === {} || isLoading}
   <Views.Loading
     topPadding={$StatusBar.height}
     bottomPadding={$StatusBar.bottomPadding}
   />
-{/if}
-
+{/if} -->
 <style>
   .profile > div {
     width: 100%;

@@ -1,18 +1,14 @@
 <script>
-  import ikomidaID from "../../stores/ikomidaID";
-  import * as AuthNetwork from "../../network/Auth";
-  import Routes from "../../stores/Routes";
-  import { Views, Stores } from "@ikomida/components";
-  import {
-    faPhone,
-    faUnlock,
-    faIdCardAlt,
-  } from "@fortawesome/free-solid-svg-icons";
-  import { Utils, Network } from "@ikomida/components";
-  import { registerPushNotificationToken } from "../../network/PushNotification";
-  import { onMount } from "svelte";
+  import ikomidaID from '../../stores/ikomidaID';
+  import * as AuthNetwork from '../../network/Auth';
+  import Routes from '../../stores/Routes';
+  import { Views, Stores } from '@ikomida/shared-frontend';
+  import { faPhone, faUnlock, faIdCardAlt } from '@fortawesome/free-solid-svg-icons';
+  import { Utils, Network } from '@ikomida/shared-frontend';
+  import { registerPushNotificationToken } from '../../network/PushNotification';
+  import { onMount } from 'svelte';
 
-  let ikomidaid = "com.ikomida.br.";
+  let ikomidaid = 'com.ikomida.br.';
   let ikomidaidInput;
   let phone;
   let password;
@@ -33,13 +29,13 @@
     if (response?.success) {
       const token = await Utils.Jws.extractToken(response?.data);
       if (token !== null) {
-        await Stores.Auth.instance.setToken(response?.data);
+        await Stores.Auth.Auth.instance.setToken(response?.data);
         if ($pushNotificationToken && $pushNotificationToken !== {}) {
           await registerPushNotificationToken($pushNotificationToken);
         }
         Stores.Navigation.instance.reset(Routes.home);
       } else {
-        Stores.MessageAlert.instance.show("O token de acesso não é válido");
+        Stores.MessageAlert.instance.show('O token de acesso não é válido');
       }
     } else {
       Stores.MessageAlert.instance.show(response?.data);
@@ -75,17 +71,10 @@
     placeHolder="Número de celular"
     bind:isValid={isValidPhone}
   />
-  <Views.TextEdit
-    bind:value={password}
-    icon={faUnlock}
-    placeHolder="Sua senha"
-    type="password"
-  />
+  <Views.TextEdit bind:value={password} icon={faUnlock} placeHolder="Sua senha" type="password" />
   <div />
   <Views.Button on:click={doLogin} disabled={!canLogin}>Entrar</Views.Button>
-  <Views.Button type="transparent" on:click={forgotPassword}
-    >Recuperar a senha</Views.Button
-  >
+  <Views.Button type="transparent" on:click={forgotPassword}>Recuperar a senha</Views.Button>
   <Views.GTerms />
 </main>
 

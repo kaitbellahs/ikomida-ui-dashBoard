@@ -1,16 +1,16 @@
-<script>
-  import { countProducts } from "../../network/Products";
-  import { countOrders } from "../../network/Orders";
-  import { countUsers } from "../../network/User";
-  import { countCoupons } from "../../network/Payment";
-  import { Views, Stores } from "@ikomida/components";
-  import { onMount, tick } from "svelte";
+<script lang="ts">
+  import { countProducts } from '../../network/Products';
+  import { countOrders } from '../../network/Orders';
+  import { countUsers } from '../../network/User';
+  import { countCoupons } from '../../network/Payment';
+  import { Views, Stores } from '@ikomida/shared-frontend';
+  import { onMount, tick } from 'svelte';
 
   onMount(async () => {
     await tick();
     Stores.Loading.instance.stop();
   });
-  Stores.Title.instance.set("iKomida - Dashboard");
+  Stores.Title.instance.set('iKomida - Dashboard');
 </script>
 
 <h2>Estatísticas</h2>

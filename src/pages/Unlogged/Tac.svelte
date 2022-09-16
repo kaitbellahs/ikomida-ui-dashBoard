@@ -1,10 +1,10 @@
 <script>
-  import { StatusBar } from "../../stores/Setup";
-  import { Views, Utils, Stores } from "@ikomida/components";
-  import { onMount } from "svelte";
-  import { getTermsOfUse } from "../../network/Terms";
+  import { StatusBar } from '../../stores/Setup';
+  import { Views, Utils, Stores } from '@ikomida/shared-frontend';
+  import { onMount } from 'svelte';
+  import { getTermsOfUse } from '../../network/Terms';
 
-  Stores.Title.instance.set("Termos de uso");
+  Stores.Title.instance.set('Termos de uso');
 
   $: styleHeight = `${Number($StatusBar.height) + 50}px`;
   let term;
@@ -30,21 +30,15 @@
         <Views.Divider />
         <h2>id: #{term?.id}</h2>
         <h3>
-          Grava esse código de identificação em algum lugar, ele é a
-          identificação do termo que você está assinando.
+          Grava esse código de identificação em algum lugar, ele é a identificação do termo que você está assinando.
         </h3>
       </div>
       <div class="content">
         {@html term?.body}
       </div>
-      <small
-        >Data do termo: {Utils.Strings.dateToDateString(term?.createdAt)}</small
-      >
+      <small>Data do termo: {Utils.Strings.dateToDateString(term?.createdAt)}</small>
     {:else}
-      <h2 class="error">
-        Ocorreu um erro, não conclua o seu pedido sem ler o termo e entre em
-        contato com a gente
-      </h2>
+      <h2 class="error">Ocorreu um erro, não conclua o seu pedido sem ler o termo e entre em contato com a gente</h2>
     {/if}
   </div>
 </main>

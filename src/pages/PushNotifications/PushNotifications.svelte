@@ -1,10 +1,10 @@
 <script>
-  import Routes from "../../stores/Routes";
-  import Fa from "svelte-fa";
-  import { faRocket } from "@fortawesome/free-solid-svg-icons";
-  import { Views, Utils, Stores } from "@ikomida/components";
-  import { StatusBar } from "../../stores/Setup";
-  import { onMount } from "svelte";
+  import Routes from '../../stores/Routes';
+  import Fa from 'svelte-fa';
+  import { faRocket } from '@fortawesome/free-solid-svg-icons';
+  import { Views, Utils, Stores } from '@ikomida/shared-frontend';
+  import { StatusBar } from '../../stores/Setup';
+  import { onMount } from 'svelte';
 
   onMount(async () => {
     Stores.Loading.instance.stop();
@@ -14,12 +14,10 @@
     Stores.Navigation.instance.goTo(Routes.newPushNotification);
   };
 
-  Stores.Title.instance.set("Mensagens push");
+  Stores.Title.instance.set('Mensagens push');
 </script>
 
-<Views.Button
-  on:click={newPushNotification}
-  bottomPadding={$StatusBar.bottomPadding}
+<Views.Button on:click={newPushNotification} bottomPadding={$StatusBar.bottomPadding}
   ><Fa icon={faRocket} /> <span>Enviar mensagem</span></Views.Button
 >
 <Views.Divider />

@@ -76,6 +76,7 @@ body {
     padding-top: 1px;
     background: #dfdfdf;
     display: flex;
+    flex-direction: column;
     overflow: hidden;
 }
 

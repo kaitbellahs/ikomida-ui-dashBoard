@@ -1,140 +1,118 @@
-<script>
-  import { Views, Utils, Types, Stores } from "@ikomida/components";
-  import { StatusBar } from "../../stores/Setup";
-  import { getSubscription } from "../../network/Payment";
-  import { onMount } from "svelte";
-  import Fa from "svelte-fa";
-  import { faReceipt, faFileInvoice } from "@fortawesome/free-solid-svg-icons";
-  import { AppLauncher } from "@capacitor/app-launcher";
+<script lang="ts">
+  import { Clipboard } from '@capacitor/clipboard';
+  import { Views, Utils, Types, Stores } from '@ikomida/shared-frontend';
+  import { getSubscription } from '../../network/Payment';
+  import { onMount } from 'svelte';
+  import Fa from 'svelte-fa';
+  import { faReceipt, faFileInvoice } from '@fortawesome/free-solid-svg-icons';
+  import { AppLauncher } from '@capacitor/app-launcher';
 
-  let subscription;
+  let subscription: Types.Interfaces.ISubscription;
 
-  async function open(url) {
-    const { value } = await AppLauncher.canOpenUrl({ url });
-    await AppLauncher.openUrl({ url });
+  async function open(url?: string) {
+    const { value } = await AppLauncher.canOpenUrl({ url: url ?? '' });
+    await AppLauncher.openUrl({ url: url ?? '' });
     if (!value) {
       await Clipboard.write({ string: url });
       Stores.MessageAlert.instance.show(
-        `Se o navegador externo no for aberto automaticamente, por favor o abra e digita esa URL: ${url}, que também foi copiado para sua área de transferência para colar-lo!`
+        `Se o navegador externo no for aberto automaticamente, por favor o abra e digita esa URL: ${url}, que também foi copiado para sua área de transferência para colar-lo!`,
       );
     }
   }
 
   onMount(async () => {
-    subscription = await getSubscription();
+    subscription = (await getSubscription()) as Types.Interfaces.ISubscription;
     Stores.Loading.instance.stop();
   });
 
-  function subscriptionStatus(status) {
-    if (typeof status === "string") {
-      switch (status.toUpperCase()) {
-        case Types.PaymentStatusTypes.AsaasSignature.ACTIVE:
-          return "Ativo";
-        case Types.PaymentStatusTypes.AsaasSignature.CANCELED:
-          return "Cancelado";
-        default:
-          return "-";
-      }
+  function subscriptionStatus(status?: Types.Types.TAsaasSignatureStatus) {
+    switch (status) {
+      case Types.Types.TAsaasSignatureStatus.ACTIVE:
+        return 'Ativo';
+      case Types.Types.TAsaasSignatureStatus.CANCELED:
+        return 'Cancelado';
+      default:
+        return '-';
     }
-    return "-";
   }
-  function paymentStatus(status) {
-    if (typeof status === "string") {
-      switch (status.toUpperCase()) {
-        case Types.PaymentStatusTypes.Asaas.CONFIRMED:
-          return "Confirmado";
-        case Types.PaymentStatusTypes.Asaas.PENDING:
-          return "Aguardando";
-        default:
-          return "-";
-      }
+  function paymentStatus(status?: Types.Types.TAsaasPaymentStatus) {
+    switch (status) {
+      case Types.Types.TAsaasPaymentStatus.CONFIRMED:
+        return 'Confirmado';
+      case Types.Types.TAsaasPaymentStatus.PENDING:
+        return 'Aguardando';
+      default:
+        return '-';
     }
-    return "-";
   }
 
-  Stores.Title.instance.set("Assinatura");
+  Stores.Title.instance.set('Assinatura');
 </script>
 
 <h2>dados da sua assinatura</h2>
 <Views.TextValue text="plano" value=": {subscription?.plan}" fontSize="1.2em" />
-<Views.TextValue
-  text="Valor"
-  value=": {Utils.Strings.currency(subscription?.value)}"
-  fontSize="1.2em"
-/>
+<Views.TextValue text="Valor" value=": {Utils.Strings.currency(subscription?.value)}" fontSize="1.2em" />
 <Views.TextValue
   text="Estado"
   value=": {subscriptionStatus(subscription?.status)}"
   fontSize="1.2em"
-  rightColor={subscription?.status ===
-  Types.PaymentStatusTypes.AsaasSignature.ACTIVE
-    ? "green"
-    : "yello"}
+  rightColor={subscription?.status === Types.Types.TAsaasSignatureStatus.ACTIVE ? 'green' : 'yello'}
 />
 <Views.TextValue
   text="inscrição"
-  value=": {Utils.Strings.dateToDateString(subscription?.subscription)}"
+  value=": {Utils.Strings.dateToDateString(subscription?.subscription?.toString())}"
   fontSize="1.1em"
 />
 <Views.TextValue
   text="Proxima data de venceimento"
-  value=": {Utils.Strings.dateToDateString(subscription?.nextDueDate)}"
+  value=": {Utils.Strings.dateToDateString(subscription?.nextDueDate?.toString())}"
   fontSize="1.1em"
 />
 <Views.Divider />
 <h2>Ciclo de pagamento</h2>
 {#if subscription?.charges}
-  {#each subscription?.charges?.sort((i1, i2) => new Date(i2?.dueDate) - new Date(i1?.dueDate)) as charges (charges?.invoiceUrl)}
+  {#each subscription?.charges?.sort((i1, i2) => (i2?.dueDate.getTime() ?? 0) - (i1?.dueDate.getTime() ?? 0)) as charges (charges?.invoiceUrl)}
     <div class="charge">
       {#if charges?.invoiceUrl}
-        <span
-          alt="Abrir comprovante de pagamento"
-          on:click={open(charges?.invoiceUrl)}
-          class="invoice"><Fa icon={faFileInvoice} /></span
+        <span alt="Abrir comprovante de pagamento" on:click={() => open(charges?.invoiceUrl)} class="invoice"
+          ><Fa icon={faFileInvoice} /></span
         >
       {/if}
       {#if charges?.transactionReceiptUrl}
-        <span
-          alt="Abrir a nota fiscal"
-          on:click={open(charges?.transactionReceiptUrl)}
-          class="receipt"><Fa icon={faReceipt} /></span
+        <span alt="Abrir a nota fiscal" on:click={() => open(charges?.transactionReceiptUrl)} class="receipt"
+          ><Fa icon={faReceipt} /></span
         >
       {/if}
-      <Views.TextValue
-        text="value:"
-        value={Utils.Strings.currency(charges?.value)}
-        fontSize="0.9em"
-        leftMargin="50"
-      />
+      <Views.TextValue text="value:" value={Utils.Strings.currency(charges?.value)} fontSize="0.9em" leftMargin={50} />
       <Views.TextValue
         text="Forma de pagamento:"
         value="**** {charges?.creditCardNumber} - {charges?.creditCardBrand}"
         fontSize="0.9em"
-        leftMargin="50"
+        leftMargin={50}
       />
       <Views.TextValue
         text="Data de vencimento:"
-        value={Utils.Strings.dateToDateString(charges?.dueDate)}
+        value={Utils.Strings.dateToDateString(charges?.dueDate?.toString())}
         fontSize="0.9em"
-        leftMargin="50"
+        leftMargin={50}
       />
 
       <Views.TextValue
         text="Data de pagamento:"
-        value={Utils.Strings.dateToDateString(charges?.confirmedDate)}
+        value={Utils.Strings.dateToDateString(charges?.confirmedDate?.toString())}
         fontSize="0.9em"
-        leftMargin="50"
+        leftMargin={50}
       />
       <Views.TextValue
         text="Status de pagamento:"
         value={paymentStatus(charges?.status)}
         fontSize="0.9em"
-        leftMargin="50"
-        rightColor={charges?.status === Types.PaymentStatusTypes.Asaas.CONFIRMED
-          ? "green"
-          : charges?.status === Types.PaymentStatusTypes.Asaas.PENDING
-          ? "yellow"
-          : "red"}
+        leftMargin={50}
+        rightColor={charges?.status === Types.Types.TAsaasPaymentStatus.CONFIRMED
+          ? 'green'
+          : charges?.status === Types.Types.TAsaasPaymentStatus.PENDING
+          ? 'yellow'
+          : 'red'}
       />
     </div>
   {/each}

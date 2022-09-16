@@ -1,26 +1,26 @@
 <script>
-  import Routes from "../stores/Routes";
-  import { Views, Utils, Stores } from "@ikomida/components";
-  import Home from "./Products/Home.svelte";
-  import Orders from "./Orders/Orders.svelte";
-  import Order from "./Orders/Order.svelte";
-  import CompanyProfile from "./User/CompanyProfile.svelte";
-  import Profile from "./User/Profile.svelte";
-  import Settings from "./Control/Settings.svelte";
-  import Subscription from "./Control/Subscription.svelte";
-  import Product from "./Products/Product.svelte";
-  import Products from "./Products/Products.svelte";
-  import Layout from "./Control/Layout.svelte";
-  import NewProduct from "./Products/NewProduct.svelte";
-  import Coupons from "./Coupons/Coupons.svelte";
-  import NewCoupon from "./Coupons/NewCoupon.svelte";
-  import PushNotifications from "./PushNotifications/PushNotifications.svelte";
-  import NewPushNotification from "./PushNotifications/NewPushNotification.svelte";
-  import Limits from "./Control/Limits.svelte";
-  import NewCategory from "./Products/NewCategory.svelte";
-  import Staff from "./Staff/Staff.svelte";
-  import NewStaff from "./Staff/NewStaff.svelte";
-  import { StatusBar } from "../stores/Setup";
+  import Routes from '../stores/Routes';
+  import { Views, Utils, Stores } from '@ikomida/shared-frontend';
+  import Home from './Products/Home.svelte';
+  import Orders from './Orders/Orders.svelte';
+  import Order from './Orders/Order.svelte';
+  import CompanyProfile from './User/CompanyProfile.svelte';
+  import Profile from './User/Profile.svelte';
+  import Settings from './Control/Settings.svelte';
+  import Subscription from './Control/Subscription.svelte';
+  import Product from './Products/Product.svelte';
+  import Products from './Products/Products.svelte';
+  import Layout from './Control/Layout.svelte';
+  import NewProduct from './Products/NewProduct.svelte';
+  import Coupons from './Coupons/Coupons.svelte';
+  import NewCoupon from './Coupons/NewCoupon.svelte';
+  import PushNotifications from './PushNotifications/PushNotifications.svelte';
+  import NewPushNotification from './PushNotifications/NewPushNotification.svelte';
+  import Limits from './Control/Limits.svelte';
+  import NewCategory from './Products/NewCategory.svelte';
+  import Staff from './Staff/Staff.svelte';
+  import NewStaff from './Staff/NewStaff.svelte';
+  import { StatusBar } from '../stores/Setup';
   import {
     faHome,
     faList,
@@ -33,77 +33,77 @@
     faUserGroup,
     faMessage,
     faShop,
-  } from "@fortawesome/free-solid-svg-icons";
-  import { onMount } from "svelte";
+  } from '@fortawesome/free-solid-svg-icons';
+  import { onMount } from 'svelte';
 
   let userInfo;
   let router = Stores.Navigation.instance.router;
   const tabs = [
     {
-      name: "Home",
+      name: 'Home',
       route: Routes.home,
       icon: faHome,
     },
     {
-      name: "Produtos",
+      name: 'Produtos',
       route: Routes.products,
       icon: faList,
     },
     {
-      name: "Pedidos",
+      name: 'Pedidos',
       route: Routes.orders,
       icon: faBook,
     },
   ];
   $: menuHamburgerItems = [
     {
-      name: "Home",
+      name: 'Home',
       callback: () => Stores.Navigation.instance.reset(Routes.home),
       icon: faHome,
     },
     {
-      name: "Perfil",
+      name: 'Perfil',
       callback: () => Stores.Navigation.instance.goTo(Routes.profile),
       icon: faUser,
     },
-    userInfo?.role === "vendor"
+    userInfo?.role === 'VENDOR'
       ? {
-          name: "Estabelecimento",
+          name: 'Estabelecimento',
           callback: () => Stores.Navigation.instance.goTo(Routes.company),
           icon: faShop,
         }
       : null,
-    userInfo?.role === "vendor"
+    userInfo?.role === 'VENDOR'
       ? {
-          name: "Assinatura",
+          name: 'Assinatura',
           callback: () => Stores.Navigation.instance.goTo(Routes.subscription),
           icon: faMoneyBill1Wave,
         }
       : null,
     {
-      name: "Configurações",
+      name: 'Configurações',
       callback: () => Stores.Navigation.instance.goTo(Routes.settings),
       icon: faSlidersH,
     },
     {
-      name: "Limites",
+      name: 'Limites',
       callback: () => Stores.Navigation.instance.goTo(Routes.limits),
       icon: faChartColumn,
     },
     {
-      name: "Comunicação",
+      name: 'Comunicação',
       callback: () => Stores.Navigation.instance.goTo(Routes.pushNotifications),
       icon: faMessage,
     },
-    userInfo?.role === "vendor"
+    userInfo?.role === 'VENDOR'
       ? {
-          name: "Colaboradores",
+          name: 'Colaboradores',
           callback: () => Stores.Navigation.instance.goTo(Routes.staff),
           icon: faUserGroup,
         }
       : null,
     {
-      name: "Layout",
+      name: 'Layout',
       callback: () => Stores.Navigation.instance.goTo(Routes.layout),
       icon: faIdCard,
     },
@@ -113,18 +113,14 @@
   $: route = $router.route;
 
   onMount(async () => {
-    userInfo = await Utils.Jws.extractToken(await Stores.Auth.instance.data());
+    userInfo = await Utils.Jws.extractToken(await Stores.Auth.Auth.instance.data());
   });
 
   $: if (menuHamburgerItems) {
     Stores.MenuHamburger.instance.reset();
-    menuHamburgerItems?.forEach((page) =>
-      Stores.MenuHamburger.instance.addItem(page)
-    );
+    menuHamburgerItems?.forEach((page) => Stores.MenuHamburger.instance.addItem(page));
   }
-  $: style = `--paddingTop:${styleHeight};--paddingBottom: ${
-    70 + $StatusBar.bottomPadding
-  }px; overflow: scroll;`;
+  $: style = `--paddingTop:${styleHeight};--paddingBottom: ${70 + $StatusBar.bottomPadding}px; overflow: scroll;`;
 </script>
 
 <main {style}>

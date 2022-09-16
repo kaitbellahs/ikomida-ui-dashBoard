@@ -1,11 +1,11 @@
-<script>
-  import Routes from "../../stores/Routes";
-  import Fa from "svelte-fa";
-  import { faEdit } from "@fortawesome/free-solid-svg-icons";
-  import { Views, Utils, Stores } from "@ikomida/components";
-  import { deleteCoupon } from "../../network/Payment";
-  import { StatusBar } from "../../stores/Setup";
-  import { onMount } from "svelte";
+<script lang="ts">
+  import Routes from '../../stores/Routes';
+  import Fa from 'svelte-fa';
+  import { faEdit } from '@fortawesome/free-solid-svg-icons';
+  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend';
+  import { deleteCoupon } from '../../network/Payment';
+  import { StatusBar } from '../../stores/Setup';
+  import { onMount } from 'svelte';
 
   onMount(async () => {
     Stores.Loading.instance.stop();
@@ -15,7 +15,7 @@
     Stores.Navigation.instance.goTo(Routes.newCoupon);
   };
 
-  async function removeCoupon(id) {
+  async function removeCoupon(id?: string) {
     Stores.Loading.instance.start();
     const response = await deleteCoupon(id);
     if (response?.success) {
@@ -26,7 +26,11 @@
     Stores.Loading.instance.stop();
   }
 
-  Stores.Title.instance.set("Cupons");
+  function handleItems(items: any[]) {
+    items = Types.Interfaces.ICoupon.fromObject(items) as any;
+  }
+
+  Stores.Title.instance.set('Cupons');
 </script>
 
 <Views.Button on:click={newCoupon} bottomPadding={$StatusBar.bottomPadding}
@@ -37,6 +41,7 @@
   noItems="Não há cupons para exibir por enquanto, aproveite e cadastre novos cupons para agradar seus clientes!"
   cache={Stores.Cache.Types.COUPONS}
   url="/coupons"
+  {handleItems}
   let:item
 >
   <article>

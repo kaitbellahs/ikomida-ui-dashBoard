@@ -1,11 +1,11 @@
 <script>
-  import Routes from "../../stores/Routes";
-  import Fa from "svelte-fa";
-  import { faRocket } from "@fortawesome/free-solid-svg-icons";
-  import { StatusBar } from "../../stores/Setup";
-  import { Views, Utils, Stores } from "@ikomida/components";
-  import { newPushNotification } from "../../network/PushNotification";
-  import { onMount } from "svelte";
+  import Routes from '../../stores/Routes';
+  import Fa from 'svelte-fa';
+  import { faRocket } from '@fortawesome/free-solid-svg-icons';
+  import { StatusBar } from '../../stores/Setup';
+  import { Views, Utils, Stores } from '@ikomida/shared-frontend';
+  import { newPushNotification } from '../../network/PushNotification';
+  import { onMount } from 'svelte';
 
   let item = {
     title: null,
@@ -20,8 +20,7 @@
   let oldSelectedDiscountType = null;
   $: if (
     selectedDiscountType &&
-    (oldSelectedDiscountType === null ||
-      oldSelectedDiscountType?.id !== selectedDiscountType?.id)
+    (oldSelectedDiscountType === null || oldSelectedDiscountType?.id !== selectedDiscountType?.id)
   ) {
     item.valueType = selectedDiscountType?.id;
     item.value = 0;
@@ -43,30 +42,21 @@
   onMount(() => {
     Stores.Loading.instance.stop();
   });
-  Stores.Title.instance.set("Novo cupom");
+  Stores.Title.instance.set('Novo cupom');
 </script>
 
 <div class="pushNotification">
-  <Views.TextEdit
-    placeHolder="Título"
-    bind:value={item.title}
-    bind:isValid={itemsValidation.title}
-    min="3"
-    max="55"
-  />
+  <Views.TextEdit placeHolder="Título" bind:value={item.title} bind:isValid={itemsValidation.title} min={3} max={55} />
   <Views.TextEdit
     type="text"
     placeHolder="texto"
     bind:value={item.body}
     bind:isValid={itemsValidation.body}
-    min="1"
-    max="255"
+    min={1}
+    max={255}
   />
   <Views.Divider />
-  <Views.Button
-    disabled={!canContinue}
-    on:click={submit}
-    bottomPadding={$StatusBar.bottomPadding}
+  <Views.Button disabled={!canContinue} on:click={submit} bottomPadding={$StatusBar.bottomPadding}
     ><Fa icon={faRocket} /> <span>Enviar</span></Views.Button
   >
 </div>

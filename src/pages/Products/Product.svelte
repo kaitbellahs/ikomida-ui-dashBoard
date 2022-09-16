@@ -1,11 +1,10 @@
-<script>
-  import Routes from "../../stores/Routes";
-  import Fa from "svelte-fa";
-  import { faEdit, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
-  import { Views, Utils, Types, Logics, Stores } from "@ikomida/components";
-  import { deleteProduct } from "../../network/Products";
-  import { StatusBar } from "../../stores/Setup";
-  import { onMount } from "svelte";
+<script lang="ts">
+  import Routes from '../../stores/Routes';
+  import Fa from 'svelte-fa';
+  import { faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+  import { Views, Utils, Types, Logics, Stores } from '@ikomida/shared-frontend';
+  import { deleteProduct } from '../../network/Products';
+  import { onMount } from 'svelte';
 
   const router = Stores.Navigation.instance.router;
   const item = $router.options;
@@ -48,39 +47,25 @@
   {/if}
   <h2>{item.title}</h2>
   <p>{item.description}</p>
-  <span class="serves"
-    >Aproximadamente {Logics.Finances.formatWeight(item.weight)}</span
-  >
-
+  <span class="serves">Aproximadamente {Logics.Finances.formatWeight(item.weight)}</span>
   <div class="price">
-    {#if [Types.DiscountTypes.PERCENT, Types.DiscountTypes.VALUE].includes(Types.DiscountTypes[item.discountType])}
+    {#if [Types.Types.TDiscount.PERCENT, Types.Types.TDiscount.VALUE].includes(item.discountType)}
       <span class="oldPrice">{Utils.Strings.currency(item.price)}</span>
     {/if}
     <span class="current"
       >{Utils.Strings.currency(
-        item.price -
-          Logics.Finances.calcDiscount(
-            item.price,
-            item.discount,
-            item.discountType
-          )
+        item.price - Logics.Finances.calcDiscount(item.price, item.discount, item.discountType),
       )}</span
     >
   </div>
   <div class="quantity">
-    Resta{item.quantity > 1 ? "m" : ""} <span>{item.quantity}</span>
-    unidade{item.quantity > 1 ? "s" : ""}
+    Resta{item.quantity > 1 ? 'm' : ''} <span>{item.quantity}</span>
+    unidade{item.quantity > 1 ? 's' : ''}
   </div>
   <Views.Divider />
-  <Views.Button on:click={removeProduct}
-    ><Fa icon={faTrashAlt} /> <span>Remover este produto</span></Views.Button
-  >
-  <Views.Button on:click={edit}
-    ><Fa icon={faEdit} /> <span>Editar</span></Views.Button
-  >
-  <Views.Button on:click={newProduct}
-    ><Fa icon={faEdit} /> <span>Novo produto Similar</span></Views.Button
-  >
+  <Views.Button on:click={removeProduct}><Fa icon={faTrashAlt} /> <span>Remover este produto</span></Views.Button>
+  <Views.Button on:click={edit}><Fa icon={faEdit} /> <span>Editar</span></Views.Button>
+  <Views.Button on:click={newProduct}><Fa icon={faEdit} /> <span>Novo produto Similar</span></Views.Button>
 </div>
 
 <style>

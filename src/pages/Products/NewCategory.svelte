@@ -1,18 +1,18 @@
-<script>
-  import Routes from "../../stores/Routes";
-  import Fa from "svelte-fa";
-  import { faEdit } from "@fortawesome/free-solid-svg-icons";
-  import { StatusBar } from "../../stores/Setup";
-  import { Views, Stores } from "@ikomida/components";
-  import { newCategory, updateCategory } from "../../network/Products";
-  import { onMount } from "svelte";
+<script lang="ts">
+  import Routes from '../../stores/Routes';
+  import Fa from 'svelte-fa';
+  import { faEdit } from '@fortawesome/free-solid-svg-icons';
+  import { StatusBar } from '../../stores/Setup';
+  import { Views, Stores } from '@ikomida/shared-frontend';
+  import { newCategory, updateCategory } from '../../network/Products';
+  import { onMount } from 'svelte';
 
   const router = Stores.Navigation.instance.router;
   let { item, edit } = $router.options;
 
   $: canContinue = itemValidation?.title;
   let itemValidation = {
-    title,
+    title: false,
   };
 
   const submit = async () => {
@@ -35,7 +35,7 @@
     Stores.Loading.instance.stop();
   });
 
-  Stores.Title.instance.set(edit ? "Editar categoria" : "Novo categoria");
+  Stores.Title.instance.set(edit ? 'Editar categoria' : 'Novo categoria');
 </script>
 
 <div class="category">
@@ -44,23 +44,20 @@
     bind:value={item.title}
     bind:isValid={itemValidation.title}
     initialValue={item.title}
-    min="3"
-    max="255"
+    min={3}
+    max={255}
   />
   <Views.TextEdit
     type="text"
     placeHolder="Descrição da categoria"
     bind:value={item.description}
     initialValue={item.description}
-    min="1"
-    max="500"
+    min={1}
+    max={500}
   />
   <Views.Divider />
   <Views.Divider />
-  <Views.Button
-    disabled={!canContinue}
-    on:click={submit}
-    bottomPadding={$StatusBar.bottomPadding}
+  <Views.Button disabled={!canContinue} on:click={submit} bottomPadding={$StatusBar.bottomPadding}
     ><Fa icon={faEdit} /> <span>Salvar</span></Views.Button
   >
 </div>

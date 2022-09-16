@@ -1,9 +1,8 @@
-<script>
-  import { Views, Utils, Stores } from "@ikomida/components";
-  import { StatusBar } from "../../stores/Setup";
-  import { getLimits } from "../../network/Settings";
-  import { onMount } from "svelte";
-  import Fa from "svelte-fa";
+<script lang="ts">
+  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend';
+  import { getLimits } from '../../network/Settings';
+  import { onMount } from 'svelte';
+  import Fa from 'svelte-fa';
   import {
     faTruck,
     faUserGroup,
@@ -12,46 +11,42 @@
     faCartShopping,
     faRocket,
     faTableList,
-  } from "@fortawesome/free-solid-svg-icons";
+  } from '@fortawesome/free-solid-svg-icons';
 
-  let limits;
+  let limits: Types.Interfaces.IVendorLimits;
 
   onMount(async () => {
     const response = await getLimits();
     if (response?.success) {
-      limits = response.data;
+      limits = response.data as Types.Interfaces.IVendorLimits;
     } else {
       Stores.MessageAlert.instance.show(response?.data);
     }
     Stores.Loading.instance.stop();
   });
 
-  Stores.Title.instance.set("Limites");
-  function color(percent) {
+  Stores.Title.instance.set('Limites');
+  function color(value?: number) {
+    const percent = value ?? 0;
     return `rgb(${percent < 50 ? (255 / 100) * (percent * 2) : 255}, ${
       percent >= 50 ? (255 / 100) * ((100 - percent) * 2) : 255
     }, 0)`;
   }
-  function percent(limit, quota) {
-    return limit === 0
-      ? 0
-      : ((100 / (limit ?? 1)) * (limit === 0 ? 0 : quota ?? 1)).toFixed(1);
+  function percent(limit?: number, quota?: number) {
+    return Number(limit === 0 ? 0 : ((100 / (limit ?? 1)) * (limit === 0 ? 0 : quota ?? 1)).toFixed(1));
   }
-  function limit(limit) {
-    return limit === 0 ? "∞" : limit ?? 0;
+  function limit(limit?: number) {
+    return limit === 0 ? '∞' : limit ?? 0;
   }
-  function limitCurrency(limit) {
-    return limit === 0 ? "∞" : Utils.Strings.currency(limit ?? 0);
+  function limitCurrency(limit?: number) {
+    return limit === 0 ? '∞' : Utils.Strings.currency(limit ?? 0);
   }
   $: staff = percent(limits?.limits?.staff, limits?.used?.staff);
   $: products = percent(limits?.limits?.products, limits?.used?.products);
   $: orders = percent(limits?.limits?.orders, limits?.used?.orders);
   $: coupons = percent(limits?.limits?.coupons, limits?.used?.coupons);
   $: categories = percent(limits?.limits?.categories, limits?.used?.categories);
-  $: pushNotifications = percent(
-    limits?.limits?.pushNotifications,
-    limits?.used?.pushNotifications
-  );
+  $: pushNotifications = percent(limits?.limits?.pushNotifications, limits?.used?.pushNotifications);
   $: billing = percent(limits?.limits?.billing, limits?.used?.billing);
 </script>
 
@@ -64,8 +59,7 @@
       <h4>
         <Fa style="color: #4c0708;" icon={faTruck} /> Pedidos
       </h4>
-      <span><b>Usado:</b> {limits?.used?.orders ?? 0} Pedidos este Mês</span
-      ><span>
+      <span><b>Usado:</b> {limits?.used?.orders ?? 0} Pedidos este Mês</span><span>
         <b>Limite:</b> {limit(limits?.limits?.orders)} Pedidos por Mês</span
       ><span><b>Percentagem:</b> {orders}% saturado</span>
       <div class="chart">
@@ -80,9 +74,9 @@
       <span
         ><b>Usado:</b>
         {Utils.Strings.currency(limits?.used?.billing) ?? 0} este Mês</span
-      ><span>
-        <b>Limite:</b> {limitCurrency(limits?.limits?.billing)} por Mês</span
-      ><span><b>Percentagem:</b> {billing}% saturado</span>
+      ><span> <b>Limite:</b> {limitCurrency(limits?.limits?.billing)} por Mês</span><span
+        ><b>Percentagem:</b> {billing}% saturado</span
+      >
       <div class="chart">
         <div style="--width: {billing}%; --color: {color(billing)};" />
       </div>
@@ -104,16 +98,11 @@
       <h4>
         <Fa style="color: #4c0708;" icon={faRocket} /> Mensagens push
       </h4>
-      <span><b>Usado:</b> {limits?.used?.pushNotifications ?? 0} este Mês</span
-      ><span>
+      <span><b>Usado:</b> {limits?.used?.pushNotifications ?? 0} este Mês</span><span>
         <b>Limite:</b> {limit(limits?.limits?.pushNotifications)} por Mês</span
       ><span><b>Percentagem:</b> {pushNotifications}% saturado</span>
       <div class="chart">
-        <div
-          style="--width: {pushNotifications}%; --color: {color(
-            pushNotifications
-          )};"
-        />
+        <div style="--width: {pushNotifications}%; --color: {color(pushNotifications)};" />
       </div>
     </article>
     <Views.Divider />

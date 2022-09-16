@@ -1,10 +1,10 @@
 <script>
-  import Fa from "svelte-fa";
-  import { faEdit, faSearch } from "@fortawesome/free-solid-svg-icons";
-  import { StatusBar } from "../../stores/Setup";
-  import { Views, Utils, Stores } from "@ikomida/components";
-  import { addStaff, GetAddressByCep } from "../../network/Staff";
-  import { onMount } from "svelte";
+  import Fa from 'svelte-fa';
+  import { faEdit, faSearch } from '@fortawesome/free-solid-svg-icons';
+  import { StatusBar } from '../../stores/Setup';
+  import { Views, Utils, Stores } from '@ikomida/shared-frontend';
+  import { addStaff, GetAddressByCep } from '../../network/Staff';
+  import { onMount } from 'svelte';
 
   let items = {
     name: null,
@@ -56,10 +56,7 @@
   };
   let currentPostalCode = null;
 
-  $: if (
-    (items?.address?.postalCode?.length ?? 0) === 8 &&
-    items?.address?.postalCode != currentPostalCode
-  ) {
+  $: if ((items?.address?.postalCode?.length ?? 0) === 8 && items?.address?.postalCode != currentPostalCode) {
     findAddress();
   }
   $: canProceed = Utils.Objects.validateFields(itemsValidation);
@@ -86,9 +83,7 @@
 
   const submit = async () => {
     if (!Utils.Objects.validateFields(itemsValidation)) {
-      Stores.MessageAlert.instance.show(
-        "Por favor preenche os dados do formulario corretamente"
-      );
+      Stores.MessageAlert.instance.show('Por favor preenche os dados do formulario corretamente');
       return;
     }
     Stores.Loading.instance.start();
@@ -105,7 +100,7 @@
     Stores.Loading.instance.stop();
   });
 
-  Stores.Title.instance.set("Novo colaborador");
+  Stores.Title.instance.set('Novo colaborador');
 </script>
 
 <div class="staff">
@@ -116,8 +111,8 @@
     bind:this={itemsInputs.name}
     bind:isValid={itemsValidation.name}
     type="name"
-    min="2"
-    max="255"
+    min={2}
+    max={255}
   />
   <Views.TextEdit
     placeHolder="Sobre nome"
@@ -125,8 +120,8 @@
     bind:this={itemsInputs.lastName}
     bind:isValid={itemsValidation.lastName}
     type="name"
-    min="2"
-    max="255"
+    min={2}
+    max={255}
   />
   <Views.TextEdit
     placeHolder="Email"
@@ -166,16 +161,16 @@
     bind:value={items.address.street}
     bind:this={itemsInputs.address.street}
     bind:isValid={itemsValidation.address.street}
-    min="2"
-    max="255"
+    min={2}
+    max={255}
   />
   <Views.TextEdit
     placeHolder="Número"
     bind:value={items.address.number}
     bind:this={itemsInputs.address.number}
     bind:isValid={itemsValidation.address.number}
-    min="1"
-    max="255"
+    min={1}
+    max={255}
     empty={!itemsValidation.address.postalCode}
   />
   <Views.TextEdit
@@ -189,8 +184,8 @@
     bind:value={items.address.neighborhood}
     bind:isValid={itemsValidation.address.neighborhood}
     bind:this={itemsInputs.address.neighborhood}
-    min="2"
-    max="255"
+    min={2}
+    max={255}
   />
   <Views.TextEdit
     disabled={true}
@@ -198,8 +193,8 @@
     bind:value={items.address.city}
     bind:isValid={itemsValidation.address.city}
     bind:this={itemsInputs.address.city}
-    min="2"
-    max="255"
+    min={2}
+    max={255}
   />
   <Views.TextEdit
     disabled={true}
@@ -207,14 +202,11 @@
     bind:value={items.address.stat}
     bind:this={itemsInputs.address.stat}
     bind:isValid={itemsValidation.address.stat}
-    min="2"
-    max="2"
+    min={2}
+    max={2}
   />
   <Views.Divider />
-  <Views.Button
-    disabled={!canProceed}
-    on:click={submit}
-    bottomPadding={$StatusBar.bottomPadding}
+  <Views.Button disabled={!canProceed} on:click={submit} bottomPadding={$StatusBar.bottomPadding}
     ><Fa icon={faEdit} /> <span>Adicionar</span></Views.Button
   >
 </div>

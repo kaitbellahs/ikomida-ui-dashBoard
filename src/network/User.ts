@@ -1,9 +1,9 @@
 import {
     Network,
-} from "@ikomida/components";
+} from "@ikomida/shared-frontend";
 
 export async function countUsers() {
-    let response = await Network.instance.get("/usersCount", true);
+    const response = await Network.instance?.get("/usersCount", true);
     if (response?.success) {
         return response?.data
     }

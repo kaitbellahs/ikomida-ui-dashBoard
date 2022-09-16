@@ -1,11 +1,11 @@
 <script>
-  import Routes from "../../stores/Routes";
-  import Fa from "svelte-fa";
-  import { faEdit } from "@fortawesome/free-solid-svg-icons";
-  import { StatusBar } from "../../stores/Setup";
-  import { Views, Types, Utils, Stores } from "@ikomida/components";
-  import { newCoupon } from "../../network/Payment";
-  import { onMount } from "svelte";
+  import Routes from '../../stores/Routes';
+  import Fa from 'svelte-fa';
+  import { faEdit } from '@fortawesome/free-solid-svg-icons';
+  import { StatusBar } from '../../stores/Setup';
+  import { Views, Types, Utils, Stores } from '@ikomida/shared-frontend';
+  import { newCoupon } from '../../network/Payment';
+  import { onMount } from 'svelte';
 
   let item = {
     name: null,
@@ -23,8 +23,7 @@
   let oldSelectedDiscountType = null;
   $: if (
     selectedDiscountType &&
-    (oldSelectedDiscountType === null ||
-      oldSelectedDiscountType?.id !== selectedDiscountType?.id)
+    (oldSelectedDiscountType === null || oldSelectedDiscountType?.id !== selectedDiscountType?.id)
   ) {
     item.valueType = selectedDiscountType?.id;
     item.value = 0;
@@ -46,7 +45,7 @@
   onMount(() => {
     Stores.Loading.instance.stop();
   });
-  Stores.Title.instance.set("Novo cupom");
+  Stores.Title.instance.set('Novo cupom');
 </script>
 
 <div class="coupon">
@@ -57,16 +56,16 @@
     bind:value={item.name}
     bind:isValid={itemsValidation.name}
     initialValue={item.name}
-    min="3"
-    max="255"
+    min={3}
+    max={255}
   />
   <Views.TextEdit
     placeHolder="Quantidade"
     bind:value={item.quantity}
     bind:isValid={itemsValidation.quantity}
     initialValue={item.quantity}
-    min="1"
-    max="11"
+    min={1}
+    max={11}
   />
   <Views.TextEdit
     type="date"
@@ -75,39 +74,32 @@
     bind:isValid={itemsValidation.validity}
     initialValue={item.validity}
   />
-  <Views.Selector
-    bind:selected={selectedDiscountType}
-    name="selecione uma opção"
-    options={Types.DiscountTypes.list}
-  />
+  <Views.Selector bind:selected={selectedDiscountType} name="selecione uma opção" options={Types.TDiscount.list} />
   {#if selectedDiscountType}
-    {#if selectedDiscountType.id === Types.DiscountTypes.PERCENT}
+    {#if selectedDiscountType.id === Types.TDiscount.PERCENT}
       <Views.TextEdit
         type="percent"
         placeHolder="Valor"
         bind:value={item.value}
         bind:isValid={itemsValidation.value}
         initialValue={item.value}
-        min="1"
-        max="11"
+        min={1}
+        max={11}
       />
-    {:else if selectedDiscountType.id === Types.DiscountTypes.VALUE}
+    {:else if selectedDiscountType.id === Types.TDiscount.VALUE}
       <Views.TextEdit
         placeHolder="Valor"
         bind:value={item.value}
         bind:isValid={itemsValidation.value}
         initialValue={item.value}
         type="currency"
-        min="1"
-        max="11"
+        min={1}
+        max={11}
       />
     {/if}
   {/if}
   <Views.Divider />
-  <Views.Button
-    disabled={!canContinue}
-    on:click={submit}
-    bottomPadding={$StatusBar.bottomPadding}
+  <Views.Button disabled={!canContinue} on:click={submit} bottomPadding={$StatusBar.bottomPadding}
     ><Fa icon={faEdit} /> <span>Salvar</span></Views.Button
   >
 </div>

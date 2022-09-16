@@ -1,57 +1,54 @@
-<script>
-  import { App } from "@capacitor/app";
-  import ikomidaID from "./stores/ikomidaID";
-  import { Network } from "@capacitor/network";
-  import { onMount } from "svelte";
-  import Routes from "./stores/Routes";
-  import { StatusBar as _StatusBar, Settings } from "./stores/Setup";
-  import { StatusBar } from "@ikomida/capacitor-plugin-status-bar";
-  import {
-    PushNotification,
-    Utils,
-    Views,
-    Network as iKomidaNetwork,
-    Stores,
-  } from "@ikomida/components";
-  import { registerPushNotificationToken } from "./network/PushNotification";
-  import Main from "./pages/Main.svelte";
-  import Login from "./pages/Unlogged/Login.svelte";
-  import Tac from "./pages/Unlogged/Tac.svelte";
-  import ForgotPassword from "./pages/Unlogged/ForgotPassword.svelte";
+<script lang="ts">
+  import { App } from '@capacitor/app';
+  import ikomidaID from './stores/ikomidaID';
+  import { Network } from '@capacitor/network';
+  import type { ConnectionStatus } from '@capacitor/network';
+  import { onMount } from 'svelte';
+  import Routes from './stores/Routes';
+  import { StatusBar as _StatusBar, Settings } from './stores/Setup';
+  import { StatusBar } from '@ikomida/capacitor-plugin-status-bar';
+  import { Utils, Views, Network as iKomidaNetwork, Stores, Types } from '@ikomida/shared-frontend';
+  import { registerPushNotificationToken } from './network/PushNotification';
+  import Main from './pages/Main.svelte';
+  import Login from './pages/Unlogged/Login.svelte';
+  import Tac from './pages/Unlogged/Tac.svelte';
+  import ForgotPassword from './pages/Unlogged/ForgotPassword.svelte';
+  import { Capacitor } from '@capacitor/core';
+  import type { IAlertButton } from '@ikomida/shared-frontend/lib/components/Alert.svelte';
 
-  let auth;
+  let auth: Stores.Auth.IStore;
   let router = Stores.Navigation.instance.router;
-  let notificationIds = [];
-  let networkStatus = null;
+  let notificationIds: string[] = [];
+  let networkStatus: ConnectionStatus | null = null;
   let logedIn = false;
   let showNotificationPopup = false;
   let notificationPopup = {
-    title: null,
-    body: null,
-    buttons: [],
+    title: '',
+    body: '',
+    buttons: [] as IAlertButton[],
   };
   function togglePushNotificationPopup() {
     showNotificationPopup = !showNotificationPopup;
   }
-  let pushNotification = new PushNotification(
+  let pushNotification = new Utils.PushNotification(
     hasRegisteredCallBack,
     receivedCallBack,
     actionPerformedCallBack,
     hasErrorCallBack,
-    permissionStatus
+    permissionStatus,
   );
 
-  const checkAppLaunchUrl = async () => {
-    const { url } = await App.getLaunchUrl();
+  // const checkAppLaunchUrl = async () => {
+  //   const { url } = await App.getLaunchUrl();
 
-    alert("App opened with URL: " + url);
-  };
+  //   alert('App opened with URL: ' + url);
+  // };
 
   $: route = $router.route;
   $: if (logedIn) {
     Utils.Jws.extractToken($auth).then(async (token) => {
       await ikomidaID.set(token?.ikomidaID);
-      iKomidaNetwork.instance.setIkomidaID(token?.ikomidaID);
+      iKomidaNetwork.instance?.setIkomidaID(token?.ikomidaID);
     });
   }
   $: if ($auth) {
@@ -60,65 +57,59 @@
       logedIn = token !== null;
     });
   } else {
-    ikomidaID
-      .get()
-      .then((id) =>
-        id && id !== "undefined"
-          ? iKomidaNetwork.instance.setIkomidaID(id)
-          : null
-      );
+    ikomidaID.get().then((id) => (id && id !== 'undefined' ? iKomidaNetwork.instance?.setIkomidaID(id) : null));
     logedIn = false;
   }
 
-  async function openNotification(notification) {
+  async function openNotification(notification: Types.Interfaces.INotificationPayload) {
     if (logedIn) {
-      if (["/order/", "/orders/"].includes(notification?.data?.uri)) {
-        await iKomidaNetwork.instance.clearStores.Cache(
-          Stores.Cache.Types.ORDERS
-        );
+      if (notification?.data?.uri && ['/order/', '/orders/'].includes(notification?.data?.uri)) {
+        await iKomidaNetwork.instance?.clearCache(Stores.Cache.Types.ORDERS);
         Stores.Navigation.instance.goTo(Routes.orders, false);
       }
     }
   }
 
-  async function hasRegisteredCallBack(token, platform) {
-    const tokenObject = { platform, token };
-    Stores.PushNotificationToken.setToken(tokenObject);
+  async function hasRegisteredCallBack(token: string, platform: string) {
+    const tokenObject = Types.Interfaces.IRegisterPushNotification.fromObject({ platform, token });
+    Stores.PushNotificationToken.instance.setToken(token);
     await registerPushNotificationToken(tokenObject);
   }
 
-  async function hasErrorCallBack(error) {
+  async function hasErrorCallBack(error: any) {
     //TODO: -- handle and report error
-    console.log({ level: "error", message: JSON.stringify(error) });
+    console.log({ level: 'error', message: JSON.stringify(error) });
   }
 
-  async function permissionStatus(permissionStatus) {
+  async function permissionStatus(permissionStatus: any) {
     //TODO: -- handle and report permissions
     console.log({
-      level: "info",
+      level: 'info',
       message: `permissionStatusObject: ${JSON.stringify(permissionStatus)}`,
     });
   }
 
-  function receivedCallBack(notification) {
-    console.log({ level: "info", message: JSON.stringify(notification) });
+  function receivedCallBack(notification: Types.Interfaces.INotificationPayload) {
+    console.log({ level: 'info', message: JSON.stringify(notification) });
     if (
       $Settings?.popups.newOrder &&
+      notification?.id &&
       !notificationIds.includes(notification?.id) &&
-      (logedIn || !((notification?.data?.logon ?? "true") === "true"))
+      (logedIn || !((notification?.data?.logon ?? 'true') === 'true'))
     ) {
       notificationIds.push(notification?.id);
-      notificationPopup.title = notification?.title;
-      notificationPopup.body = notification?.body;
+      notificationPopup.title = notification?.title ?? '';
+      notificationPopup.body = notification?.body ?? '';
       notificationPopup.buttons = [
         {
-          name: "Fechar",
+          name: 'Fechar',
           callback: togglePushNotificationPopup,
+          principal: false,
         },
       ];
       if (notification?.data?.uri) {
         notificationPopup?.buttons?.push({
-          name: "Abrir",
+          name: 'Abrir',
           callback: () => {
             showNotificationPopup = false;
             openNotification(notification);
@@ -127,18 +118,20 @@
         });
       }
       notificationPopup = notificationPopup;
-      console.log({ level: "info", message: "Inside" });
+      console.log({ level: 'info', message: 'Inside' });
       togglePushNotificationPopup();
     }
   }
 
-  function actionPerformedCallBack(notification) {
-    console.log({ level: "info", message: JSON.stringify(notification) });
-    openNotification(notification?.notification);
+  function actionPerformedCallBack(notification: Types.Interfaces.INotificationPayload) {
+    console.log({ level: 'info', message: JSON.stringify(notification) });
+    if (notification?.notification) {
+      openNotification(notification?.notification);
+    }
   }
 
   onMount(async () => {
-    auth = await Stores.Auth.instance.store();
+    auth = await Stores.Auth.Auth.instance.store();
     networkStatus = await Network.getStatus();
     if (Capacitor.isNativePlatform()) {
       pushNotification.init();
@@ -147,11 +140,11 @@
     }
   });
 
-  Network.addListener("networkStatusChange", (status) => {
+  Network.addListener('networkStatusChange', (status) => {
     networkStatus = status;
   });
 
-  App.addListener("appUrlOpen", (data) => {
+  App.addListener('appUrlOpen', (data) => {
     // console.log({
     //   level: "info",
     //   message: `App opened with URL: ${JSON.stringify(data)}`,
@@ -163,9 +156,7 @@
   });
 </script>
 
-<Views.LoadJS
-  url="https://www.google.com/recaptcha/api.js?render=6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS"
-/>
+<Views.LoadJS url="https://www.google.com/recaptcha/api.js?render=6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS" />
 {#if networkStatus == null || !networkStatus.connected}
   <div id="internetError">Esperando por conexão a internet...</div>
 {/if}
@@ -187,10 +178,7 @@
     buttons={notificationPopup?.buttons}
   />
 {/if}
-<Views.Loading
-  topPadding={$_StatusBar.height}
-  bottomPadding={$_StatusBar.bottomPadding}
-/>
+<Views.Loading topPadding={$_StatusBar.height} bottomPadding={$_StatusBar.bottomPadding} />
 <Views.MessageAlert />
 
 <style>

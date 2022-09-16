@@ -12,6 +12,7 @@ import {
 	asMarkupPreprocessor
 } from 'svelte-as-markup-preprocessor';
 import replace from "@rollup/plugin-replace";
+import typescript from '@rollup/plugin-typescript';
 // import obfuscatorPlugin from 'rollup-plugin-javascript-obfuscator';
 
 const production = !process.env.ROLLUP_WATCH;
@@ -44,9 +45,10 @@ export default {
 				return;
 			}
 		}
+		// if (warning.code === 'THIS_IS_UNDEFINED') { return; }
 		warn(warning);
 	},
-	input: 'src/main.js',
+	input: 'src/main.ts',
 	output: {
 		inlineDynamicImports: true,
 		sourcemap: !production,
@@ -72,7 +74,7 @@ export default {
 				// 	optionsPreset: 'medium-obfuscation',
 				// }),
 				asMarkupPreprocessor([
-					sveltePreprocess()
+					sveltePreprocess({ sourceMap: !production })
 				]),
 				cssModules(),
 			],
@@ -98,6 +100,10 @@ export default {
 			dedupe: ['svelte']
 		}),
 		commonjs(),
+		typescript({
+			sourceMap: !production,
+			inlineSources: !production
+		}),
 
 		// In dev mode, call `npm run start` once
 		// the bundle has been generated

@@ -1,7 +1,7 @@
 <script>
-  import { Views, Utils, Stores } from "@ikomida/components";
-  import { onMount } from "svelte";
-  import { updatePassword, logout } from "../../network/Auth";
+  import { Views, Utils, Stores } from '@ikomida/shared-frontend';
+  import { onMount } from 'svelte';
+  import { updatePassword, logout } from '../../network/Auth';
 
   let userInfo;
 
@@ -29,18 +29,16 @@
 
   async function editPassword() {
     if (!passwordValidationObject.newPass) {
-      Stores.MessageAlert.instance.show("A nova senha não está correta!");
+      Stores.MessageAlert.instance.show('A nova senha não está correta!');
       return;
     } else if (!passwordValidationObject.reNewPass) {
-      Stores.MessageAlert.instance.show(
-        "A confirmação da senha não está correta"
-      );
+      Stores.MessageAlert.instance.show('A confirmação da senha não está correta');
       return;
     }
     Stores.Loading.instance.start();
     let response = await updatePassword(passwordObject);
     if (response.success) {
-      Stores.MessageAlert.instance.show("Senha atualizada com sucesso!");
+      Stores.MessageAlert.instance.show('Senha atualizada com sucesso!');
     } else {
       Stores.MessageAlert.instance.show(response?.data);
       Stores.Loading.instance.stop();
@@ -50,12 +48,12 @@
   }
 
   onMount(async () => {
-    auth = await Stores.Auth.instance.store();
+    auth = await Stores.Auth.Auth.instance.store();
     userInfo = await Utils.Jws.extractToken($auth);
     Stores.Loading.instance.stop();
   });
 
-  Stores.Title.instance.set("Perfil");
+  Stores.Title.instance.set('Perfil');
 </script>
 
 {#if userInfo}
@@ -71,39 +69,20 @@
     <Views.Divider />
     <Views.TextValue
       text="CPF:"
-      value={Utils?.Strings?.formatString(
-        /\d/gi,
-        "___.___.___-__",
-        "_",
-        userInfo?.identity
-      )}
+      value={Utils?.Strings?.formatString(/\d/gi, '___.___.___-__', '_', userInfo?.identity)}
       fontSize="1.3em"
-      leftMargin="30"
+      leftMargin={30}
     />
     <Views.TextValue
       text="Telefone:"
-      value={Utils?.Strings?.formatString(
-        /\d/gi,
-        "(__) _____-____",
-        "_",
-        userInfo?.phone
-      )}
+      value={Utils?.Strings?.formatString(/\d/gi, '(__) _____-____', '_', userInfo?.phone)}
       fontSize="1.3em"
-      leftMargin="30"
+      leftMargin={30}
     />
-    <Views.TextValue
-      text="email:"
-      value={userInfo.email}
-      fontSize="1.3em"
-      leftMargin="30"
-    />
+    <Views.TextValue text="email:" value={userInfo.email} fontSize="1.3em" leftMargin={30} />
     <Views.Divider />
     <h2>Senha</h2>
-    <Views.TextEdit
-      type="password"
-      placeHolder="Senha atual"
-      bind:value={passwordObject.oldPass}
-    />
+    <Views.TextEdit type="password" placeHolder="Senha atual" bind:value={passwordObject.oldPass} />
     <Views.TextEdit
       type="password"
       placeHolder="Nova senha"

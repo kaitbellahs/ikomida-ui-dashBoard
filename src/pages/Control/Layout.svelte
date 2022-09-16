@@ -1,34 +1,34 @@
-<script>
-  import { Views, Utils, Stores } from "@ikomida/components";
-  import { getLayout, updateLayout } from "../../network/Layout";
-  import { StatusBar } from "../../stores/Setup";
-  import { onMount } from "svelte";
+<script lang="ts">
+  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend';
+  import { getLayout, updateLayout } from '../../network/Layout';
+  import { onMount } from 'svelte';
 
-  let layout = {
-    link: "#e8d130",
-    background: "#dfdfdf",
-    color: "#000000",
+  let layout = Types.Interfaces.ILayout.fromObject({
+    link: '#e8d130',
+    background: '#dfdfdf',
+    color: '#000000',
     header: {
-      color: "#ffffff",
-      background: "#4c0708",
-      menuHamburger: "#ffffff",
+      color: '#ffffff',
+      background: '#4c0708',
+      menuHamburger: '#ffffff',
     },
-    tabs: { background: "#ffe4c4", color: "#4c0708" },
-    button: { background: "#4c0708", color: "#ffffff" },
-    dialog: { background: "#ffffffdf", color: "#4c0708" },
-  };
+    tabs: { background: '#ffe4c4', color: '#4c0708' },
+    button: { background: '#4c0708', color: '#ffffff' },
+    dialog: { background: '#ffffffdf', color: '#4c0708' },
+  });
+  let textEdit = new Views.TextEdit({ target: new Element() });
   let layoutInputs = {
-    link: null,
-    background: null,
-    color: null,
+    link: textEdit,
+    background: textEdit,
+    color: textEdit,
     header: {
-      color: null,
-      background: null,
-      menuHamburger: null,
+      color: textEdit,
+      background: textEdit,
+      menuHamburger: textEdit,
     },
-    tabs: { background: null, color: null },
-    button: { background: null, color: null },
-    dialog: { background: null, color: null },
+    tabs: { background: textEdit, color: textEdit },
+    button: { background: textEdit, color: textEdit },
+    dialog: { background: textEdit, color: textEdit },
   };
 
   async function setLaout() {
@@ -43,22 +43,21 @@
   onMount(async () => {
     let response = await getLayout();
     if (response?.success && response?.data) {
-      layout = { ...layout, ...response?.data };
+      layout = Object.assign(layout, response?.data);
       Utils?.Objects?.updateInputs(layoutInputs, layout);
     }
     Stores.Loading.instance.stop();
   });
 
-  Stores.Title.instance.set("Ajustes");
+  Stores.Title.instance.set('Ajustes');
 </script>
 
 <div class="settings">
   <div class="data">
     <div
       class="sample"
-      style="--background: {layout.background}; --color: {layout.color}; --header: {layout
-        .header.background}; --headerTextColor: {layout.header
-        .color}; --menuHamburger: {layout.header.menuHamburger}; "
+      style="--background: {layout.background}; --color: {layout.color}; --header: {layout.header
+        ?.background}; --headerTextColor: {layout.header?.color}; --menuHamburger: {layout.header?.menuHamburger}; "
     >
       <div class="header">
         <div class="menuSandwich">
@@ -73,22 +72,12 @@
           Aqui é uma simulação dos textos normais do seu app.<br />
           <span style="color: {layout.link};">Aqui está um link</span>
         </div>
-        <button
-          style="background: {layout.button.background};color: {layout.button
-            .color}">Aqui um texto dentro de um botão</button
+        <button style="background: {layout.button?.background};color: {layout.button?.color}"
+          >Aqui um texto dentro de um botão</button
         >
       </div>
-      <div
-        style="background-color: {layout.tabs.background};color: {layout.tabs
-          .color};"
-        class="tabs"
-      >
-        <div
-          style="color: {layout.tabs.background};background-color: {layout.tabs
-            .color};"
-        >
-          Home
-        </div>
+      <div style="background-color: {layout.tabs?.background};color: {layout.tabs?.color};" class="tabs">
+        <div style="color: {layout.tabs?.background};background-color: {layout.tabs?.color};">Home</div>
         <div>produtos</div>
         <div>pedidos</div>
       </div>
