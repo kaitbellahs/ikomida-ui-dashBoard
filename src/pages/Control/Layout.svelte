@@ -3,7 +3,21 @@
   import { getLayout, updateLayout } from '../../network/Layout';
   import { onMount } from 'svelte';
 
-  let layout = Types.Interfaces.ILayout.fromObject({
+  interface ILayoutInputs {
+    link: Views.TextEdit;
+    background: Views.TextEdit;
+    color: Views.TextEdit;
+    header: {
+      color: Views.TextEdit;
+      background: Views.TextEdit;
+      menuHamburger: Views.TextEdit;
+    };
+    tabs: { background: Views.TextEdit; color: Views.TextEdit };
+    button: { background: Views.TextEdit; color: Views.TextEdit };
+    dialog: { background: Views.TextEdit; color: Views.TextEdit };
+  }
+
+  let layout = Types.Classes.CLayout.fromObject({
     link: '#e8d130',
     background: '#dfdfdf',
     color: '#000000',
@@ -16,20 +30,19 @@
     button: { background: '#4c0708', color: '#ffffff' },
     dialog: { background: '#ffffffdf', color: '#4c0708' },
   });
-  let textEdit = new Views.TextEdit({ target: new Element() });
   let layoutInputs = {
-    link: textEdit,
-    background: textEdit,
-    color: textEdit,
+    link: {},
+    background: {},
+    color: {},
     header: {
-      color: textEdit,
-      background: textEdit,
-      menuHamburger: textEdit,
+      color: {},
+      background: {},
+      menuHamburger: {},
     },
-    tabs: { background: textEdit, color: textEdit },
-    button: { background: textEdit, color: textEdit },
-    dialog: { background: textEdit, color: textEdit },
-  };
+    tabs: { background: {}, color: {} },
+    button: { background: {}, color: {} },
+    dialog: { background: {}, color: {} },
+  } as ILayoutInputs;
 
   async function setLaout() {
     Stores.Loading.instance.start();

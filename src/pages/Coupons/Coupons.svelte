@@ -27,7 +27,7 @@
   }
 
   function handleItems(items: any[]) {
-    items = Types.Interfaces.ICoupon.fromObject(items) as any;
+    items = Types.Classes.CCoupon.fromObject(items) as any;
   }
 
   Stores.Title.instance.set('Cupons');

@@ -61,7 +61,7 @@
     logedIn = false;
   }
 
-  async function openNotification(notification: Types.Interfaces.INotificationPayload) {
+  async function openNotification(notification: Types.Classes.CNotificationPayload) {
     if (logedIn) {
       if (notification?.data?.uri && ['/order/', '/orders/'].includes(notification?.data?.uri)) {
         await iKomidaNetwork.instance?.clearCache(Stores.Cache.Types.ORDERS);
@@ -71,7 +71,7 @@
   }
 
   async function hasRegisteredCallBack(token: string, platform: string) {
-    const tokenObject = Types.Interfaces.IRegisterPushNotification.fromObject({ platform, token });
+    const tokenObject = Types.Classes.CRegisterPushNotification.fromObject({ platform, token });
     Stores.PushNotificationToken.instance.setToken(token);
     await registerPushNotificationToken(tokenObject);
   }
@@ -89,7 +89,7 @@
     });
   }
 
-  function receivedCallBack(notification: Types.Interfaces.INotificationPayload) {
+  function receivedCallBack(notification: Types.Classes.CNotificationPayload) {
     console.log({ level: 'info', message: JSON.stringify(notification) });
     if (
       $Settings?.popups.newOrder &&
@@ -123,7 +123,7 @@
     }
   }
 
-  function actionPerformedCallBack(notification: Types.Interfaces.INotificationPayload) {
+  function actionPerformedCallBack(notification: Types.Classes.CNotificationPayload) {
     console.log({ level: 'info', message: JSON.stringify(notification) });
     if (notification?.notification) {
       openNotification(notification?.notification);

@@ -9,7 +9,7 @@ export async function GetPaymentMethods() {
     return Network.instance?.get("/payments", true);
 }
 
-export async function newCoupon(object: Types.Interfaces.ICoupon) {
+export async function newCoupon(object: Types.Classes.CCoupon) {
     const response = await Network.instance?.post("/coupon", true, object);
     if (response?.success) {
         await Network.instance?.clearCache(Stores.Cache.Types.STAFF)

@@ -12,7 +12,7 @@
   import { getSettings } from '../../network/Settings';
 
   const router = Stores.Navigation.instance.router;
-  const order: Types.Interfaces.IOrder = $router.options;
+  const order: Types.Classes.COrder = $router.options;
 
   let screenShot = true;
   let showImage = true;
@@ -21,7 +21,7 @@
 
   $: total = Number(order?.subtotal ?? 0) + Number(order?.delivery ?? 0) - Number(order?.discount ?? 0);
 
-  const nextButtonText = (order: Types.Interfaces.IOrder) => {
+  const nextButtonText = (order: Types.Classes.COrder) => {
     switch (order?.status) {
       case Types.Types.TOrderStatus.WAITING_PAYMENT:
         return '';
@@ -70,6 +70,7 @@
   async function goToProduct(id?: string) {
     Stores.Loading.instance.start();
     if (!id) {
+      Stores.Loading.instance.stop();
       return;
     }
     const response = await getOrder(id);
@@ -148,7 +149,7 @@
     <Views.Divider height={30} />
   </div>
   <div class="orderStatus" data-html2canvas-ignore>
-    {#if order.status && [Types.Types.TOrderStatus.WAITING_PAYMENT, Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY].includes(order.status) && order?.createdAt && new Date(new Date(order?.createdAt).getTime() + (order?.preparation?.max ?? 0) * 1000) < new Date()}
+    {#if order.status && [Types.Types.TOrderStatus.WAITING_PAYMENT, Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY].includes(order.status) && order?.createdAt && new Date(order?.createdAt.getTime() + (order?.preparation?.max ?? 0) * 1000) < new Date()}
       <Views.Status type={Types.Status.ERROR} circle={true}>Pedido atrasado</Views.Status>
     {/if}
     {#if order.status && [Types.Types.TOrderStatus.DELIVERED].includes(order.status)}
@@ -166,7 +167,7 @@
       <Views.Status showIcon={false} type={Types.Status.WARNING}
         >Prepare o pedido antes de
         {Utils.Strings.dateToString(
-          String(new Date(order?.createdAt ?? '').getTime() + (order?.preparation?.max ?? 0) * 1000),
+          String(new Date((order?.createdAt?.getTime() ?? 0) + (order?.preparation?.max ?? 0) * 1000)),
         )}</Views.Status
       >
       <Views.Divider />
@@ -184,11 +185,13 @@
   <span class="time">Data: {Utils.Strings.timestampToString(order?.createdAt?.getTime() ?? 0)}</span>
   <Views.Divider />
   <h3>Itens do pedido</h3>
-  {#each order?.products ?? [] as { id, title, price, quantity, discount, discountType }, index (id ?? index)}
-    <div class="product" on:click={() => goToProduct(id)}>
-      <span class="quantity">{quantity}</span><span class="title">{title}</span><span class="price"
+  {#each order?.products ?? [] as product, index (product.id ?? index)}
+    <div class="product" on:click={() => goToProduct(product.id)}>
+      <span class="quantity">{product.quantity}</span><span class="title">{product.title}</span><span class="price"
         >{Utils.Strings.currency(
-          (quantity ?? 0) * ((price ?? 0) - Logics.Finances.calcDiscount(price ?? 0, discount ?? 0, discountType)),
+          (product.quantity ?? 0) *
+            ((product.price ?? 0) -
+              Logics.Finances.calcDiscount(product.price ?? 0, product.discount ?? 0, product.discountType)),
         )}</span
       >
     </div>

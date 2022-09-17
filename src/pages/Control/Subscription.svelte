@@ -7,7 +7,7 @@
   import { faReceipt, faFileInvoice } from '@fortawesome/free-solid-svg-icons';
   import { AppLauncher } from '@capacitor/app-launcher';
 
-  let subscription: Types.Interfaces.ISubscription;
+  let subscription: Types.Classes.CSubscription;
 
   async function open(url?: string) {
     const { value } = await AppLauncher.canOpenUrl({ url: url ?? '' });
@@ -21,7 +21,7 @@
   }
 
   onMount(async () => {
-    subscription = (await getSubscription()) as Types.Interfaces.ISubscription;
+    subscription = (await getSubscription()) as Types.Classes.CSubscription;
     Stores.Loading.instance.stop();
   });
 

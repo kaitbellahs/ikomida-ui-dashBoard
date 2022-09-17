@@ -11,8 +11,8 @@
   let oldValue: string;
   let error = false;
 
-  let listableCategoryProducts: Types.Interfaces.ICategoryProducts[] = [];
-  let categoriesAndProducts: Types.Interfaces.ICategoryProducts[] = [];
+  let listableCategoryProducts: Types.Classes.CCategoryProducts[] = [];
+  let categoriesAndProducts: Types.Classes.CCategoryProducts[] = [];
   $: if (searchTerm !== oldValue) {
     error = false;
     if (searchTerm.length > 0) {
@@ -38,19 +38,19 @@
 
   function newProduct() {
     Stores.Navigation.instance.goTo(Routes.editProduct, {
-      item: Types.Interfaces.IProduct.fromObject({}),
+      item: Types.Classes.CProduct.fromObject({}),
       edit: false,
     });
   }
 
   function newCategory() {
     Stores.Navigation.instance.goTo(Routes.editCategory, {
-      item: Types.Interfaces.IProduct.fromObject({}),
+      item: Types.Classes.CProduct.fromObject({}),
       edit: false,
     });
   }
 
-  async function removeProduct(item: Types.Interfaces.IProduct) {
+  async function removeProduct(item: Types.Classes.CProduct) {
     Stores.Loading.instance.start();
     const response = await deleteProduct(item.id);
     if (!response?.success) {
@@ -70,7 +70,7 @@
     Stores.Loading.instance.stop();
   }
 
-  async function editCategory(item: Types.Interfaces.ICategoryProducts) {
+  async function editCategory(item: Types.Classes.CCategoryProducts) {
     Stores.Navigation.instance.goTo(Routes.editCategory, {
       item,
       edit: true,
@@ -95,10 +95,10 @@
     const indexOfProduct = product ? category?.products?.indexOf(product) : -1;
     const itemOrder = product?.order ?? indexOfProduct;
     const beforItemOrder = category?.products?.[(indexOfProduct ?? -1) - 1]?.order ?? (indexOfProduct ?? -1) - 1;
-    let objects: Types.Interfaces.IProduct[] = [];
-    objects.push(Types.Interfaces.IProduct.fromObject({ id: product?.id, order: (itemOrder ?? -1) - 1 }));
+    let objects: Types.Classes.CProduct[] = [];
+    objects.push(Types.Classes.CProduct.fromObject({ id: product?.id, order: (itemOrder ?? -1) - 1 }));
     objects.push(
-      Types.Interfaces.IProduct.fromObject({
+      Types.Classes.CProduct.fromObject({
         id: category?.products?.[(indexOfProduct ?? -1) - 1]?.id,
         order: beforItemOrder + 1,
       }),
@@ -125,10 +125,10 @@
     const indexOfProduct = product ? category?.products?.indexOf(product) : -1;
     const itemOrder = product?.order ?? indexOfProduct;
     const nextItemOrder = category?.products?.[(indexOfProduct ?? -1) + 1]?.order ?? (indexOfProduct ?? -1) + 1;
-    let objects: Types.Interfaces.IProduct[] = [];
-    objects.push(Types.Interfaces.IProduct.fromObject({ id: product?.id, order: (itemOrder ?? -1) + 1 }));
+    let objects: Types.Classes.CProduct[] = [];
+    objects.push(Types.Classes.CProduct.fromObject({ id: product?.id, order: (itemOrder ?? -1) + 1 }));
     objects.push(
-      Types.Interfaces.IProduct.fromObject({
+      Types.Classes.CProduct.fromObject({
         id: category?.products?.[(indexOfProduct ?? -1) + 1]?.id,
         order: nextItemOrder - 1,
       }),

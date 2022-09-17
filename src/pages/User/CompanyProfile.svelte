@@ -7,21 +7,35 @@
   import { faEdit, faSearch } from '@fortawesome/free-solid-svg-icons';
   import { GetAddressByCep } from '../../network/Staff';
 
-  let profile = Types.Interfaces.IVendorProfile.fromObject({});
-  let textEdit = new Views.TextEdit({ target: new Element() });
-  let profileInputs = {
-    phone: textEdit,
-    email: textEdit,
+  interface IProfileInputs {
+    phone: Views.TextEdit;
+    email: Views.TextEdit;
     address: {
-      postalCode: textEdit,
-      street: textEdit,
-      number: textEdit,
-      complement: textEdit,
-      neighborhood: textEdit,
-      city: textEdit,
-      stat: textEdit,
+      postalCode: Views.TextEdit;
+      street: Views.TextEdit;
+      number: Views.TextEdit;
+      complement: Views.TextEdit;
+      neighborhood: Views.TextEdit;
+      city: Views.TextEdit;
+      stat: Views.TextEdit;
+    };
+  }
+
+  let profile = Types.Classes.CVendorProfile.fillWith(null);
+
+  let profileInputs = {
+    phone: {},
+    email: {},
+    address: {
+      postalCode: {},
+      street: {},
+      number: {},
+      complement: {},
+      neighborhood: {},
+      city: {},
+      stat: {},
     },
-  };
+  } as IProfileInputs;
   let profileValidation = {
     phone: false,
     email: false,
@@ -63,7 +77,7 @@
   }
 
   const submit = async () => {
-    if (!Utils.Objects.validateFields(profileValidation)) {
+    if (!Utils.Objects.validateFields(profileValidation) || !profile.validate()) {
       Stores.MessageAlert.instance.show('Por favor preenche os dados do formulario corretamente');
       return;
     }
@@ -80,8 +94,10 @@
     const response = await getSettings();
     if (response?.success) {
       currentPostalCode = response?.data?.profile?.address?.postalCode;
-      profile = { ...profile, ...response?.data?.profile };
+      profile = Types.Classes.CVendorProfile.fromObject({ ...profile, ...response?.data?.profile });
+      console.log(profile);
       Utils.Objects.updateInputs(profileInputs, profile);
+      Stores.Loading.instance.stop();
     } else {
       Stores.MessageAlert.instance.show(response?.data);
     }

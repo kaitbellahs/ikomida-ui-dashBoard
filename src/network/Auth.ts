@@ -10,18 +10,18 @@ export async function doLogin(areaCode: string, phone: string, password: string)
     }, "login");
 }
 
-export async function updatePassword(object: Types.Interfaces.IUser) {
+export async function updatePassword(object: Types.Classes.CUser) {
     return Network.instance?.post("/password", true, object, "updatePassword");
 }
 
-export async function requestPasswordPhoneValidation(object: Types.Interfaces.IUser) {
+export async function requestPasswordPhoneValidation(object: Types.Classes.CUser) {
     return Network.instance?.post("/requestPasswordPhoneValidation", undefined, object, "requestPasswordPhoneValidation");
 }
-export async function validatePasswordPhoneValidationCode(object: Types.Interfaces.IUser) {
+export async function validatePasswordPhoneValidationCode(object: Types.Classes.CUser) {
     return Network.instance?.post("/validatePasswordPhoneValidationCode", undefined, object, "validatePasswordPhoneValidationCode");
 }
 
-export async function requestPassword(object: Types.Interfaces.IUser) {
+export async function requestPassword(object: Types.Classes.CUser) {
     return Network.instance?.post("/requestPassword", undefined, object, "requestPassword");
 }
 

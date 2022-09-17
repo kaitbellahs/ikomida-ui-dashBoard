@@ -9,7 +9,7 @@
     Stores.Loading.instance.stop();
   });
 
-  const nextButtonText = (order: Types.Interfaces.IOrder) => {
+  const nextButtonText = (order: Types.Classes.COrder) => {
     switch (order?.status) {
       case Types.Types.TOrderStatus.WAITING_PAYMENT:
         return '';
@@ -26,7 +26,7 @@
     }
   };
 
-  async function cancel(order: Types.Interfaces.IOrder) {
+  async function cancel(order: Types.Classes.COrder) {
     Stores.Loading.instance.start();
     const response = await ChangeOrderStatus(order?.id, Types.Types.TOrderStatus.CANCELED);
     if (response?.success) {
@@ -39,7 +39,7 @@
     Stores.Loading.instance.stop();
   }
 
-  async function next(order: Types.Interfaces.IOrder) {
+  async function next(order: Types.Classes.COrder) {
     Stores.Loading.instance.start();
     let newStatus = [...Types.Types.TOrderStatus][
       (Types.Types.TOrderStatus.values().indexOf(order?.status ?? Types.Types.TOrderStatus.WAITING_PAYMENT) ?? 0) + 1
@@ -55,14 +55,14 @@
     Stores.Loading.instance.stop();
   }
 
-  function goToOrder(order: Types.Interfaces.IOrder) {
+  function goToOrder(order: Types.Classes.COrder) {
     Stores.Navigation.instance.goTo(Routes.order, order);
   }
 
   function handleItems(items: any[]): any {
     console.log('1:', items);
     for (let index = 0; index < items.length; index++) {
-      items[index] = Types.Interfaces.IOrder.fromObject(items[index]);
+      items[index] = Types.Classes.COrder.fromObject(items[index]);
     }
     console.log('2:', items[0].createdAt);
     return items;

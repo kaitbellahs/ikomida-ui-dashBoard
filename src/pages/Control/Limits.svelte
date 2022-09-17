@@ -13,12 +13,12 @@
     faTableList,
   } from '@fortawesome/free-solid-svg-icons';
 
-  let limits: Types.Interfaces.IVendorLimits;
+  let limits: Types.Classes.CVendorLimits;
 
   onMount(async () => {
     const response = await getLimits();
     if (response?.success) {
-      limits = response.data as Types.Interfaces.IVendorLimits;
+      limits = response.data as Types.Classes.CVendorLimits;
     } else {
       Stores.MessageAlert.instance.show(response?.data);
     }

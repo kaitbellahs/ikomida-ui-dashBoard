@@ -17,12 +17,12 @@
   import { v4 as uuid } from 'uuid';
 
   let paymentGateway: any = { type: null, data: null };
-  let delivery = new Types.Interfaces.IVendorDelivery(false, 0, 0);
+  let delivery = new Types.Classes.CVendorDelivery(false, 0, 0);
   let deliveryInputs: { min?: Views.TextEdit; value?: Views.TextEdit } = { value: undefined, min: undefined };
-  let preparation = new Types.Interfaces.IVendorPreparation(0, 0);
+  let preparation = new Types.Classes.CVendorPreparation(0, 0);
   let preparationInputs: { min?: Views.TextEdit; max?: Views.TextEdit } = { min: undefined, max: undefined };
   let popupNewOrder = $Settings?.popups?.newOrder;
-  let userInfo: Types.Interfaces.IUser;
+  let userInfo: Types.Classes.CUser;
   let auth: Stores.Auth.IStore;
   const router = Stores.Navigation.instance.router;
 
@@ -36,7 +36,7 @@
     { name: 'Sabado', checked: false },
   ];
 
-  let business: Types.Interfaces.IBusinessTime = Types.Interfaces.IBusinessTime.fromObject({
+  let business: Types.Classes.CBusinessTime = Types.Classes.CBusinessTime.fromObject({
     days: [],
     hours: [],
   });
@@ -83,7 +83,7 @@
     if (!business?.hours) {
       business.hours = [];
     }
-    business.hours.push(new Types.Interfaces.IBusinessTimeHours({ id: uuid(), start: '08:00', end: '23:59' }));
+    business.hours.push(new Types.Classes.CBusinessTimeHours({ id: uuid(), start: '08:00', end: '23:59' }));
     business.hours = business.hours;
   };
 
@@ -202,7 +202,7 @@
     auth = await Stores.Auth.Auth.instance.store();
     userInfo = await Utils.Jws.extractToken($auth);
     const response = await getSettings();
-    const data = response?.data as Types.Interfaces.IVendorSettings;
+    const data = response?.data as Types.Classes.CVendorSettings;
     if (response?.success) {
       paymentGateway = { ...paymentGateway, ...data?.paymentGateway };
       business = Object.assign(business, data?.business);
