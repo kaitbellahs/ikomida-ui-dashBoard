@@ -59,97 +59,13 @@
     Stores.Navigation.instance.goTo(Routes.order, order);
   }
 
-  function handleItems(items: any[]) {
-    items = Types.Interfaces.IOrder.fromObject(items);
-    // for (let item of items as Types.Interfaces.IOrder[]) {
-    //   const products: Types.Interfaces.IProduct[] = [];
-    //   for (const product of item.products as Types.Interfaces.IProduct[]) {
-    //     const category = new Types.Interfaces.IProductCategory(
-    //       product.category?.title ?? '',
-    //       product.category?.image,
-    //       product.category?.description,
-    //       product.category?.id,
-    //     );
-    //     products.push(
-    //       new Types.Interfaces.IProduct(
-    //         product.title,
-    //         product.price,
-    //         product.discount,
-    //         product.discountType,
-    //         product.quantity,
-    //         product.description,
-    //         product.order,
-    //         product.serves,
-    //         product.weight,
-    //         category,
-    //         product.image,
-    //         product.createdAt,
-    //         product.id,
-    //         product.timestamp,
-    //       ),
-    //     );
-    //   }
-    //   const address = new Types.Interfaces.IAddress(
-    //     item.address?.postalCode,
-    //     item.address?.street,
-    //     item.address?.neighborhood,
-    //     item.address?.city,
-    //     item.address?.stat,
-    //     item.address?.number,
-    //     item.address?.complement,
-    //     item.address?.type,
-    //     item.address?.reference,
-    //     item.address?.distance,
-    //     item.address?.duration,
-    //     item.address?.selected,
-    //     item.address?.id,
-    //     item.address?.timestamp,
-    //   );
-    //   const preparation = new Types.Interfaces.IOrderPreparation(
-    //     item.preparation?.min,
-    //     item.preparation?.max,
-    //     item.preparation?.id,
-    //     item.preparation?.timestamp,
-    //   );
-    //   const payment = new Types.Interfaces.IPaymentMethods(
-    //     item.payment?.type ?? Types.Types.TPaymentMethod.CASH_ON_DELIVERY,
-    //     item.payment?.brand ?? '',
-    //     item.payment?.lastDigits ?? 0,
-    //     item.payment?.selected,
-    //     item.payment?.firstDigits,
-    //     item.payment?.createdAt,
-    //     item.payment?.id,
-    //     item.payment?.timestamp,
-    //   );
-    //   const coupon = new Types.Interfaces.ICoupon(
-    //     item.coupon?.name ?? '',
-    //     item.coupon?.value ?? 0,
-    //     item.coupon?.valueType ?? Types.Types.TDiscount.NO,
-    //     item.coupon?.quantity,
-    //     item.coupon?.validity,
-    //     item.coupon?.createdAt,
-    //     item.coupon?.id,
-    //     item.coupon?.timestamp,
-    //   );
-    //   item = new Types.Interfaces.IOrder(
-    //     item.subtotal,
-    //     item.discount,
-    //     item.delivery,
-    //     products,
-    //     address,
-    //     item.paymentMethodType,
-    //     preparation,
-    //     coupon,
-    //     item.createdAt,
-    //     item.customID,
-    //     item.status,
-    //     item.finishedAt,
-    //     payment,
-    //     item.user,
-    //     item.id,
-    //     item.timestamp,
-    //   );
-    // }
+  function handleItems(items: any[]): any {
+    console.log('1:', items);
+    for (let index = 0; index < items.length; index++) {
+      items[index] = Types.Interfaces.IOrder.fromObject(items[index]);
+    }
+    console.log('2:', items[0].createdAt);
+    return items;
   }
 
   Stores.Title.instance.set('Pedidos');
@@ -181,7 +97,7 @@
           <Views.Status showIcon={false} type={Types.Status.WARNING}
             >Prepare o pedido antes de
             {Utils.Strings.dateToString(
-              String(new Date(item?.createdAt).getTime() + item?.preparation?.max * 1000),
+              new Date(item?.createdAt.getTime() + item?.preparation?.max * 1000).toString(),
             )}</Views.Status
           >
           <Views.Divider height={5} />
@@ -189,7 +105,7 @@
       </div>
       {#if ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED].includes(item?.status)}
         <Views.Status>
-          Pedido {OrderStatus(item?.status)}
+          Pedido {item?.status?.description}
         </Views.Status>
         <Views.Divider height={5} />
       {/if}
@@ -208,12 +124,12 @@
       {/if}
       <Views.Divider height={5} />
       <div class="address">
-        Entregua na: <b>{item?.address.street ?? '-'}</b>
+        Entregua na: <b>{item.address?.street ?? '-'}</b>
       </div>
       <div class="paymentMethod">
         Forma de pagamento: <b
-          >{new Types.Types.TPaymentMethod(item?.payment.type).name}
-          {new Types.Types.TPaymentMethod(item?.payment.type).description}</b
+          >{item.payment?.type?.name}
+          {item.payment?.type?.description}</b
         >
       </div>
     </div>

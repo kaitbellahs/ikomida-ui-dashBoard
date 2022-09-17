@@ -9,7 +9,7 @@ export async function all(): Promise<Types.Interfaces.ICategoryProducts[]> {
         if (response?.success) {
             cache.setObject('Products', response?.data)
             timeout = new Date()
-            return response?.data as Types.Interfaces.ICategoryProducts[];
+            return Types.Interfaces.ICategoryProducts.fromObject(response?.data);
         } else {
             return [];
         }

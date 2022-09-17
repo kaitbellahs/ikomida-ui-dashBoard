@@ -239,7 +239,7 @@
     </span>
   </div>
   <div data-html2canvas-ignore class="buttonGroup">
-    {#if !order?.status || !order?.status || ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED].includes(order?.status)}
+    {#if !order?.status || ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED].includes(order?.status)}
       <Views.Button sizeMultiplier={0.8} type="secondary" on:click={cancel}>Cancelar</Views.Button>
     {/if}
     {#if !order?.status || ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED, Types.Types.TOrderStatus.WAITING_PAYMENT].includes(order?.status)}

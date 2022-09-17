@@ -31,9 +31,7 @@
   Stores.Title.instance.set('Produtos');
   onMount(async () => {
     categoriesAndProducts = await all();
-
     console.log(categoriesAndProducts);
-    // order();
     sortItems();
     Stores.Loading.instance.stop();
   });
