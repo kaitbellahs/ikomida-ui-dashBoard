@@ -21,7 +21,7 @@
   }
 
   onMount(async () => {
-    subscription = (await getSubscription()) as Types.Classes.CSubscription;
+    subscription = Types.Classes.CSubscription.fromObject(await getSubscription());
     Stores.Loading.instance.stop();
   });
 
