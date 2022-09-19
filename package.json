@@ -94,7 +94,7 @@
     "@capacitor/share": "^4.0.1",
     "@fortawesome/free-solid-svg-icons": "^6.1.1",
     "@ikomida/capacitor-plugin-status-bar": "github:TIAltoNivel/capacitor-plugin-statusbar",
-    "@ikomida/shared-frontend": "^0.0.71",
+    "@ikomida/shared-frontend": "^0.0.74",
     "capacitor-native-log": "^0.2.0",
     "html2canvas": "^1.4.1",
     "react-image-file-resizer": "^0.4.8",

@@ -114,7 +114,7 @@
     <Views.Divider />
     <Views.TextValue
       text="CNPJ:"
-      value={Utils?.Strings?.formatString(/\d/gi, '__.___.___/____-__', '_', profile?.cnpj)}
+      value={Utils?.Strings?.formatString(/\d/gi, '__.___.___/____-__', '_', profile?.contractIdentity)}
       fontSize="1.3em"
       leftMargin={30}
     />

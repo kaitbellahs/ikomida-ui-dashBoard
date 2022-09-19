@@ -25,12 +25,13 @@
     Stores.Loading.instance.stop();
   });
 
-  function subscriptionStatus(status?: Types.Types.TAsaasSignatureStatus) {
+  function subscriptionStatus(status?: Types.Types.Asaas.TAsaasSubscriptionStatus) {
+    console.log(status);
     switch (status) {
-      case Types.Types.TAsaasSignatureStatus.ACTIVE:
+      case Types.Types.Asaas.TAsaasSubscriptionStatus.ACTIVE:
         return 'Ativo';
-      case Types.Types.TAsaasSignatureStatus.CANCELED:
-        return 'Cancelado';
+      case Types.Types.Asaas.TAsaasSubscriptionStatus.EXPIRED:
+        return 'Expirado';
       default:
         return '-';
     }

@@ -1,9 +1,11 @@
 <script lang="ts">
   import Routes from '../../stores/Routes';
-  import { OrderStatus } from '../../network/Orders';
   import { Views, Utils, Types, Stores } from '@ikomida/shared-frontend';
   import { ChangeOrderStatus } from '../../network/Orders';
   import { onMount } from 'svelte';
+  import Item from '@ikomida/shared-frontend/lib/components/Item.svelte';
+
+  let items: Types.Classes.COrder[];
 
   onMount(async () => {
     Stores.Loading.instance.stop();
@@ -39,18 +41,22 @@
     Stores.Loading.instance.stop();
   }
 
-  async function next(order: Types.Classes.COrder) {
+  async function next(order: Types.Classes.COrder, index: number) {
     Stores.Loading.instance.start();
-    let newStatus = [...Types.Types.TOrderStatus][
-      (Types.Types.TOrderStatus.values().indexOf(order?.status ?? Types.Types.TOrderStatus.WAITING_PAYMENT) ?? 0) + 1
-    ];
-    const response = await ChangeOrderStatus(order?.id, newStatus);
-    if (response?.success) {
-      order.status = newStatus;
-      Stores.MessageAlert.instance.show('O pedido foi atualizado com sucesso!');
-      // items = items;
+    if (order?.status && order?.status !== Types.Types.TOrderStatus.DELIVERED) {
+      const newStatus = order?.status.next();
+      const response = await ChangeOrderStatus(order?.id, newStatus);
+      if (response?.success) {
+        order.status = newStatus;
+        items[index] = order;
+        items = items;
+        Stores.MessageAlert.instance.show('O pedido foi atualizado com sucesso!');
+        // items = items;
+      } else {
+        Stores.MessageAlert.instance.show(response?.data);
+      }
     } else {
-      Stores.MessageAlert.instance.show(response?.data);
+      Stores.MessageAlert.instance.show('Aconteceu um erro inesperado, por favor reinicie o iKomida app.');
     }
     Stores.Loading.instance.stop();
   }
@@ -59,13 +65,12 @@
     Stores.Navigation.instance.goTo(Routes.order, order);
   }
 
-  function handleItems(items: any[]): any {
-    console.log('1:', items);
+  $: if (items) {
     for (let index = 0; index < items.length; index++) {
       items[index] = Types.Classes.COrder.fromObject(items[index]);
     }
-    console.log('2:', items[0].createdAt);
-    return items;
+    items = items;
+    // return items;
   }
 
   Stores.Title.instance.set('Pedidos');
@@ -75,51 +80,52 @@
   noItems="Não há pedido para exibir por enquanto, aproveite e divulgue seu app para seus clientes, e se precisar de ajuda para fazer suas campanhas de propaganda nos dê um toque pra gente, que vamos te ajudar a turbinar suas vendas!"
   cache={Stores.Cache.Types.ORDERS}
   url="/orders"
-  {handleItems}
+  bind:items
   hasRecaptcha={true}
   let:item
+  let:index
 >
   <div class="leftShadow orderContainer">
     <div on:click={() => goToOrder(item)}>
-      <h3 class="title">Pedido N˚: {item?.customID}</h3>
-      {#if [Types.Types.TOrderStatus.WAITING_PAYMENT, Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY].includes(item?.status) && new Date(new Date(item?.createdAt).getTime() + item?.preparation?.max * 1000) < new Date()}
+      <h3 class="title">Pedido N˚: {item.customID}</h3>
+      {#if item.status && [Types.Types.TOrderStatus.WAITING_PAYMENT, Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY].includes(item.status) && new Date((item.createdAt?.getTime() ?? 0) + item.preparation?.max * 1000) < new Date()}
         <Views.Status type={Types.Status.ERROR} circle={false} showIcon={false}>Pedido atrasado</Views.Status>
       {/if}
-      {#if [Types.Types.TOrderStatus.DELIVERED].includes(item?.status)}
+      {#if item.status && [Types.Types.TOrderStatus.DELIVERED].includes(item.status)}
         <Views.Status type={Types.Status.SUCCESS} circle={false} showIcon={false}>Pedido entregue</Views.Status>
       {/if}
-      {#if [Types.Types.TOrderStatus.CANCELED].includes(item?.status)}
+      {#if item.status && [Types.Types.TOrderStatus.CANCELED].includes(item.status)}
         <Views.Status type={Types.Status.ERROR} circle={false} showIcon={false}>Pedido cancelado</Views.Status>
       {/if}
       <Views.Divider height={5} />
       <div class="info">
-        {#if [Types.Types.TOrderStatus.WAITING_PAYMENT, Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY].includes(item?.status)}
+        {#if item.status && [Types.Types.TOrderStatus.WAITING_PAYMENT, Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY].includes(item.status)}
           <Views.Status showIcon={false} type={Types.Status.WARNING}
             >Prepare o pedido antes de
             {Utils.Strings.dateToString(
-              new Date(item?.createdAt.getTime() + item?.preparation?.max * 1000).toString(),
+              new Date((item.createdAt?.getTime() ?? 0) + item.preparation?.max * 1000).toString(),
             )}</Views.Status
           >
           <Views.Divider height={5} />
         {/if}
       </div>
-      {#if ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED].includes(item?.status)}
+      {#if item.status && ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED].includes(item.status)}
         <Views.Status>
-          Pedido {item?.status?.description}
+          Pedido {item.status?.description}
         </Views.Status>
         <Views.Divider height={5} />
       {/if}
       <div class="time">
-        Data: {Utils.Strings.dateToString(item?.createdAt)}
+        Data: {Utils.Strings.dateToString(item.createdAt?.toString())}
       </div>
       <Views.Divider height={10} />
-      {#if item?.products?.length > 0}
-        <div class="product">1. {item?.products?.[0]?.title}</div>
+      {#if item.products?.length > 0}
+        <div class="product">1. {item.products?.[0]?.title}</div>
       {/if}
-      {#if item?.products?.length > 1}
+      {#if item.products?.length > 1}
         <div class="product">
-          e mais {item?.products?.length - 1}
-          {item?.products?.length - 1 == 1 ? 'item' : 'itens'}
+          e mais {item.products?.length - 1}
+          {item.products?.length - 1 == 1 ? 'item' : 'itens'}
         </div>
       {/if}
       <Views.Divider height={5} />
@@ -137,18 +143,18 @@
     <div class="value">
       Total:&nbsp;<span
         >{Utils.Strings.currency(
-          Number(item?.subtotal ?? 0) + Number(item?.delivery ?? 0) - Number(item?.discount ?? 0),
+          Number(item.subtotal ?? 0) + Number(item.delivery ?? 0) - Number(item.discount ?? 0),
         )}</span
       >
     </div>
-    {#if ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED, Types.Types.TOrderStatus.WAITING_PAYMENT].includes(item?.status)}
+    {#if item.status && ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED, Types.Types.TOrderStatus.WAITING_PAYMENT].includes(item.status)}
       <Views.Divider height={10} />
       <div class="buttonGroup">
-        {#if ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED].includes(item?.status)}
+        {#if item.status && ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED].includes(item.status)}
           <Views.Button sizeMultiplier={0.8} type="secondary" on:click={() => cancel(item)}>Cancelar</Views.Button>
         {/if}
-        {#if ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED, Types.Types.TOrderStatus.WAITING_PAYMENT].includes(item?.status)}
-          <Views.Button sizeMultiplier={0.8} on:click={() => next(item)}>{nextButtonText(item)}</Views.Button>
+        {#if item.status && ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED, Types.Types.TOrderStatus.WAITING_PAYMENT].includes(item.status)}
+          <Views.Button sizeMultiplier={0.8} on:click={() => next(item, index)}>{nextButtonText(item)}</Views.Button>
         {/if}
       </div>
     {/if}

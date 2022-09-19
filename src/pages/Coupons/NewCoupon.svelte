@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import Routes from '../../stores/Routes';
   import Fa from 'svelte-fa';
   import { faEdit } from '@fortawesome/free-solid-svg-icons';
@@ -7,27 +7,21 @@
   import { newCoupon } from '../../network/Payment';
   import { onMount } from 'svelte';
 
-  let item = {
+  let item: Types.Classes.CCoupon = Types.Classes.CCoupon.fromObject({
     name: null,
     value: null,
+    valueType: null,
     quantity: null,
     validity: null,
-  };
+  });
   let itemsValidation = {
-    name: null,
-    value: null,
-    quantity: null,
-    validity: null,
+    name: false,
+    value: false,
+    quantity: false,
+    validity: false,
   };
-  let selectedDiscountType;
-  let oldSelectedDiscountType = null;
-  $: if (
-    selectedDiscountType &&
-    (oldSelectedDiscountType === null || oldSelectedDiscountType?.id !== selectedDiscountType?.id)
-  ) {
-    item.valueType = selectedDiscountType?.id;
+  $: if (item.valueType) {
     item.value = 0;
-    oldSelectedDiscountType = selectedDiscountType;
   }
   $: canContinue = Utils.Objects.validateFields(itemsValidation);
 
@@ -60,6 +54,7 @@
     max={255}
   />
   <Views.TextEdit
+    type="number"
     placeHolder="Quantidade"
     bind:value={item.quantity}
     bind:isValid={itemsValidation.quantity}
@@ -72,11 +67,10 @@
     placeHolder="Validade"
     bind:value={item.validity}
     bind:isValid={itemsValidation.validity}
-    initialValue={item.validity}
   />
-  <Views.Selector bind:selected={selectedDiscountType} name="selecione uma opção" options={Types.TDiscount.list} />
-  {#if selectedDiscountType}
-    {#if selectedDiscountType.id === Types.TDiscount.PERCENT}
+  <Views.Selector bind:selected={item.valueType} name="selecione uma opção" options={Types.Types.TDiscount.values()} />
+  {#if item.valueType}
+    {#if item.valueType === Types.Types.TDiscount.PERCENT}
       <Views.TextEdit
         type="percent"
         placeHolder="Valor"
@@ -86,7 +80,7 @@
         min={1}
         max={11}
       />
-    {:else if selectedDiscountType.id === Types.TDiscount.VALUE}
+    {:else if item.valueType === Types.Types.TDiscount.VALUE}
       <Views.TextEdit
         placeHolder="Valor"
         bind:value={item.value}

@@ -17,9 +17,9 @@
   import { v4 as uuid } from 'uuid';
 
   let paymentGateway: any = { type: null, data: null };
-  let delivery = new Types.Classes.CVendorDelivery(false, 0, 0);
+  let delivery = Types.Classes.CVendorDelivery.init(false, 0, 0);
   let deliveryInputs: { min?: Views.TextEdit; value?: Views.TextEdit } = { value: undefined, min: undefined };
-  let preparation = new Types.Classes.CVendorPreparation(0, 0);
+  let preparation = Types.Classes.CVendorPreparation.init(0, 0);
   let preparationInputs: { min?: Views.TextEdit; max?: Views.TextEdit } = { min: undefined, max: undefined };
   let popupNewOrder = $Settings?.popups?.newOrder;
   let userInfo: Types.Classes.CUser;
@@ -83,7 +83,7 @@
     if (!business?.hours) {
       business.hours = [];
     }
-    business.hours.push(new Types.Classes.CBusinessTimeHours({ id: uuid(), start: '08:00', end: '23:59' }));
+    business.hours.push(Types.Classes.CBusinessTimeHours.fromObject({ id: uuid(), start: '08:00', end: '23:59' }));
     business.hours = business.hours;
   };
 

@@ -8,7 +8,7 @@
 
   const router = Stores.Navigation.instance.router;
   const item = $router.options;
-
+  console.log('item:', item);
   const edit = async () => {
     Stores.Navigation.instance.goTo(Routes.editProduct, {
       item,

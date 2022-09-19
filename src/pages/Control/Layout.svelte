@@ -17,7 +17,7 @@
     dialog: { background: Views.TextEdit; color: Views.TextEdit };
   }
 
-  let layout = Types.Classes.CLayout.fromObject({
+  let layout: Types.Classes.CLayout = Types.Classes.CLayout.fromObject({
     link: '#e8d130',
     background: '#dfdfdf',
     color: '#000000',

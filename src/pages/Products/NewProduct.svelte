@@ -10,13 +10,11 @@
   const router = Stores.Navigation.instance.router;
   const discountTypeOptions = Types.Types.TDiscount.values() as Types.SelectorOptions[];
 
-  let { item, edit } = $router.options;
+  const item: Types.Classes.CProduct = $router.options.item;
+  const edit = $router.options.edit;
 
   let categoriesOptions: Types.SelectorOptions[] = [];
-  let firstLaunch = true;
-  let selectedDiscountType: Types.SelectorOptions;
-  let oldSelectedDiscountType: Types.SelectorOptions | null | undefined = null;
-  let itemsValidation = {
+  const itemsValidation = {
     title: false,
     description: false,
     weight: false,
@@ -26,40 +24,15 @@
     quantity: false,
   };
 
-  $: if (
-    selectedDiscountType &&
-    (oldSelectedDiscountType === null || oldSelectedDiscountType?.id !== selectedDiscountType?.id)
-  ) {
-    item.discountType = selectedDiscountType?.id;
-    item.discount = item.discount;
-    oldSelectedDiscountType = selectedDiscountType;
-  }
-
   $: canContinue =
     item?.category &&
     itemsValidation?.title &&
     itemsValidation?.description &&
     itemsValidation?.weight &&
     itemsValidation?.price &&
-    (itemsValidation?.discount || selectedDiscountType === Types.Types.TDiscount.NO) &&
+    (itemsValidation?.discount || item.discountType === Types.Types.TDiscount.NO) &&
     itemsValidation?.serves &&
     itemsValidation?.quantity;
-
-  $: if (firstLaunch) {
-    if ((categoriesOptions?.length ?? 0) > 0) {
-      const result = categoriesOptions.filter((option) => option.id == item.categoryID);
-      item.category = result.length > 0 ? result[0] : null;
-    }
-
-    if (!item?.image) {
-      item.image = null;
-    }
-
-    const result = [Types.Types.TDiscount].filter((option) => option == item.discountType);
-
-    selectedDiscountType = result?.[0] as unknown as Types.SelectorOptions;
-    firstLaunch = false;
-  }
 
   async function submit() {
     if (!canContinue) {
@@ -87,10 +60,6 @@
       categoriesOptions = response?.map((item) => {
         return { id: item.id, name: item.title } as Types.SelectorOptions;
       });
-      if (categoriesOptions.length > 0) {
-        const result = categoriesOptions.filter((option) => option.id == item.categoryID);
-        item.category = result.length > 0 ? result[0] : null;
-      }
     }
     Stores.Loading.instance.stop();
   }
@@ -103,9 +72,6 @@
   };
 
   onMount(async () => {
-    if (!item.category) {
-      item.category = null;
-    }
     Stores.Loading.instance.stop();
   });
 
@@ -172,9 +138,9 @@
       max={9}
     />
     <Views.Divider />
-    <Views.Selector bind:selected={selectedDiscountType} name="selecione uma opção" options={discountTypeOptions} />
-    {#if selectedDiscountType}
-      {#if selectedDiscountType.id === Types.Types.TDiscount.PERCENT}
+    <Views.Selector bind:selected={item.discountType} name="selecione uma opção" options={discountTypeOptions} />
+    {#if item.discountType}
+      {#if item.discountType === Types.Types.TDiscount.PERCENT}
         <Views.TextEdit
           type="percent"
           placeHolder="Disconto"
@@ -185,7 +151,7 @@
           error="A percentagem do desconto deve ser maior que % 0,00 e menor que % 100,00"
         />
         <Views.Divider />
-      {:else if selectedDiscountType.id === Types.Types.TDiscount.VALUE}
+      {:else if item.discountType === Types.Types.TDiscount.VALUE}
         <Views.TextEdit
           placeHolder="Disconto"
           bind:value={item.discount}

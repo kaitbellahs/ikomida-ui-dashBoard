@@ -14,7 +14,7 @@
   const router = Stores.Navigation.instance.router;
   const order: Types.Classes.COrder = $router.options;
 
-  let screenShot = true;
+  let screenShot = false;
   let showImage = true;
   let orderScreen: HTMLElement;
   let showCardBrand = false;
@@ -52,7 +52,7 @@
 
   async function next() {
     Stores.Loading.instance.start();
-    let newStatus = order?.status;
+    const newStatus = order.status?.next();
     const response = await ChangeOrderStatus(order?.id, newStatus);
     if (response?.success) {
       order.status = newStatus;
@@ -93,6 +93,7 @@
       useCORS: true,
     });
     screenShot = false;
+    await tick();
     Stores.Loading.instance.stop();
     const data = canvas.toDataURL('image/jpeg', 1.0).split(',');
     const screenShotFile = await Filesystem.writeFile({

@@ -6,7 +6,7 @@
   import { deleteCoupon } from '../../network/Payment';
   import { StatusBar } from '../../stores/Setup';
   import { onMount } from 'svelte';
-
+  let items: Types.Classes.CCoupon[];
   onMount(async () => {
     Stores.Loading.instance.stop();
   });
@@ -26,8 +26,8 @@
     Stores.Loading.instance.stop();
   }
 
-  function handleItems(items: any[]) {
-    items = Types.Classes.CCoupon.fromObject(items) as any;
+  $: if (items) {
+    items = Types.Classes.CCoupon.fromObject(items);
   }
 
   Stores.Title.instance.set('Cupons');
@@ -41,14 +41,14 @@
   noItems="Não há cupons para exibir por enquanto, aproveite e cadastre novos cupons para agradar seus clientes!"
   cache={Stores.Cache.Types.COUPONS}
   url="/coupons"
-  {handleItems}
+  {items}
   let:item
 >
   <article>
     <Views.FloatRemove callback={() => removeCoupon(item?.id)} />
     <h2>{item?.name}</h2>
-    <div>{Utils.Strings.currency(item?.value)}</div>
-    <div>{Utils.Strings.dateToDateString(item?.validity)}</div>
+    <div>{Utils.Strings.currency(item.value)}</div>
+    <div>{Utils.Strings.dateToDateString(item.validity?.toString())}</div>
   </article>
 </Views.LoadMoreReusableList>
 

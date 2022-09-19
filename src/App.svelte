@@ -71,7 +71,10 @@
   }
 
   async function hasRegisteredCallBack(token: string, platform: string) {
-    const tokenObject = Types.Classes.CRegisterPushNotification.fromObject({ platform, token });
+    const tokenObject: Types.Classes.CRegisterPushNotification = Types.Classes.CRegisterPushNotification.fromObject({
+      platform,
+      token,
+    });
     Stores.PushNotificationToken.instance.setToken(token);
     await registerPushNotificationToken(tokenObject);
   }
