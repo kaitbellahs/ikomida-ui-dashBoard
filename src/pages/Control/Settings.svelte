@@ -118,6 +118,7 @@
       return;
     }
     for (const businessHour of business?.hours ?? []) {
+      console.log(businessHour);
       if (!validateTime(businessHour?.start)) {
         Stores.MessageAlert.instance.show(
           'O horário de abertura é inválida, o formato deve ser HH:mm e entre 00:00 e 23:59!',
@@ -127,6 +128,12 @@
       } else if (!validateTime(businessHour?.end)) {
         Stores.MessageAlert.instance.show(
           'O horário de fechamento é inválida, o formato deve ser HH:mm e entre 00:00 e 23:59!',
+        );
+        Stores.Loading.instance.stop();
+        return;
+      } else if (Number(businessHour.start) > Number(businessHour.end)) {
+        Stores.MessageAlert.instance.show(
+          'O horário de abertura deve estar menor que o horário de fechamento, exemplo de abertura: 09:00 e fechamento: 18:00!',
         );
         Stores.Loading.instance.stop();
         return;
@@ -155,8 +162,13 @@
   }
 
   async function updateDelivery() {
+    const vendorSettings = Types.Classes.CVendorSettings.fromObject({ preparation, delivery });
+    if (!vendorSettings.validate()) {
+      Stores.MessageAlert.instance.show(`Algum dos dados fornecidos não é válido!`);
+      return;
+    }
     Stores.Loading.instance.start();
-    const response = await setDelivery(preparation, delivery);
+    const response = await setDelivery(vendorSettings);
     if (!response?.success) {
       Stores.MessageAlert.instance.show(response?.data);
     }
@@ -234,18 +246,16 @@
           <div class="twoCells">
             <Views.TextEdit
               placeHolder="Abertura"
-              mask="__:__"
               initialValue={businessHour.start}
               bind:value={businessHour.start}
-              type="number"
+              type={Types.TTextEdit.TIME}
               rightPadding={10}
             />
             <Views.TextEdit
               placeHolder="Fechamento"
               bind:value={businessHour.end}
               initialValue={businessHour.end}
-              mask="__:__"
-              type="number"
+              type={Types.TTextEdit.TIME}
               leftPadding={10}
             />
           </div>
@@ -282,7 +292,7 @@
         bind:value={preparation.min}
         bind:this={preparationInputs.min}
         initialValue={preparation.min}
-        type="number"
+        type={Types.TTextEdit.NUMBER}
         rightPadding={10}
       />
       <Views.TextEdit
@@ -290,7 +300,7 @@
         bind:value={preparation.max}
         bind:this={preparationInputs.max}
         initialValue={preparation.max}
-        type="number"
+        type={Types.TTextEdit.NUMBER}
         leftPadding={10}
       />
     </div>
@@ -303,14 +313,14 @@
     <Views.Switch name="Frete grátis" bind:checked={delivery.free} />
     {#if !(delivery?.free || false)}
       <Views.TextEdit
-        type="currency"
+        type={Types.TTextEdit.CURRENCY}
         bind:value={delivery.value}
         bind:this={deliveryInputs.value}
         initialValue={delivery.value}
         placeHolder="Valor por KM"
       />
       <Views.TextEdit
-        type="currency"
+        type={Types.TTextEdit.CURRENCY}
         bind:value={delivery.min}
         bind:this={deliveryInputs.min}
         initialValue={delivery.min}

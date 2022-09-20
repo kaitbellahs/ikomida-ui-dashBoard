@@ -34,7 +34,7 @@
   }
 
   function roleName(role) {
-    switch (role.toLowerCase()) {
+    switch (role.toUpperCase()) {
       case 'VENDOR':
         return 'Responsável';
       case 'STAFF':

@@ -86,7 +86,7 @@
         category.products = category?.products?.sort((i1, i2) => (i1?.order ?? 0) - (i2?.order ?? 0));
         return category;
       })
-      .sort((i1, i2) => (i1?.order ?? 0) - (i2?.order ?? 0));
+      .sort((i1, i2) => (i1.order ?? 0) - (i2.order ?? 0));
   }
   async function itemUp(categoryId?: string, id?: string) {
     const category = categoriesAndProducts?.filter((category) => category.id === categoryId)?.[0];

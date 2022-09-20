@@ -1,5 +1,5 @@
 <script>
-  import { Views, Utils, Stores } from '@ikomida/shared-frontend';
+  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend';
   import { onMount } from 'svelte';
   import { updatePassword, logout } from '../../network/Auth';
 
@@ -82,9 +82,9 @@
     <Views.TextValue text="email:" value={userInfo.email} fontSize="1.3em" leftMargin={30} />
     <Views.Divider />
     <h2>Senha</h2>
-    <Views.TextEdit type="password" placeHolder="Senha atual" bind:value={passwordObject.oldPass} />
+    <Views.TextEdit type={Types.TTextEdit.PASSWORD} placeHolder="Senha atual" bind:value={passwordObject.oldPass} />
     <Views.TextEdit
-      type="password"
+      type={Types.TTextEdit.PASSWORD}
       placeHolder="Nova senha"
       bind:value={passwordObject.newPass}
       bind:isValid={passwordValidationObject.newPass}
@@ -92,7 +92,7 @@
         uma letra maiúscula, uma letra minúscula, um número e um símbolo"
     />
     <Views.TextEdit
-      type="password"
+      type={Types.TTextEdit.PASSWORD}
       placeHolder="Confirmação"
       bind:value={passwordObject.reNewPass}
       bind:isValid={passwordValidationObject.reNewPass}

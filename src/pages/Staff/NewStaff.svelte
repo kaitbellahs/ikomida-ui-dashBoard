@@ -2,7 +2,7 @@
   import Fa from 'svelte-fa';
   import { faEdit, faSearch } from '@fortawesome/free-solid-svg-icons';
   import { StatusBar } from '../../stores/Setup';
-  import { Views, Utils, Stores } from '@ikomida/shared-frontend';
+  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend';
   import { addStaff, GetAddressByCep } from '../../network/Staff';
   import { onMount } from 'svelte';
 
@@ -110,7 +110,7 @@
     bind:value={items.name}
     bind:this={itemsInputs.name}
     bind:isValid={itemsValidation.name}
-    type="name"
+    type={Types.TTextEdit.NAME}
     min={2}
     max={255}
   />
@@ -119,7 +119,7 @@
     bind:value={items.lastName}
     bind:this={itemsInputs.lastName}
     bind:isValid={itemsValidation.lastName}
-    type="name"
+    type={Types.TTextEdit.NAME}
     min={2}
     max={255}
   />
@@ -128,18 +128,18 @@
     bind:value={items.email}
     bind:isValid={itemsValidation.email}
     bind:this={itemsInputs.email}
-    type="email"
+    type={Types.TTextEdit.EMAIL}
   />
   <Views.TextEdit
     bind:value={items.phone}
     bind:this={itemsInputs.phone}
     bind:isValid={itemsValidation.phone}
-    type="phone"
+    type={Types.TTextEdit.PHONE}
     placeHolder="Número de celular"
   />
   <Views.TextEdit
     placeHolder="CPF"
-    type="cpf"
+    type={Types.TTextEdit.CPF}
     bind:value={items.cpf}
     bind:this={itemsInputs.cpf}
     bind:isValid={itemsValidation.cpf}
@@ -147,7 +147,7 @@
   <Views.Divider />
   <h2>Endereço</h2>
   <Views.TextEdit
-    type="cep"
+    type={Types.TTextEdit.CEP}
     callback={findAddress}
     buttonIcon={faSearch}
     bind:value={items.address.postalCode}

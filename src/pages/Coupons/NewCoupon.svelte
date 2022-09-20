@@ -7,9 +7,10 @@
   import { newCoupon } from '../../network/Payment';
   import { onMount } from 'svelte';
 
+  let valueType: Types.Types.TDiscount | null = null;
   let item: Types.Classes.CCoupon = Types.Classes.CCoupon.fromObject({
     name: null,
-    value: null,
+    value: 0,
     valueType: null,
     quantity: null,
     validity: null,
@@ -20,7 +21,9 @@
     quantity: false,
     validity: false,
   };
-  $: if (item.valueType) {
+
+  $: if (valueType !== item.valueType) {
+    valueType = item.valueType;
     item.value = 0;
   }
   $: canContinue = Utils.Objects.validateFields(itemsValidation);
@@ -44,7 +47,7 @@
 
 <div class="coupon">
   <Views.TextEdit
-    type="alphanumeric"
+    type={Types.TTextEdit.ALPHA_NUMERIC}
     upper={true}
     placeHolder="Nome"
     bind:value={item.name}
@@ -54,7 +57,7 @@
     max={255}
   />
   <Views.TextEdit
-    type="number"
+    type={Types.TTextEdit.NUMBER}
     placeHolder="Quantidade"
     bind:value={item.quantity}
     bind:isValid={itemsValidation.quantity}
@@ -63,7 +66,7 @@
     max={11}
   />
   <Views.TextEdit
-    type="date"
+    type={Types.TTextEdit.DATE}
     placeHolder="Validade"
     bind:value={item.validity}
     bind:isValid={itemsValidation.validity}
@@ -72,7 +75,7 @@
   {#if item.valueType}
     {#if item.valueType === Types.Types.TDiscount.PERCENT}
       <Views.TextEdit
-        type="percent"
+        type={Types.TTextEdit.PERCENT}
         placeHolder="Valor"
         bind:value={item.value}
         bind:isValid={itemsValidation.value}
@@ -86,7 +89,7 @@
         bind:value={item.value}
         bind:isValid={itemsValidation.value}
         initialValue={item.value}
-        type="currency"
+        type={Types.TTextEdit.CURRENCY}
         min={1}
         max={11}
       />

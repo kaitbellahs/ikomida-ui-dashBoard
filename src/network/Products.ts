@@ -28,8 +28,8 @@ export async function countProducts() {
 
 export async function getCategories() {
     const response = await Network.instance?.get(`/categories`, true);
-    if (response?.success) {
-        return response?.data as Types.Classes.CCategoryProducts[];
+    if (response.success) {
+        return Types.Classes.CProductCategory.fromObject(response.data);
     }
     return [];
 }

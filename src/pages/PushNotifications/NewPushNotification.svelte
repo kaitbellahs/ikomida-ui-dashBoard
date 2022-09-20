@@ -3,7 +3,7 @@
   import Fa from 'svelte-fa';
   import { faRocket } from '@fortawesome/free-solid-svg-icons';
   import { StatusBar } from '../../stores/Setup';
-  import { Views, Utils, Stores } from '@ikomida/shared-frontend';
+  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend';
   import { newPushNotification } from '../../network/PushNotification';
   import { onMount } from 'svelte';
 
@@ -48,7 +48,7 @@
 <div class="pushNotification">
   <Views.TextEdit placeHolder="Título" bind:value={item.title} bind:isValid={itemsValidation.title} min={3} max={55} />
   <Views.TextEdit
-    type="text"
+    type={Types.TTextEdit.TEXT}
     placeHolder="texto"
     bind:value={item.body}
     bind:isValid={itemsValidation.body}

@@ -3,7 +3,7 @@
   import Fa from 'svelte-fa';
   import { faEdit } from '@fortawesome/free-solid-svg-icons';
   import { StatusBar } from '../../stores/Setup';
-  import { Views, Stores } from '@ikomida/shared-frontend';
+  import { Views, Stores, Types } from '@ikomida/shared-frontend';
   import { newCategory, updateCategory } from '../../network/Products';
   import { onMount } from 'svelte';
 
@@ -48,7 +48,7 @@
     max={255}
   />
   <Views.TextEdit
-    type="text"
+    type={Types.TTextEdit.TEXT}
     placeHolder="Descrição da categoria"
     bind:value={item.description}
     initialValue={item.description}

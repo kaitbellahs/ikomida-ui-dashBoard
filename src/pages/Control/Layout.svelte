@@ -100,84 +100,84 @@
     <small>Aqui você pode alterar as cores do seu app como quiser</small>
     <div id="options">
       <Views.TextEdit
-        type="color"
+        type={Types.TTextEdit.COLOR}
         placeHolder="A cor do link"
         bind:value={layout.link}
         bind:this={layoutInputs.link}
         initialValue={layout.link}
       />
       <Views.TextEdit
-        type="color"
+        type={Types.TTextEdit.COLOR}
         placeHolder="A cor do fundo"
         bind:value={layout.background}
         bind:this={layoutInputs.background}
         initialValue={layout.background}
       />
       <Views.TextEdit
-        type="color"
+        type={Types.TTextEdit.COLOR}
         placeHolder="A cor do texto"
         bind:value={layout.color}
         bind:this={layoutInputs.color}
         initialValue={layout.color}
       />
       <Views.TextEdit
-        type="color"
+        type={Types.TTextEdit.COLOR}
         placeHolder="A cor do cabeçalho"
         bind:value={layout.header.background}
         bind:this={layoutInputs.header.background}
         initialValue={layout.header.background}
       />
       <Views.TextEdit
-        type="color"
+        type={Types.TTextEdit.COLOR}
         placeHolder="A cor do texto do cabeçalho"
         bind:value={layout.header.color}
         bind:this={layoutInputs.header.color}
         initialValue={layout.header.color}
       />
       <Views.TextEdit
-        type="color"
+        type={Types.TTextEdit.COLOR}
         placeHolder="A cor do menu hamburger"
         bind:value={layout.header.menuHamburger}
         bind:this={layoutInputs.header.menuHamburger}
         initialValue={layout.header.menuHamburger}
       />
       <Views.TextEdit
-        type="color"
+        type={Types.TTextEdit.COLOR}
         placeHolder="A cor do fundo do tabs"
         bind:value={layout.tabs.background}
         bind:this={layoutInputs.tabs.background}
         initialValue={layout.tabs.background}
       />
       <Views.TextEdit
-        type="color"
+        type={Types.TTextEdit.COLOR}
         placeHolder="A cor do texto do tabs"
         bind:value={layout.tabs.color}
         bind:this={layoutInputs.tabs.color}
         initialValue={layout.tabs.color}
       />
       <Views.TextEdit
-        type="color"
+        type={Types.TTextEdit.COLOR}
         placeHolder="A cor do fundo do botão"
         bind:value={layout.button.background}
         bind:this={layoutInputs.button.background}
         initialValue={layout.button.background}
       />
       <Views.TextEdit
-        type="color"
+        type={Types.TTextEdit.COLOR}
         placeHolder="A cor do botão"
         bind:value={layout.button.color}
         bind:this={layoutInputs.button.color}
         initialValue={layout.button.color}
       />
       <Views.TextEdit
-        type="color"
+        type={Types.TTextEdit.COLOR}
         placeHolder="A cor do fundo do alerta"
         bind:value={layout.dialog.background}
         bind:this={layoutInputs.dialog.background}
         initialValue={layout.dialog.background}
       />
       <Views.TextEdit
-        type="color"
+        type={Types.TTextEdit.COLOR}
         placeHolder="A cor do alerta"
         bind:value={layout.dialog.color}
         bind:this={layoutInputs.dialog.color}

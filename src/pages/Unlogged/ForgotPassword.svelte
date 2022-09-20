@@ -1,6 +1,6 @@
 <script>
   import Routes from '../../stores/Routes';
-  import { Views, Utils, Stores } from '@ikomida/shared-frontend';
+  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend';
   import { StatusBar } from '../../stores/Setup';
   import {
     requestPasswordPhoneValidation,
@@ -118,7 +118,7 @@
   <h2>Por favor informe seu número de telefone cadastrado</h2>
   <small>clique em "<b>Solicitar</b>" para solicitar o código de validação</small>
   <Views.TextEdit
-    type="phone"
+    type={Types.TTextEdit.PHONE}
     bind:value={requestPasswordObject.phone}
     buttonName="Solicitar"
     callback={toggleshowRequestValidatingCodeAlert}
@@ -131,7 +131,7 @@
   {/if}
   <Views.Divider />
   <Views.TextEdit
-    type="number"
+    type={Types.TTextEdit.NUMBER}
     bind:value={requestPasswordObject.phoneValidationCode}
     mask="_ _ _ _"
     buttonName="Confirmar"

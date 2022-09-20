@@ -110,6 +110,11 @@
       dialogTitle: 'Compartilhar o pedido',
     });
   }
+
+  function erroLoadImage() {
+    showImage = false;
+  }
+
   onMount(async () => {
     if (await Share.canShare()) {
       Stores.Menu.instance.addItem({
@@ -121,15 +126,14 @@
     if (!('PROFILE' in $Settings) || !$Settings?.profile) {
       const response = await getSettings();
       if (response?.success) {
-        $Settings.profile = response?.data?.profile;
+        $Settings.profile = response.data.profile;
         Settings.set($Settings);
       }
     }
+    tick();
     Stores.Loading.instance.stop();
   });
-  function erroLoadImage() {
-    showImage = false;
-  }
+
   Stores.Title.instance.set('Detalhes do predido');
 </script>
 

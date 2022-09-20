@@ -10,10 +10,12 @@
   const router = Stores.Navigation.instance.router;
   const discountTypeOptions = Types.Types.TDiscount.values() as Types.SelectorOptions[];
 
-  const item: Types.Classes.CProduct = $router.options.item;
+  const item: Types.Classes.CProduct = $router.options.item
+    ? Types.Classes.CProduct.fromObject($router.options.item.toJSON())
+    : Types.Classes.CProduct.fillWith(null);
   const edit = $router.options.edit;
 
-  let categoriesOptions: Types.SelectorOptions[] = [];
+  let categoriesOptions: Types.Classes.CProductCategory[] = [];
   const itemsValidation = {
     title: false,
     description: false,
@@ -55,12 +57,7 @@
 
   async function generateOptions() {
     Stores.Loading.instance.start();
-    const response = await getCategories();
-    if (response) {
-      categoriesOptions = response?.map((item) => {
-        return { id: item.id, name: item.title } as Types.SelectorOptions;
-      });
-    }
+    categoriesOptions = await getCategories();
     Stores.Loading.instance.stop();
   }
 
@@ -93,7 +90,7 @@
       max={255}
     />
     <Views.TextEdit
-      type="text"
+      type={Types.TTextEdit.TEXT}
       placeHolder="Descrição do produto"
       bind:value={item.description}
       bind:isValid={itemsValidation.description}
@@ -102,7 +99,7 @@
       max={500}
     />
     <Views.TextEdit
-      type="number"
+      type={Types.TTextEdit.NUMBER}
       placeHolder="Peso do produto em gramas (g)"
       bind:value={item.weight}
       bind:isValid={itemsValidation.weight}
@@ -111,7 +108,7 @@
       max={9}
     />
     <Views.TextEdit
-      type="number"
+      type={Types.TTextEdit.NUMBER}
       placeHolder="Serve quantas pessoas?"
       bind:value={item.serves}
       bind:isValid={itemsValidation.serves}
@@ -120,7 +117,7 @@
       max={9}
     />
     <Views.TextEdit
-      type="number"
+      type={Types.TTextEdit.NUMBER}
       placeHolder="Quantos itens você tem?"
       bind:value={item.quantity}
       bind:isValid={itemsValidation.quantity}
@@ -129,7 +126,7 @@
       max={9}
     />
     <Views.TextEdit
-      type="currency"
+      type={Types.TTextEdit.CURRENCY}
       placeHolder="Preço"
       bind:value={item.price}
       bind:isValid={itemsValidation.price}
@@ -142,7 +139,7 @@
     {#if item.discountType}
       {#if item.discountType === Types.Types.TDiscount.PERCENT}
         <Views.TextEdit
-          type="percent"
+          type={Types.TTextEdit.PERCENT}
           placeHolder="Disconto"
           bind:value={item.discount}
           bind:isValid={itemsValidation.discount}
@@ -157,7 +154,7 @@
           bind:value={item.discount}
           bind:isValid={itemsValidation.discount}
           initialValue={item.discount}
-          type="currency"
+          type={Types.TTextEdit.CURRENCY}
           validation={currencyValidation}
           error="O valor do desconto deve ser maior que R$ 0,00 e menor que o valor do produto que é {Utils.Strings.currency(
             item.price,

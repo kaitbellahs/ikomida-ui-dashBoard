@@ -16,12 +16,12 @@
   import { Capacitor } from '@capacitor/core';
   import type { IAlertButton } from '@ikomida/shared-frontend/lib/components/Alert.svelte';
 
+  let logedIn = false;
+  let showNotificationPopup = false;
   let auth: Stores.Auth.IStore;
   let router = Stores.Navigation.instance.router;
   let notificationIds: string[] = [];
   let networkStatus: ConnectionStatus | null = null;
-  let logedIn = false;
-  let showNotificationPopup = false;
   let notificationPopup = {
     title: '',
     body: '',
@@ -148,21 +148,12 @@
   });
 
   App.addListener('appUrlOpen', (data) => {
-    // console.log({
-    //   level: "info",
-    //   message: `App opened with URL: ${JSON.stringify(data)}`,
-    // });
     Stores.Navigation.instance.goTo(Routes.settings, {
       callback: true,
       ...data,
     });
   });
 </script>
-
-<Views.LoadJS url="https://www.google.com/recaptcha/api.js?render=6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS" />
-{#if networkStatus == null || !networkStatus.connected}
-  <div id="internetError">Esperando por conexão a internet...</div>
-{/if}
 
 {#if logedIn}
   <Main />
@@ -172,6 +163,10 @@
   <Tac />
 {:else}
   <Login />
+{/if}
+<Views.LoadJS url="https://www.google.com/recaptcha/api.js?render=6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS" />
+{#if networkStatus == null || !networkStatus.connected}
+  <div id="internetError">Esperando por conexão a internet...</div>
 {/if}
 {#if showNotificationPopup}
   <Views.Alert
@@ -185,11 +180,17 @@
 <Views.MessageAlert />
 
 <style>
-  :global(.grecaptcha-badge) {
-    visibility: hidden;
-  }
   #internetError {
     background-color: #4c0708;
     color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  :global(.grecaptcha-badge) {
+    visibility: hidden;
   }
 </style>

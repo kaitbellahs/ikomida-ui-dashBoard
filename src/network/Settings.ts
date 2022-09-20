@@ -3,7 +3,9 @@ import {
 } from "@ikomida/shared-frontend";
 
 export async function getSettings() {
-    return await Network.instance?.get("/vendor/settings", true);
+    const response = await Network.instance?.get("/vendor/settings", true);
+    response.data = Types.Classes.CVendorSettings.fromObject(response.data) as Types.Classes.CVendorSettings
+    return response
 }
 export async function getLimits() {
     return Network.instance?.get("/vendor/limits", true);
@@ -29,6 +31,6 @@ export async function updateBusinessHours(object: Types.Classes.CBusinessTime) {
     return Network.instance?.put("/vendor/businessHours", true, object);
 }
 
-export async function setDelivery(preparation: Types.Classes.CVendorPreparation, delivery: Types.Classes.CVendorDelivery) {
-    return Network.instance?.put("/vendor/delivery", true, { preparation, delivery });
+export async function setDelivery(vendorSettings: Types.Classes.CVendorSettings) {
+    return Network.instance?.put("/vendor/delivery", true, vendorSettings);
 }

@@ -3,13 +3,15 @@
   import { Views, Utils, Types, Stores } from '@ikomida/shared-frontend';
   import { ChangeOrderStatus } from '../../network/Orders';
   import { onMount } from 'svelte';
-  import Item from '@ikomida/shared-frontend/lib/components/Item.svelte';
 
   let items: Types.Classes.COrder[];
 
-  onMount(async () => {
-    Stores.Loading.instance.stop();
-  });
+  $: if (items) {
+    for (let index = 0; index < items.length; index++) {
+      items[index] = Types.Classes.COrder.fromObject(items[index]);
+    }
+    items = items;
+  }
 
   const nextButtonText = (order: Types.Classes.COrder) => {
     switch (order?.status) {
@@ -34,7 +36,6 @@
     if (response?.success) {
       order.status = Types.Types.TOrderStatus.CANCELED;
       Stores.MessageAlert.instance.show('O pedido foi atualizado com sucesso!');
-      // items = items;
     } else {
       Stores.MessageAlert.instance.show(response?.data);
     }
@@ -51,7 +52,6 @@
         items[index] = order;
         items = items;
         Stores.MessageAlert.instance.show('O pedido foi atualizado com sucesso!');
-        // items = items;
       } else {
         Stores.MessageAlert.instance.show(response?.data);
       }
@@ -65,13 +65,9 @@
     Stores.Navigation.instance.goTo(Routes.order, order);
   }
 
-  $: if (items) {
-    for (let index = 0; index < items.length; index++) {
-      items[index] = Types.Classes.COrder.fromObject(items[index]);
-    }
-    items = items;
-    // return items;
-  }
+  onMount(() => {
+    Stores.Loading.instance.stop();
+  });
 
   Stores.Title.instance.set('Pedidos');
 </script>
@@ -151,10 +147,14 @@
       <Views.Divider height={10} />
       <div class="buttonGroup">
         {#if item.status && ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED].includes(item.status)}
-          <Views.Button sizeMultiplier={0.8} type="secondary" on:click={() => cancel(item)}>Cancelar</Views.Button>
+          <Views.Button sizeMultiplier={0.8} type="secondary" on:click={() => cancel(items[index])}
+            >Cancelar</Views.Button
+          >
         {/if}
         {#if item.status && ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED, Types.Types.TOrderStatus.WAITING_PAYMENT].includes(item.status)}
-          <Views.Button sizeMultiplier={0.8} on:click={() => next(item, index)}>{nextButtonText(item)}</Views.Button>
+          <Views.Button sizeMultiplier={0.8} on:click={() => next(items[index], index)}
+            >{nextButtonText(item)}</Views.Button
+          >
         {/if}
       </div>
     {/if}

@@ -119,7 +119,7 @@
       leftMargin={30}
     />
     <Views.TextEdit
-      type="phone"
+      type={Types.TTextEdit.PHONE}
       bind:value={profile.phone}
       bind:isValid={profileValidation.phone}
       initialValue={profile?.phone}
@@ -127,7 +127,7 @@
       bind:this={profileInputs.phone}
     />
     <Views.TextEdit
-      type="email"
+      type={Types.TTextEdit.EMAIL}
       bind:value={profile.email}
       bind:isValid={profileValidation.email}
       initialValue={profile?.email}
@@ -137,7 +137,7 @@
     <Views.Divider />
     <h2>Endereço</h2>
     <Views.TextEdit
-      type="cep"
+      type={Types.TTextEdit.CEP}
       callback={findAddress}
       buttonIcon={faSearch}
       bind:value={profile.address.postalCode}

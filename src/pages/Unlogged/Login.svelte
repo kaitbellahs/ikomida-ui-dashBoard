@@ -2,7 +2,7 @@
   import ikomidaID from '../../stores/ikomidaID';
   import * as AuthNetwork from '../../network/Auth';
   import Routes from '../../stores/Routes';
-  import { Views, Stores } from '@ikomida/shared-frontend';
+  import { Views, Stores, Types } from '@ikomida/shared-frontend';
   import { faPhone, faUnlock, faIdCardAlt } from '@fortawesome/free-solid-svg-icons';
   import { Utils, Network } from '@ikomida/shared-frontend';
   import { registerPushNotificationToken } from '../../network/PushNotification';
@@ -61,17 +61,17 @@
     bind:this={ikomidaidInput}
     initialValue={ikomidaid}
     icon={faIdCardAlt}
-    type="slug"
+    type={Types.TTextEdit.SLUG}
     placeHolder="Id do estabelecimento"
   />
   <Views.TextEdit
     bind:value={phone}
     icon={faPhone}
-    type="phone"
+    type={Types.TTextEdit.PHONE}
     placeHolder="Número de celular"
     bind:isValid={isValidPhone}
   />
-  <Views.TextEdit bind:value={password} icon={faUnlock} placeHolder="Sua senha" type="password" />
+  <Views.TextEdit bind:value={password} icon={faUnlock} placeHolder="Sua senha" type={Types.TTextEdit.PASSWORD} />
   <div />
   <Views.Button on:click={doLogin} disabled={!canLogin}>Entrar</Views.Button>
   <Views.Button type="transparent" on:click={forgotPassword}>Recuperar a senha</Views.Button>
