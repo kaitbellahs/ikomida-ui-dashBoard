@@ -55,10 +55,10 @@
 
   onMount(async () => {
     let response = await getLayout();
-    if (response?.success && response?.data) {
+    if (response.success && response.data) {
       layout = Object.assign(layout, response?.data);
-      Utils?.Objects?.updateInputs(layoutInputs, layout);
     }
+    Utils?.Objects?.updateInputs(layoutInputs, layout);
     Stores.Loading.instance.stop();
   });
 

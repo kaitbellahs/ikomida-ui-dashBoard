@@ -2,38 +2,38 @@
   import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend';
   import { getSettings, setSettings } from '../../network/Settings';
   import { StatusBar } from '../../stores/Setup';
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import Fa from 'svelte-fa';
   import { faEdit, faSearch } from '@fortawesome/free-solid-svg-icons';
   import { GetAddressByCep } from '../../network/Staff';
 
   interface IProfileInputs {
-    phone: Views.TextEdit;
-    email: Views.TextEdit;
+    phone: Views.TextEdit | null;
+    email: Views.TextEdit | null;
     address: {
-      postalCode: Views.TextEdit;
-      street: Views.TextEdit;
-      number: Views.TextEdit;
-      complement: Views.TextEdit;
-      neighborhood: Views.TextEdit;
-      city: Views.TextEdit;
-      stat: Views.TextEdit;
+      postalCode: Views.TextEdit | null;
+      street: Views.TextEdit | null;
+      number: Views.TextEdit | null;
+      complement: Views.TextEdit | null;
+      neighborhood: Views.TextEdit | null;
+      city: Views.TextEdit | null;
+      stat: Views.TextEdit | null;
     };
   }
 
-  let profile = Types.Classes.CVendorProfile.fillWith(null);
+  let profile: Types.Classes.CVendorProfile = Types.Classes.CVendorProfile.fillWith(null);
 
   let profileInputs = {
-    phone: {},
-    email: {},
+    phone: null,
+    email: null,
     address: {
-      postalCode: {},
-      street: {},
-      number: {},
-      complement: {},
-      neighborhood: {},
-      city: {},
-      stat: {},
+      postalCode: null,
+      street: null,
+      number: null,
+      complement: null,
+      neighborhood: null,
+      city: null,
+      stat: null,
     },
   } as IProfileInputs;
   let profileValidation = {
@@ -53,7 +53,7 @@
   $: canProceed = Utils.Objects.validateFields(profileValidation);
 
   $: if ((profile.address?.postalCode?.length ?? 0) === 8 && profile?.address?.postalCode != currentPostalCode) {
-    findAddress();
+    // findAddress();
   }
 
   function findAddress() {
@@ -94,9 +94,8 @@
     const response = await getSettings();
     if (response?.success) {
       currentPostalCode = response?.data?.profile?.address?.postalCode;
-      profile = Types.Classes.CVendorProfile.fromObject({ ...profile, ...response?.data?.profile });
-      console.log(profile);
-      Utils.Objects.updateInputs(profileInputs, profile);
+      profile = Types.Classes.CVendorProfile.fromObject({ ...profile.toJSON(), ...response?.data?.profile.toJSON() });
+      Utils.Objects.updateInputs(profileInputs, profile.toJSON());
       Stores.Loading.instance.stop();
     } else {
       Stores.MessageAlert.instance.show(response?.data);

@@ -12,15 +12,18 @@ try {
 } catch (error: any) { }
 const agent = 'VENDOR';
 const url = isProd ? 'https://api.ikomida.com' : 'hmlg.api.ikomida.com';
+// const url = 'https://api.ikomida.com'// : 'hmlg.api.ikomida.com';
 Stores.Cache.createInstance();
 Network.createInstance(url, 'com.ikomida.br.', agent, '6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS', appVersion);
 Stores.Auth.Auth.createInstance(agent);
 Stores.MenuHamburger.createInstance();
 Stores.Menu.createInstance();
 Stores.Title.createInstance();
+Stores.Loading.createInstance();
 Stores.PushNotificationToken.createInstance();
 Stores.Navigation.createInstance(Routes.home);
 Stores.LoadMore.createInstance();
+Stores.Layout.createInstance();
 
 const app = new App({
   target: document.body,

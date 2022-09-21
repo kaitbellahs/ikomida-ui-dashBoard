@@ -16,10 +16,10 @@
   import { onMount } from 'svelte';
   import { v4 as uuid } from 'uuid';
 
-  let paymentGateway: any = { type: null, data: null };
-  let delivery = Types.Classes.CVendorDelivery.init(false, 0, 0);
+  let paymentGateway: Types.Classes.CVendorPaymentGateway = Types.Classes.CVendorPaymentGateway.fillWith(null);
+  let delivery: Types.Classes.CVendorDelivery = Types.Classes.CVendorDelivery.init(false, 0, 0);
   let deliveryInputs: { min?: Views.TextEdit; value?: Views.TextEdit } = { value: undefined, min: undefined };
-  let preparation = Types.Classes.CVendorPreparation.init(0, 0);
+  let preparation: Types.Classes.CVendorPreparation = Types.Classes.CVendorPreparation.init(0, 0);
   let preparationInputs: { min?: Views.TextEdit; max?: Views.TextEdit } = { min: undefined, max: undefined };
   let popupNewOrder = $Settings?.popups?.newOrder;
   let userInfo: Types.Classes.CUser;
@@ -55,27 +55,28 @@
     };
   }
 
-  $: if (integratePagSeguro?.callback && !paymentGateway?.type) {
+  $: if (integratePagSeguro.callback) {
     integratePagSeguro.callback = false;
-    if (integratePagSeguro?.url) {
+    if (integratePagSeguro.url) {
       Stores.Loading.instance.start();
-      const url = new URL(integratePagSeguro?.url);
+      Stores.MessageAlert.instance.hide();
+      const url = new URL(integratePagSeguro.url);
       const code = url.searchParams.get('code');
       const state = url.searchParams.get('state');
       const payload = { code, state };
       updatePaymentGateway(payload).then((response) => {
-        if (!response?.success) {
-          Stores.MessageAlert.instance.show(response?.data);
+        if (!response.success) {
+          Stores.MessageAlert.instance.show(response.data);
         } else {
-          paymentGateway = { ...paymentGateway, ...(response?.data as any) };
-          Stores.MessageAlert.instance.show(`${(response?.data as any)?.type} foi integrado com sucesso`);
+          paymentGateway = Types.Classes.CVendorPaymentGateway.fromObject(response.data);
+          Stores.MessageAlert.instance.show(`${(response.data as any)?.type} foi integrado com sucesso`);
         }
-        Stores.Loading.instance.stop();
+        Stores.Loading.instance.reset();
       });
     }
   }
 
-  $: integrateButtonName = paymentGateway?.type
+  $: integrateButtonName = paymentGateway.integrated
     ? 'Cancelar a integgração com pagseguro'
     : 'Integrar sua conta pagseguro';
 
@@ -151,10 +152,10 @@
       return;
     }
     let response = await updateBusinessHours(business);
-    if (response?.success) {
+    if (response.success) {
       Stores.MessageAlert.instance.show('O horário de funcionamento atualizado com sucesso!');
     } else {
-      Stores.MessageAlert.instance.show(response?.data);
+      Stores.MessageAlert.instance.show(response.data);
       Stores.Loading.instance.stop();
       return;
     }
@@ -169,27 +170,28 @@
     }
     Stores.Loading.instance.start();
     const response = await setDelivery(vendorSettings);
-    if (!response?.success) {
-      Stores.MessageAlert.instance.show(response?.data);
+    if (!response.success) {
+      Stores.MessageAlert.instance.show(response.data);
     }
     Stores.Loading.instance.stop();
   }
 
   async function requestPagSeguroIntegration() {
     Stores.Loading.instance.start();
-    if (paymentGateway?.type) {
+    if (paymentGateway.integrated) {
       const response = await revokePaymentGateway();
-      if (response?.success) {
+      if (response.success) {
+        paymentGateway = Types.Classes.CVendorPaymentGateway.fromObject(response.data);
         Stores.MessageAlert.instance.show(
-          `A integração dos nossos nossos sistemas com o pagseguro foi revogado com sucesso!`,
+          `A integração dos nossos nossos sistemas com sua conta no pagseguro foi revogada com sucesso!`,
         );
       } else {
         Stores.MessageAlert.instance.show(`Não foi possível revogar a integração, tente novamente mais tarde!`);
       }
     } else {
       const response = await getPagSeguroUrl();
-      if (response?.success) {
-        const url = (response?.data as any)?.url;
+      if (response.success) {
+        const url = (response.data as any)?.url;
         if (!url) {
           Stores.MessageAlert.instance.show(`Não foi possível obter a url de integração, tente novamente mais tarde!`);
           return;
@@ -214,21 +216,21 @@
     auth = await Stores.Auth.Auth.instance.store();
     userInfo = await Utils.Jws.extractToken($auth);
     const response = await getSettings();
-    const data = response?.data as Types.Classes.CVendorSettings;
-    if (response?.success) {
-      paymentGateway = { ...paymentGateway, ...data?.paymentGateway };
-      business = Object.assign(business, data?.business);
-      for (const index of business?.days || []) {
+    if (response.success) {
+      const data = Types.Classes.CVendorSettings.fromObject(response.data);
+      paymentGateway = data.paymentGateway;
+      business = data.business;
+      for (const index of business.days ?? []) {
         days[index].checked = true;
       }
       delivery = Object.assign(delivery, data?.delivery);
-      deliveryInputs?.min?.updateValue(String(delivery?.min));
-      deliveryInputs?.value?.updateValue(String(delivery?.value));
-      preparation = Object.assign(preparation, data?.preparation);
+      deliveryInputs.min?.updateValue(String(delivery?.min));
+      deliveryInputs.value?.updateValue(String(delivery?.value));
+      preparation = data?.preparation;
       preparationInputs?.min?.updateValue(String(preparation?.min));
       preparationInputs?.max?.updateValue(String(preparation?.max));
     } else {
-      Stores.MessageAlert.instance.show(data);
+      Stores.MessageAlert.instance.show(response.data);
     }
     Stores.Loading.instance.stop();
   });
