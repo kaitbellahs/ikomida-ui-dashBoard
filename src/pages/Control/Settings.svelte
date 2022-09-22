@@ -163,7 +163,10 @@
   }
 
   async function updateDelivery() {
-    const vendorSettings = Types.Classes.CVendorSettings.fromObject({ preparation, delivery });
+    const vendorSettings: Types.Classes.CVendorSettings = Types.Classes.CVendorSettings.fromObject({
+      preparation,
+      delivery,
+    });
     if (!vendorSettings.validate()) {
       Stores.MessageAlert.instance.show(`Algum dos dados fornecidos não é válido!`);
       return;
@@ -217,7 +220,7 @@
     userInfo = await Utils.Jws.extractToken($auth);
     const response = await getSettings();
     if (response.success) {
-      const data = Types.Classes.CVendorSettings.fromObject(response.data);
+      const data: Types.Classes.CVendorSettings = Types.Classes.CVendorSettings.fromObject(response.data);
       paymentGateway = data.paymentGateway;
       business = data.business;
       for (const index of business.days ?? []) {
