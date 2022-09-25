@@ -37,7 +37,6 @@ function serve() {
 		}
 	};
 }
-
 export default {
 	onwarn(warning, warn) {
 		if (warning.code === 'CIRCULAR_DEPENDENCY') {
@@ -59,7 +58,7 @@ export default {
 	plugins: [
 		replace({
 			preventAssignment: true,
-			isProduction: process.env.ENV === 'prod',
+			'ENVIRONMENT': process.env.ENV ?? 'development',
 		}),
 		svelte({
 			preprocess: [
