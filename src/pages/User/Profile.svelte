@@ -1,64 +1,64 @@
 <script>
-  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend';
-  import { onMount } from 'svelte';
-  import { updatePassword, logout } from '../../network/Auth';
+  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend'
+  import { onMount } from 'svelte'
+  import { updatePassword, logout } from '../../network/Auth'
 
-  let userInfo;
+  let userInfo
 
-  let auth;
+  let auth
 
   let passwordObject = {
     oldPass: null,
     newPass: null,
-    reNewPass: null,
-  };
+    reNewPass: null
+  }
   let passwordValidationObject = {
     newPass: false,
-    reNewPass: false,
-  };
+    reNewPass: false
+  }
 
   $: if (userInfo?.avatar) {
     // update()
   }
 
   async function out() {
-    Stores.Loading.instance.start();
-    await logout();
-    Stores.Loading.instance.stop();
+    Stores.Loading.instance.start()
+    await logout()
+    Stores.Loading.instance.stop()
   }
 
   async function editPassword() {
     if (!passwordValidationObject.newPass) {
-      Stores.MessageAlert.instance.show('A nova senha não está correta!');
-      return;
+      Stores.MessageAlert.instance.show('A nova senha não está correta!')
+      return
     } else if (!passwordValidationObject.reNewPass) {
-      Stores.MessageAlert.instance.show('A confirmação da senha não está correta');
-      return;
+      Stores.MessageAlert.instance.show('A confirmação da senha não está correta')
+      return
     }
-    Stores.Loading.instance.start();
-    let response = await updatePassword(passwordObject);
+    Stores.Loading.instance.start()
+    let response = await updatePassword(passwordObject)
     if (response.success) {
-      Stores.MessageAlert.instance.show('Senha atualizada com sucesso!');
+      Stores.MessageAlert.instance.show('Senha atualizada com sucesso!')
     } else {
-      Stores.MessageAlert.instance.show(response?.data);
-      Stores.Loading.instance.stop();
-      return;
+      Stores.MessageAlert.instance.show(response?.data)
+      Stores.Loading.instance.stop()
+      return
     }
-    Stores.Loading.instance.stop();
+    Stores.Loading.instance.stop()
   }
 
   onMount(async () => {
-    auth = await Stores.Auth.Auth.instance.store();
-    userInfo = await Utils.Jws.extractToken($auth);
-    Stores.Loading.instance.stop();
-  });
+    auth = await Stores.Auth.Auth.instance.store()
+    userInfo = await Utils.Jws.extractToken($auth)
+    Stores.Loading.instance.stop()
+  })
 
-  Stores.Title.instance.set('Perfil');
+  Stores.Title.instance.set('Perfil')
 </script>
 
 {#if userInfo}
   <Views.UploadablePhoto
-    type="profile"
+    type={Types.TUploadablePhoto.PROFILE}
     image={userInfo?.avatar}
     name={userInfo.name[0]}
     lastName={userInfo.lastName[0]}
@@ -96,7 +96,7 @@
       placeHolder="Confirmação"
       bind:value={passwordObject.reNewPass}
       bind:isValid={passwordValidationObject.reNewPass}
-      validation={(password) => passwordObject.newPass === password}
+      validation={password => passwordObject.newPass === password}
       error="A confirmação da senha não é válida"
     />
     <Views.Divider />

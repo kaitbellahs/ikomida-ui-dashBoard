@@ -1,140 +1,139 @@
 <script lang="ts">
-  import { Share } from '@capacitor/share';
-  import { onMount, tick } from 'svelte';
-  import html2canvas from 'html2canvas';
-  import { Views, Utils, Types, Logics, Stores } from '@ikomida/shared-frontend';
-  import { faShare } from '@fortawesome/free-solid-svg-icons';
-  import { Filesystem, Directory } from '@capacitor/filesystem';
-  import Routes from '../../stores/Routes';
-  import { OrderStatus, ChangeOrderStatus } from '../../network/Orders';
-  import { getOrder } from '../../network/Products';
-  import { Settings } from '../../stores/Setup';
-  import { getSettings } from '../../network/Settings';
+  import { Share } from '@capacitor/share'
+  import { onMount, tick } from 'svelte'
+  import html2canvas from 'html2canvas'
+  import { Views, Utils, Types, Logics, Stores } from '@ikomida/shared-frontend'
+  import { faShare } from '@fortawesome/free-solid-svg-icons'
+  import { Filesystem, Directory } from '@capacitor/filesystem'
+  import Routes from '../../stores/Routes'
+  import { OrderStatus, ChangeOrderStatus } from '../../network/Orders'
+  import { getOrder } from '../../network/Products'
+  import { Settings } from '../../stores/Setup'
+  import { getSettings } from '../../network/Settings'
 
-  const router = Stores.Navigation.instance.router;
-  const order: Types.Classes.COrder = $router.options;
+  const router = Stores.Navigation.instance.router
+  const order: Types.Classes.COrder = $router.options
 
-  let screenShot = false;
-  let showImage = true;
-  let orderScreen: HTMLElement;
-  let showCardBrand = false;
+  let screenShot = false
+  let showImage = true
+  let orderScreen: HTMLElement
+  let showCardBrand = false
 
-  $: total = Number(order?.subtotal ?? 0) + Number(order?.delivery ?? 0) - Number(order?.discount ?? 0);
+  $: total = Number(order?.subtotal ?? 0) + Number(order?.delivery ?? 0) - Number(order?.discount ?? 0)
 
   const nextButtonText = (order: Types.Classes.COrder) => {
     switch (order?.status) {
       case Types.Types.TOrderStatus.WAITING_PAYMENT:
-        return '';
+        return ''
       case Types.Types.TOrderStatus.OPEN:
-        return 'Aceitar o pedido';
+        return 'Aceitar o pedido'
       case Types.Types.TOrderStatus.ACCEPTED:
-        return 'Esperando o entregador';
+        return 'Esperando o entregador'
       case Types.Types.TOrderStatus.WAITING_DELIVERY:
-        return 'Saiu para entrega';
+        return 'Saiu para entrega'
       case Types.Types.TOrderStatus.IN_DELIVERY:
-        return 'Pedido entrege';
+        return 'Pedido entrege'
       default:
-        return '-';
+        return '-'
     }
-  };
+  }
 
   async function cancel() {
-    Stores.Loading.instance.start();
-    const response = await ChangeOrderStatus(order?.id, Types.Types.TOrderStatus.CANCELED);
+    Stores.Loading.instance.start()
+    const response = await ChangeOrderStatus(order?.id, Types.Types.TOrderStatus.CANCELED)
     if (response?.success) {
-      order.status = Types.Types.TOrderStatus.CANCELED;
-      Stores.MessageAlert.instance.show('O pedido foi atualizado com sucesso!');
+      order.status = Types.Types.TOrderStatus.CANCELED
+      Stores.MessageAlert.instance.show('O pedido foi atualizado com sucesso!')
     } else {
-      Stores.MessageAlert.instance.show(response?.data);
+      Stores.MessageAlert.instance.show(response?.data)
     }
-    Stores.Loading.instance.stop();
+    Stores.Loading.instance.stop()
   }
 
   async function next() {
-    Stores.Loading.instance.start();
-    const newStatus = order.status?.next();
-    const response = await ChangeOrderStatus(order?.id, newStatus);
+    Stores.Loading.instance.start()
+    const newStatus = order.status?.next()
+    const response = await ChangeOrderStatus(order?.id, newStatus)
     if (response?.success) {
-      order.status = newStatus;
-      Stores.MessageAlert.instance.show('O pedido foi atualizado com sucesso!');
+      order.status = newStatus
+      Stores.MessageAlert.instance.show('O pedido foi atualizado com sucesso!')
     } else {
-      Stores.MessageAlert.instance.show(response?.data);
+      Stores.MessageAlert.instance.show(response?.data)
     }
-    Stores.Loading.instance.stop();
+    Stores.Loading.instance.stop()
   }
 
   function hideCardBrand() {
-    showCardBrand = false;
+    showCardBrand = false
   }
 
   async function goToProduct(id?: string) {
-    Stores.Loading.instance.start();
+    Stores.Loading.instance.start()
     if (!id) {
-      Stores.Loading.instance.stop();
-      return;
+      Stores.Loading.instance.stop()
+      return
     }
-    const response = await getOrder(id);
+    const response = await getOrder(id)
     if (response?.success) {
-      const product = response?.data;
-      Stores.Navigation.instance?.goTo(Routes.product, product);
+      const product = response?.data
+      Stores.Navigation.instance?.goTo(Routes.product, product)
     } else {
-      Stores.MessageAlert.instance.show(response?.data);
+      Stores.MessageAlert.instance.show(response?.data)
     }
-    Stores.Loading.instance.stop();
+    Stores.Loading.instance.stop()
   }
   async function share() {
-    Stores.Loading.instance.start();
-    screenShot = true;
-    await tick();
+    Stores.Loading.instance.start()
+    screenShot = true
+    await tick()
     const canvas = await html2canvas(orderScreen, {
       logging: false,
       backgroundColor: '#fff',
       allowTaint: true,
-      useCORS: true,
-    });
-    screenShot = false;
-    await tick();
-    Stores.Loading.instance.stop();
-    const data = canvas.toDataURL('image/jpeg', 1.0).split(',');
+      useCORS: true
+    })
+    screenShot = false
+    await tick()
+    Stores.Loading.instance.stop()
+    const data = canvas.toDataURL('image/jpeg', 1.0).split(',')
     const screenShotFile = await Filesystem.writeFile({
       path: `screenshots/order-${order?.customID}.jpg`,
       data: data?.[1],
       directory: Directory.Cache,
-      recursive: true,
-    });
+      recursive: true
+    })
     //TODO: -- report identifier of the app that received the share action. Can be an empty string in some cases. On web it will be undefined.
     await Share.share({
       title: `Pedido #${order?.customID}`,
       // text: "Eu estou compartilhando com você esse pedido",
       url: `file://${screenShotFile?.uri}`,
-      dialogTitle: 'Compartilhar o pedido',
-    });
+      dialogTitle: 'Compartilhar o pedido'
+    })
   }
 
   function erroLoadImage() {
-    showImage = false;
+    showImage = false
   }
-
   onMount(async () => {
     if (await Share.canShare()) {
       Stores.Menu.instance.addItem({
         name: 'Compartilhar',
         icon: faShare,
-        callback: share,
-      });
+        callback: share
+      })
     }
     if (!('PROFILE' in $Settings) || !$Settings?.profile) {
-      const response = await getSettings();
+      const response = await getSettings()
       if (response?.success) {
-        $Settings.profile = response.data.profile;
-        Settings.set($Settings);
+        $Settings.profile = response.data.profile
+        Settings.set($Settings)
       }
     }
-    tick();
-    Stores.Loading.instance.stop();
-  });
+    tick()
+    Stores.Loading.instance.stop()
+  })
 
-  Stores.Title.instance.set('Detalhes do predido');
+  Stores.Title.instance.set('Detalhes do pedido')
 </script>
 
 <div class="order screenShot {screenShot ? 'screenShot' : ''}" bind:this={orderScreen}>
@@ -172,7 +171,7 @@
       <Views.Status showIcon={false} type={Types.Status.WARNING}
         >Prepare o pedido antes de
         {Utils.Strings.dateToString(
-          String(new Date((order?.createdAt?.getTime() ?? 0) + (order?.preparation?.max ?? 0) * 1000)),
+          String(new Date((order?.createdAt?.getTime() ?? 0) + (order?.preparation?.max ?? 0) * 1000))
         )}</Views.Status
       >
       <Views.Divider />
@@ -192,13 +191,31 @@
   <h3>Itens do pedido</h3>
   {#each order?.products ?? [] as product, index (product.id ?? index)}
     <div class="product" on:click={() => goToProduct(product.id)}>
-      <span class="quantity">{product.quantity}</span><span class="title">{product.title}</span><span class="price"
-        >{Utils.Strings.currency(
-          (product.quantity ?? 0) *
-            ((product.price ?? 0) -
-              Logics.Finances.calcDiscount(product.price ?? 0, product.discount ?? 0, product.discountType)),
-        )}</span
-      >
+      <header>
+        <span class="quantity">{product.quantity}</span><span class="title">{product.title}</span><span class="price"
+          >{Utils.Strings.currency(
+            (product.quantity ?? 0) *
+              ((product.price ?? 0) -
+                Logics.Finances.calcDiscount(product.price ?? 0, product.discount ?? 0, product.discountType))
+          )}</span
+        >
+      </header>
+      {#if (product.options?.length ?? 0) > 0}
+        <div>
+          <h4>Opções do produto:</h4>
+          {#each product.options ?? [] as option, optionIndex}
+            <div class="option">
+              <span class="units">{option.units}</span><span class="name">{option.name}</span><span class="price"
+                >{Utils.Strings.currency(
+                  (option.units ?? 0) *
+                    ((option.price ?? 0) -
+                      Logics.Finances.calcDiscount(option.price ?? 0, product.discount ?? 0, product.discountType))
+                )}</span
+              >
+            </div>
+          {/each}
+        </div>
+      {/if}
     </div>
   {/each}
   <Views.Divider />
@@ -297,13 +314,6 @@
 </div>
 <Views.GTerms />
 
-<!-- {#if isLoading}
-  <Views.Loading
-    opacity="0.99"
-    topPadding={$StatusBar.height}
-    bottomPadding={$StatusBar.bottomPadding}
-  />
-{/if} -->
 <style>
   .order {
     display: flex;
@@ -329,7 +339,8 @@
     justify-content: space-between;
     border-bottom: 1px solid #ccc;
   }
-  .product > .quantity {
+  .product > header > .quantity {
+    margin-right: 5px;
     font-family: RobotoMedium;
     font-size: 1em;
     background: #ccc;
@@ -339,9 +350,26 @@
     text-align: center;
     vertical-align: middle;
   }
-  .product > .quantity {
+  .product > header > .price {
+    margin-left: 5px;
+    font-family: RobotoMedium;
+    font-size: 0.9em;
+  }
+  .product > div > .option > .units {
+    margin-right: 5px;
     font-family: RobotoMedium;
     font-size: 1em;
+    background: rgba(204, 204, 204, 0.356);
+    width: 20px;
+    height: 20px;
+    padding: 2px;
+    text-align: center;
+    vertical-align: middle;
+  }
+  .product > div > .option > .price {
+    margin-left: 5px;
+    font-family: RobotoMedium;
+    font-size: 0.9em;
   }
   .address {
     font-size: 0.9em;

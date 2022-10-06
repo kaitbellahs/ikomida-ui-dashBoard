@@ -1,27 +1,27 @@
 <script lang="ts">
-  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend';
-  import { getSettings, setSettings } from '../../network/Settings';
-  import { StatusBar } from '../../stores/Setup';
-  import { onMount, tick } from 'svelte';
-  import Fa from 'svelte-fa';
-  import { faEdit, faSearch } from '@fortawesome/free-solid-svg-icons';
-  import { GetAddressByCep } from '../../network/Staff';
+  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend'
+  import { getSettings, setSettings } from '../../network/Settings'
+  import { StatusBar } from '../../stores/Setup'
+  import { onMount } from 'svelte'
+  import Fa from 'svelte-fa'
+  import { faEdit, faSearch } from '@fortawesome/free-solid-svg-icons'
+  import { GetAddressByCep } from '../../network/Staff'
 
   interface IProfileInputs {
-    phone: Views.TextEdit | null;
-    email: Views.TextEdit | null;
+    phone: Views.TextEdit | null
+    email: Views.TextEdit | null
     address: {
-      postalCode: Views.TextEdit | null;
-      street: Views.TextEdit | null;
-      number: Views.TextEdit | null;
-      complement: Views.TextEdit | null;
-      neighborhood: Views.TextEdit | null;
-      city: Views.TextEdit | null;
-      stat: Views.TextEdit | null;
-    };
+      postalCode: Views.TextEdit | null
+      street: Views.TextEdit | null
+      number: Views.TextEdit | null
+      complement: Views.TextEdit | null
+      neighborhood: Views.TextEdit | null
+      city: Views.TextEdit | null
+      stat: Views.TextEdit | null
+    }
   }
 
-  let profile: Types.Classes.CVendorProfile = Types.Classes.CVendorProfile.fillWith(null);
+  let profile: Types.Classes.CVendorProfile = Types.Classes.CVendorProfile.fillWith(null)
 
   let profileInputs = {
     phone: null,
@@ -33,9 +33,9 @@
       complement: null,
       neighborhood: null,
       city: null,
-      stat: null,
-    },
-  } as IProfileInputs;
+      stat: null
+    }
+  } as IProfileInputs
   let profileValidation = {
     phone: false,
     email: false,
@@ -45,69 +45,73 @@
       number: false,
       neighborhood: false,
       city: false,
-      stat: false,
-    },
-  };
-  let currentPostalCode: string | null = null;
+      stat: false
+    }
+  }
+  let currentPostalCode: string | null = null
 
-  $: canProceed = Utils.Objects.validateFields(profileValidation);
+  $: canProceed = Utils.Objects.validateFields(profileValidation)
 
   $: if ((profile.address?.postalCode?.length ?? 0) === 8 && profile?.address?.postalCode != currentPostalCode) {
     // findAddress();
   }
 
   function findAddress() {
-    Stores.Loading.instance.start();
-    currentPostalCode = profile?.address?.postalCode;
+    Stores.Loading.instance.start()
+    currentPostalCode = profile?.address?.postalCode
     GetAddressByCep(profile.address.postalCode)
-      .then((response) => {
+      .then(response => {
         if (response?.success) {
-          const address = response?.data;
-          currentPostalCode = address?.postalCode;
-          profile.address = { ...profile?.address, ...address };
-          Utils?.Objects?.updateInputs(profileInputs, profile);
+          const address = response?.data
+          currentPostalCode = address?.postalCode
+          profile.address = { ...profile?.address, ...address }
+          Utils?.Objects?.updateInputs(profileInputs, profile)
         } else {
-          Stores.MessageAlert.instance.show(response?.data);
+          Stores.MessageAlert.instance.show(response?.data)
         }
-        Stores.Loading.instance.stop();
+        Stores.Loading.instance.stop()
       })
-      .catch((exception) => {
-        Stores.MessageAlert.instance.show(exception);
-      });
+      .catch(exception => {
+        Stores.MessageAlert.instance.show(exception)
+      })
   }
 
   const submit = async () => {
     if (!Utils.Objects.validateFields(profileValidation) || !profile.validate()) {
-      Stores.MessageAlert.instance.show('Por favor preenche os dados do formulario corretamente');
-      return;
+      Stores.MessageAlert.instance.show('Por favor preenche os dados do formulario corretamente')
+      return
     }
-    Stores.Loading.instance.start();
-    let response = await setSettings(profile);
+    Stores.Loading.instance.start()
+    let response = await setSettings(profile)
     Stores.MessageAlert.instance.show(
-      response?.success ? 'As informações do estabelecimento foram atualizadas com sucesso' : response?.data,
-    );
-    Stores.Loading.instance.stop();
-  };
+      response?.success ? 'As informações do estabelecimento foram atualizadas com sucesso' : response?.data
+    )
+    Stores.Loading.instance.stop()
+  }
 
   onMount(async () => {
-    Stores.Loading.instance.start();
-    const response = await getSettings();
+    Stores.Loading.instance.start()
+    const response = await getSettings()
     if (response?.success) {
-      currentPostalCode = response?.data?.profile?.address?.postalCode;
-      profile = Types.Classes.CVendorProfile.fromObject({ ...profile.toJSON(), ...response?.data?.profile.toJSON() });
-      Utils.Objects.updateInputs(profileInputs, profile.toJSON());
-      Stores.Loading.instance.stop();
+      currentPostalCode = response?.data?.profile?.address?.postalCode
+      profile = Types.Classes.CVendorProfile.fromObject({ ...profile.toJSON(), ...response?.data?.profile.toJSON() })
+      Utils.Objects.updateInputs(profileInputs, profile.toJSON())
+      Stores.Loading.instance.stop()
     } else {
-      Stores.MessageAlert.instance.show(response?.data);
+      Stores.MessageAlert.instance.show(response?.data)
     }
-    Stores.Loading.instance.stop();
-  });
+    Stores.Loading.instance.stop()
+  })
 
-  Stores.Title.instance.set('O estabelecimento');
+  Stores.Title.instance.set('O estabelecimento')
 </script>
 
 <div class="profile">
-  <Views.UploadablePhoto type="vendor" bind:image={profile.mainPicture} title={profile?.contractName} />
+  <Views.UploadablePhoto
+    type={Types.TUploadablePhoto.VENDOR}
+    bind:image={profile.mainPicture}
+    title={profile?.contractName}
+  />
   <div class="data">
     <h2>{profile?.contractName}</h2>
     <Views.Divider />
