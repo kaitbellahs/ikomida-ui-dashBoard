@@ -1,75 +1,75 @@
 <script lang="ts">
-  import Routes from '../../stores/Routes';
-  import { Views, Utils, Types, Stores } from '@ikomida/shared-frontend';
-  import { ChangeOrderStatus } from '../../network/Orders';
-  import { onMount } from 'svelte';
-  const initailOrderStatus = Types.Types.TOrderStatus.WAITING_PAYMENT;
-  let items: Types.Classes.COrder[];
+  import Routes from '../../stores/Routes'
+  import { Views, Utils, Types, Stores } from '@ikomida/shared-frontend'
+  import { ChangeOrderStatus } from '../../network/Orders'
+  import { onMount } from 'svelte'
+  const initailOrderStatus = Types.Types.TOrderStatus.WAITING_PAYMENT
+  let items: Types.Classes.COrder[]
 
   $: if (items) {
     for (let index = 0; index < items.length; index++) {
-      items[index] = Types.Classes.COrder.fromObject(items[index]);
+      items[index] = Types.Classes.COrder.fromObject(items[index])
     }
-    items = items;
+    items = items
   }
 
   const nextButtonText = (order: Types.Classes.COrder) => {
     switch (order?.status) {
       case initailOrderStatus:
-        return '';
+        return ''
       case Types.Types.TOrderStatus.OPEN:
-        return 'Aceitar o pedido';
+        return 'Aceitar o pedido'
       case Types.Types.TOrderStatus.ACCEPTED:
-        return 'Esperando o entregador';
+        return 'Esperando o entregador'
       case Types.Types.TOrderStatus.WAITING_DELIVERY:
-        return 'Saiu para entrega';
+        return 'Saiu para entrega'
       case Types.Types.TOrderStatus.IN_DELIVERY:
-        return 'Pedido entrege';
+        return 'Pedido entrege'
       default:
-        return '-';
+        return '-'
     }
-  };
+  }
 
   async function cancel(order: Types.Classes.COrder) {
-    Stores.Loading.instance.start();
-    const response = await ChangeOrderStatus(order?.id, Types.Types.TOrderStatus.CANCELED);
+    Stores.Loading.instance.start()
+    const response = await ChangeOrderStatus(order?.id, Types.Types.TOrderStatus.CANCELED)
     if (response?.success) {
-      order.status = Types.Types.TOrderStatus.CANCELED;
-      Stores.MessageAlert.instance.show('O pedido foi atualizado com sucesso!');
+      order.status = Types.Types.TOrderStatus.CANCELED
+      Stores.MessageAlert.instance.show('O pedido foi atualizado com sucesso!')
     } else {
-      Stores.MessageAlert.instance.show(response?.data);
+      Stores.MessageAlert.instance.show(response?.data)
     }
-    Stores.Loading.instance.stop();
+    Stores.Loading.instance.stop()
   }
 
   async function next(order: Types.Classes.COrder, index: number) {
-    Stores.Loading.instance.start();
+    Stores.Loading.instance.start()
     if (order?.status && order?.status !== Types.Types.TOrderStatus.DELIVERED) {
-      const newStatus = order?.status.next();
-      const response = await ChangeOrderStatus(order?.id, newStatus);
+      const newStatus = order?.status.next()
+      const response = await ChangeOrderStatus(order?.id, newStatus)
       if (response?.success) {
-        order.status = newStatus;
-        items[index] = order;
-        items = items;
-        Stores.MessageAlert.instance.show('O pedido foi atualizado com sucesso!');
+        order.status = newStatus
+        items[index] = order
+        items = items
+        Stores.MessageAlert.instance.show('O pedido foi atualizado com sucesso!')
       } else {
-        Stores.MessageAlert.instance.show(response?.data);
+        Stores.MessageAlert.instance.show(response?.data)
       }
     } else {
-      Stores.MessageAlert.instance.show('Aconteceu um erro inesperado, por favor reinicie o iKomida app.');
+      Stores.MessageAlert.instance.show('Aconteceu um erro inesperado, por favor reinicie o iKomida app.')
     }
-    Stores.Loading.instance.stop();
+    Stores.Loading.instance.stop()
   }
 
   function goToOrder(order: Types.Classes.COrder) {
-    Stores.Navigation.instance.goTo(Routes.order, order);
+    Stores.Navigation.instance.goTo(Routes.order, order)
   }
 
   onMount(() => {
-    Stores.Loading.instance.stop();
-  });
+    Stores.Loading.instance.stop()
+  })
 
-  Stores.Title.instance.set('Pedidos');
+  Stores.Title.instance.set('Pedidos')
 </script>
 
 <Views.LoadMoreReusableList
@@ -98,7 +98,7 @@
           <Views.Status showIcon={false} type={Types.Status.WARNING}
             >Prepare o pedido antes de
             {Utils.Strings.dateToString(
-              new Date((items[index].createdAt?.getTime() ?? 0) + items[index].preparation?.max * 1000).toString(),
+              new Date((items[index].createdAt?.getTime() ?? 0) + items[index].preparation?.max * 1000).toString()
             )}</Views.Status
           >
           <Views.Divider height={5} />
@@ -138,7 +138,7 @@
     <div class="value">
       Total:&nbsp;<span
         >{Utils.Strings.currency(
-          Number(items[index].subtotal ?? 0) + Number(items[index].delivery ?? 0) - Number(items[index].discount ?? 0),
+          Number(items[index].subtotal ?? 0) + Number(items[index].delivery ?? 0) - Number(items[index].discount ?? 0)
         )}</span
       >
     </div>
@@ -146,7 +146,7 @@
       <Views.Divider height={10} />
       <div class="buttonGroup">
         {#if items[index].status && ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED].includes(items[index].status ?? initailOrderStatus)}
-          <Views.Button sizeMultiplier={0.8} type="secondary" on:click={() => cancel(items[index])}
+          <Views.Button sizeMultiplier={0.8} type={Types.TButton.SECONDARY} on:click={() => cancel(items[index])}
             >Cancelar</Views.Button
           >
         {/if}

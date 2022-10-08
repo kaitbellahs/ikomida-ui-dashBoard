@@ -1,53 +1,53 @@
 <script lang="ts">
-  import { Clipboard } from '@capacitor/clipboard';
-  import { Views, Utils, Types, Stores } from '@ikomida/shared-frontend';
-  import { getSubscription } from '../../network/Payment';
-  import { onMount } from 'svelte';
-  import Fa from 'svelte-fa';
-  import { faReceipt, faFileInvoice } from '@fortawesome/free-solid-svg-icons';
-  import { AppLauncher } from '@capacitor/app-launcher';
+  import { Clipboard } from '@capacitor/clipboard'
+  import { Views, Utils, Types, Stores } from '@ikomida/shared-frontend'
+  import { getSubscription } from '../../network/Payment'
+  import { onMount } from 'svelte'
+  import Fa from 'svelte-fa'
+  import { faReceipt, faFileInvoice } from '@fortawesome/free-solid-svg-icons'
+  import { AppLauncher } from '@capacitor/app-launcher'
 
-  let subscription: Types.Classes.CSubscription;
+  let subscription: Types.Classes.CSubscription
 
   async function open(url?: string) {
-    const { value } = await AppLauncher.canOpenUrl({ url: url ?? '' });
-    await AppLauncher.openUrl({ url: url ?? '' });
+    const { value } = await AppLauncher.canOpenUrl({ url: url ?? '' })
+    await AppLauncher.openUrl({ url: url ?? '' })
     if (!value) {
-      await Clipboard.write({ string: url });
+      await Clipboard.write({ string: url })
       Stores.MessageAlert.instance.show(
-        `Se o navegador externo no for aberto automaticamente, por favor o abra e digita esa URL: ${url}, que também foi copiado para sua área de transferência para colar-lo!`,
-      );
+        `Se o navegador externo no for aberto automaticamente, por favor o abra e digita esa URL: ${url}, que também foi copiado para sua área de transferência para colar-lo!`
+      )
     }
   }
 
   onMount(async () => {
-    subscription = Types.Classes.CSubscription.fromObject(await getSubscription());
-    Stores.Loading.instance.stop();
-  });
+    subscription = Types.Classes.CSubscription.fromObject(await getSubscription())
+    Stores.Loading.instance.stop()
+  })
 
   function subscriptionStatus(status?: Types.Types.Asaas.TAsaasSubscriptionStatus) {
-    console.log(status);
+    console.log(status)
     switch (status) {
       case Types.Types.Asaas.TAsaasSubscriptionStatus.ACTIVE:
-        return 'Ativo';
+        return 'Ativo'
       case Types.Types.Asaas.TAsaasSubscriptionStatus.EXPIRED:
-        return 'Expirado';
+        return 'Expirado'
       default:
-        return '-';
+        return '-'
     }
   }
   function paymentStatus(status?: Types.Types.TAsaasPaymentStatus) {
     switch (status) {
       case Types.Types.TAsaasPaymentStatus.CONFIRMED:
-        return 'Confirmado';
+        return 'Confirmado'
       case Types.Types.TAsaasPaymentStatus.PENDING:
-        return 'Aguardando';
+        return 'Aguardando'
       default:
-        return '-';
+        return '-'
     }
   }
 
-  Stores.Title.instance.set('Assinatura');
+  Stores.Title.instance.set('Assinatura')
 </script>
 
 <h2>dados da sua assinatura</h2>
@@ -75,12 +75,12 @@
   {#each subscription?.charges?.sort((i1, i2) => (i2?.dueDate.getTime() ?? 0) - (i1?.dueDate.getTime() ?? 0)) as charges (charges?.invoiceUrl)}
     <div class="charge">
       {#if charges?.invoiceUrl}
-        <span alt="Abrir comprovante de pagamento" on:click={() => open(charges?.invoiceUrl)} class="invoice"
+        <span name="Abrir comprovante de pagamento" on:click={() => open(charges?.invoiceUrl)} class="invoice"
           ><Fa icon={faFileInvoice} /></span
         >
       {/if}
       {#if charges?.transactionReceiptUrl}
-        <span alt="Abrir a nota fiscal" on:click={() => open(charges?.transactionReceiptUrl)} class="receipt"
+        <span name="Abrir a nota fiscal" on:click={() => open(charges?.transactionReceiptUrl)} class="receipt"
           ><Fa icon={faReceipt} /></span
         >
       {/if}

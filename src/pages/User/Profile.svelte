@@ -102,7 +102,7 @@
     <Views.Divider />
   </div>
   <Views.Button on:click={editPassword}>Atualizar senha</Views.Button>
-  <Views.Button type="transparent" on:click={out}>Logout</Views.Button>
+  <Views.Button type={Types.TButton.TRANSPARENT} on:click={out}>Logout</Views.Button>
   <Views.GTerms />
 {/if}
 

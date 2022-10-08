@@ -15,7 +15,6 @@
   const order: Types.Classes.COrder = $router.options
 
   let screenShot = false
-  let showImage = true
   let orderScreen: HTMLElement
   let showCardBrand = false
 
@@ -111,9 +110,6 @@
     })
   }
 
-  function erroLoadImage() {
-    showImage = false
-  }
   onMount(async () => {
     if (await Share.canShare()) {
       Stores.Menu.instance.addItem({
@@ -138,16 +134,15 @@
 
 <div class="order screenShot {screenShot ? 'screenShot' : ''}" bind:this={orderScreen}>
   <div class="avatar {screenShot ? 'screenShot' : ''}">
-    {#if $Settings?.profile?.mainPicture && showImage}
-      <img
-        on:error={erroLoadImage}
-        src={$Settings?.profile?.mainPicture ?? 'assets/icons/transparent-logo-1.svg'}
-        alt={$Settings?.profile?.contractName ?? 'iKomida'}
+    {#if $Settings?.profile?.mainPicture}
+      <Views.Image
+        source={$Settings?.profile?.mainPicture ?? 'assets/icons/transparent-logo-1.svg'}
+        name={$Settings?.profile?.contractName ?? 'iKomida'}
       />
     {:else if $Settings?.profile?.contractName}
       <h1>{$Settings?.profile?.contractName}</h1>
     {:else}
-      <img src="assets/icons/transparent-logo-1_144x45.png" alt="iKomida" />
+      <Views.Image source="assets/icons/transparent-logo-1_144x45.png" name="iKomida" />
       <h2>{$Settings?.profile?.contractName}</h2>
     {/if}
     <Views.Divider height={30} />
@@ -252,12 +247,9 @@
     <span class="brand">
       {#if order?.payment?.type === Types.Types.TPaymentMethod.CREDIT_CARD_ONLINE}
         {#if showCardBrand}
-          <img
-            on:error={hideCardBrand}
-            style="object-fit: contain;"
-            src="/assets/cardBrand/{order?.payment.brand}.svg"
-            alt={order?.payment.brand}
-          />
+          <div style="object-fit: contain;">
+            <Views.Image source="/assets/cardBrand/{order?.payment.brand}.svg" name={order?.payment.brand} />
+          </div>
         {/if}
         **** {order?.payment.lastDigits}
       {/if}
@@ -265,7 +257,7 @@
   </div>
   <div data-html2canvas-ignore class="buttonGroup">
     {#if !order?.status || ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED].includes(order?.status)}
-      <Views.Button sizeMultiplier={0.8} type="secondary" on:click={cancel}>Cancelar</Views.Button>
+      <Views.Button sizeMultiplier={0.8} type={Types.TButton.SECONDARY} on:click={cancel}>Cancelar</Views.Button>
     {/if}
     {#if !order?.status || ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED, Types.Types.TOrderStatus.WAITING_PAYMENT].includes(order?.status)}
       <Views.Button sizeMultiplier={0.8} on:click={next}>{nextButtonText(order)}</Views.Button>
@@ -309,7 +301,7 @@
   </table>
   <div class="signature {screenShot ? 'screenShot' : ''}">
     <Views.Divider height={30} />
-    <span>Feito com carinho por</span><img src="/assets/icons/transparent-logo-1.png" alt="iKomida" />
+    <span>Feito com carinho por</span><Views.Image source="/assets/icons/transparent-logo-1.png" name="iKomida" />
   </div>
 </div>
 <Views.GTerms />
@@ -391,7 +383,7 @@
     display: flex;
     flex-direction: column;
   }
-  .paymentMethod > .brand > img {
+  .paymentMethod > .brand > :global(img) {
     height: 14px;
   }
   .paymentMethod > .brand {
@@ -467,7 +459,7 @@
   .avatar.screenShot {
     display: flex;
   }
-  .avatar > img {
+  .avatar > :global(img) {
     font-size: 3em;
     width: 100%;
     max-width: 500px;
@@ -486,7 +478,7 @@
   .signature.screenShot {
     display: flex;
   }
-  .signature > img {
+  .signature > :global(img) {
     height: 45px;
   }
 </style>

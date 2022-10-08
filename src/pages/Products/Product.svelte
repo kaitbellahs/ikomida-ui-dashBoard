@@ -16,20 +16,6 @@
     })
   }
 
-  let showImage: any = { image: true, optionsCategories: [] }
-
-  function generateShowImage() {
-    for (const index in product.optionsCategories ?? []) {
-      showImage.optionsCategories.push({
-        image: true,
-        options: []
-      })
-      for (const optionIndex in product.optionsCategories?.[index].options ?? []) {
-        showImage.optionsCategories[index].options.push({ image: true })
-      }
-    }
-  }
-
   const newProduct = async () => {
     Stores.Navigation.instance.goTo(Routes.editProduct, {
       product,
@@ -48,18 +34,6 @@
     Stores.Loading.instance.stop()
   }
 
-  function erroLoadImage(index?: number, optionIndex?: number) {
-    if (Utils.Objects.isTrue(index)) {
-      if (Utils.Objects.isTrue(optionIndex)) {
-        showImage.optionsCategories[index ?? 0].options[optionIndex ?? 0].image = false
-      } else {
-        showImage.optionsCategories[index ?? 0].image = false
-      }
-    } else {
-      showImage.image = false
-    }
-  }
-
   onMount(async () => {
     if (!initalProduct.id) {
       Stores.Loading.instance.stop()
@@ -68,21 +42,17 @@
     const response = await getProduct(initalProduct.id)
     if (response?.success) {
       product = Types.Classes.CProduct.fromObject({ ...initalProduct.toJSON(), ...response?.data })
-      generateShowImage()
     } else {
       Stores.MessageAlert.instance.show(response?.data)
     }
     Stores.Loading.instance.stop()
   })
-
   $: Stores.Title.instance.set(product?.title ?? '')
 </script>
 
 {#if product}
   <div class="product">
-    {#if showImage.image && product.image}
-      <img on:error={() => erroLoadImage()} src={product.image} alt={product.title} />
-    {/if}
+    <Views.Image source={product.image} name={product.title} />
     <h2>{product.title}</h2>
     <p>{product.description}</p>
     <span class="serves">Aproximadamente {Logics.Finances.formatWeight(product.weight ?? 0)}</span>
@@ -107,9 +77,7 @@
         <Views.Divider />
         <div class="optionsCategory">
           <header>
-            {#if showImage.optionsCategories[index].image && optionsCategory.image}
-              <img on:error={() => erroLoadImage(index)} src={optionsCategory.image} alt={optionsCategory.name} />
-            {/if}
+            <Views.Image source={optionsCategory.image} name={optionsCategory.name} height="45px" width="45px" />
             <div>
               <h3>{optionsCategory.name}</h3>
               Escolher entre {optionsCategory.min} e {optionsCategory.max} opções
@@ -119,22 +87,27 @@
             {#each optionsCategory.options ?? [] as option, optionIndex}
               <Views.Divider />
               <div class="option">
-                {#if showImage.optionsCategories[index].options[optionIndex].image && option.image}
-                  <img on:error={() => erroLoadImage(index, optionIndex)} src={option.image} alt={option.name} />
-                {/if}
+                <Views.Image source={option.image} name={option.name} height="45px" width="45px" />
                 <div>
                   <h3>{option.name}</h3>
-                  {#if [Types.Types.TDiscount.PERCENT, Types.Types.TDiscount.VALUE].includes(product.discountType) && option.price > 0}
-                    <span class="oldPrice">Preço original: {Utils.Strings.currency(option.price)}</span>
-                  {/if}
-                  <Views.TextValue
-                    text="Preço:"
-                    value={Utils.Strings.currency(
-                      option.price - Logics.Finances.calcDiscount(option.price, product.discount, product.discountType)
-                    )}
-                    leftMargin={50}
-                  />
-                  <Views.TextValue text="Por ptoduto:" value={`${option.units} unidades`} leftMargin={50} />
+                  <div>
+                    <div>
+                      <span>Valor</span>
+                      {#if [Types.Types.TDiscount.PERCENT, Types.Types.TDiscount.VALUE].includes(product.discountType) && option.price > 0}
+                        <span class="oldPrice">{Utils.Strings.currency(option.price)}</span>
+                      {/if}
+                      <b
+                        >{Utils.Strings.currency(
+                          option.price -
+                            Logics.Finances.calcDiscount(option.price, product.discount, product.discountType)
+                        )}</b
+                      >
+                    </div>
+                    <div>
+                      <span>Unidades</span>
+                      <b>{option.units}</b>
+                    </div>
+                  </div>
                 </div>
               </div>
             {/each}
@@ -215,7 +188,7 @@
     display: flex;
     flex-direction: row;
   }
-  .product > .optionsCategory > header > img {
+  .product > .optionsCategory > header > :global(img) {
     width: 45px;
     height: 45px;
   }
@@ -234,13 +207,28 @@
     display: flex;
     flex-direction: row;
   }
-  .product > .optionsCategory > .option > img {
+  .product > .optionsCategory > .option > :global(img) {
     width: 45px;
     height: 45px;
   }
   .product > .optionsCategory > .option > div {
-    width: calc(100% - 42px);
+    width: 100%;
     margin-left: 10px;
+  }
+  .product > .optionsCategory > .option > div > div {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: center;
+  }
+  .product > .optionsCategory > .option > div > div > div {
+    display: flex;
+    flex-direction: column;
+  }
+  .product > .optionsCategory > .option > div > div > div > b {
+    font-size: 1.1em;
+    font-family: RobotoBold;
   }
   .product > .optionsCategory > .option > div > h3 {
     text-align: center;

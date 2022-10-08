@@ -12,6 +12,7 @@
     deleteProductOption
   } from '../../network/Products'
   import { onMount } from 'svelte'
+  import Divider from '@ikomida/shared-frontend/lib/components/Divider.svelte'
 
   const router = Stores.Navigation.instance.router
   const discountTypeOptions = Types.Types.TDiscount.values() as Types.SelectorOptions[]
@@ -324,6 +325,12 @@
     {/if}
 
     {#if (product.optionsCategories?.length ?? 0) > 0}
+      {#if product.discountType !== Types.Types.TDiscount.NO}
+        <Views.Divider height={10} />
+        <Views.Status type={Types.Status.WARNING}
+          >Este desconto será aplicado nos valores das opções do produto.</Views.Status
+        >
+      {/if}
       {#each product.optionsCategories ?? [] as optionsCategory, index}
         <Views.Divider />
         <div class="optionsCategory">
@@ -430,7 +437,6 @@
             <Views.Divider />
             <Views.Status showIcon={false}>Não há opções cadastradas nesta categoria de opções.</Views.Status>
           {/if}
-          <Views.Divider />
           <Views.Button on:click={() => addOptions(index)} sizeMultiplier={0.6}
             ><span>Adicionar nova opção</span></Views.Button
           >
@@ -440,11 +446,9 @@
       <Views.Divider />
       <Views.Status showIcon={false}>Não há opções cadastradas neste produto.</Views.Status>
     {/if}
-    <Views.Divider />
     <Views.Button on:click={addOptionsCategory} sizeMultiplier={0.7}
       ><span>Adicionar categoria de opções</span></Views.Button
     >
-    <Views.Divider />
     <Views.Button on:click={submit} disabled={!canContinue} bottomPadding={$StatusBar.bottomPadding}
       ><Fa icon={faEdit} /> <span>Salvar</span></Views.Button
     >
