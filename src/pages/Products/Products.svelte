@@ -45,7 +45,7 @@
 
   function newCategory() {
     Stores.Navigation.instance.goTo(Routes.editCategory, {
-      product: Types.Classes.CProduct.fromObject({}),
+      category: Types.Classes.CProductCategory.fillWith(undefined),
       edit: false
     })
   }

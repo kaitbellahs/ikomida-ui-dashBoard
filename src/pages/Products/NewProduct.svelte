@@ -49,7 +49,19 @@
     productsValidation.price &&
     (productsValidation.discount || product.discountType === Types.Types.TDiscount.NO) &&
     productsValidation.serves &&
-    productsValidation.quantity
+    productsValidation.quantity &&
+    validateOptionsCategory(undefined, false)
+
+  $: for (let index = 0; index < (product.optionsCategories?.length ?? 0); index++) {
+    const min = product.optionsCategories?.[index].min
+    const max = product.optionsCategories?.[index].max
+    let isValid = false
+    try {
+      isValid = Number(min) <= Number(max)
+    } catch (exception: any) {}
+    productsValidation.optionsCategories[index].min = isValid
+    productsValidation.optionsCategories[index].max = isValid
+  }
 
   async function submit() {
     if (!canContinue) {
@@ -96,15 +108,17 @@
     return true
   }
 
-  function validateOptionsCategory(index?: number) {
+  function validateOptionsCategory(index?: number, showMessage = true) {
     const toValidate = !isNaN(Number(index))
       ? [productsValidation.optionsCategories[index ?? 0]]
       : productsValidation.optionsCategories
     if (toValidate.length > 0) {
       if (!Utils.Objects.validateFields(toValidate)) {
-        Stores.MessageAlert.instance.show(
-          'Precisa preencher todos campos da categoria de opções e/ou opção corretamente antes de adicionar nova opção ou categoria.'
-        )
+        if (showMessage) {
+          Stores.MessageAlert.instance.show(
+            'Precisa preencher todos campos da categoria de opções e/ou opção corretamente antes de adicionar nova opção ou categoria.'
+          )
+        }
         return false
       }
       return !isNaN(Number(index)) || validateCategoriesOptions(index)
@@ -191,23 +205,6 @@
       productsValidation.optionsCategories?.[index].options?.splice(optionIndex, 1)
       product = product
       Stores.MessageAlert.instance.show('A opção foi removida.')
-    }
-  }
-
-  function validateOptionsCategoryMax(optionsCategory: Types.Classes.CProductOptionsCategory) {
-    return (value: any) => {
-      return Utils.Objects.isTrue(value) && value !== '' && Number(value) >= Number(optionsCategory.min)
-    }
-  }
-
-  function validateOptionsCategoryMin(optionsCategory: Types.Classes.CProductOptionsCategory) {
-    return (value: any) => {
-      return (
-        Utils.Objects.isTrue(value) &&
-        value !== '' &&
-        !isNaN(Number(value)) &&
-        Number(value) <= Number(optionsCategory.max)
-      )
     }
   }
 
@@ -369,9 +366,10 @@
                 bind:isValid={productsValidation.optionsCategories[index].min}
                 initialValue={optionsCategory.min}
                 type={Types.TTextEdit.NUMBER}
-                validation={validateOptionsCategoryMin(optionsCategory)}
                 buttonIcon={faQuestion}
                 callback={showOptionsCategoryMinExplication}
+                error="Este campo deve conter um valor menor que o campo máximo"
+                max={3}
               />
               <Views.TextEdit
                 marginTop={20}
@@ -381,10 +379,10 @@
                 bind:isValid={productsValidation.optionsCategories[index].max}
                 initialValue={optionsCategory.max}
                 type={Types.TTextEdit.NUMBER}
-                validation={validateOptionsCategoryMax(optionsCategory)}
                 error="Este campo deve conter um valor maior que o campo mínimo"
                 buttonIcon={faQuestion}
                 callback={showOptionsCategoryMaxExplication}
+                max={3}
               />
             </div>
           </header>
