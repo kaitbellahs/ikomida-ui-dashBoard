@@ -70,7 +70,7 @@
     }
     const response = await getOrder(id)
     if (response?.success) {
-      const product = response?.data
+      const product: Types.Classes.CProduct = Types.Classes.CProduct.fromObject(response?.data)
       Stores.Navigation.instance?.goTo(Routes.product, product)
     } else {
       Stores.MessageAlert.instance.show(response?.data)
@@ -177,11 +177,11 @@
       <Views.Divider />
     </div>
   {/if}
-  <span class="time">Data: {Utils.Strings.timestampToString(order?.createdAt?.getTime() ?? 0)}</span>
+  <span class="time">Data: {Utils.Strings.dateToString(order?.createdAt)}</span>
   <Views.Divider />
   <h3>Itens do pedido</h3>
   {#each order?.products ?? [] as product}
-    <div class="product" on:click={() => goToProduct(product.id)}>
+    <button class="product" on:click={() => goToProduct(product.id)}>
       <header>
         <span class="quantity">{product.quantity}</span><span class="title">{product.title}</span><span class="price"
           >{Utils.Strings.currency(
@@ -210,7 +210,7 @@
           {/if}
         </div>
       {/if}
-    </div>
+    </button>
   {/each}
   <Views.Divider />
   <h3>Dados da entrega</h3>
@@ -328,10 +328,12 @@
     margin-bottom: 0;
     display: flex;
     justify-content: space-between;
+    border: 0;
     border-bottom: 1px solid #ccc;
     border-left: 1px solid #ccc;
     display: flex;
     flex-direction: column;
+    background-color: transparent;
   }
   .product > small {
     margin-left: 5px;

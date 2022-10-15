@@ -1,7 +1,7 @@
 <script lang="ts">
   import Routes from '../../stores/Routes'
   import { search, all, deleteProduct, deleteCategory, updateProduct } from '../../network/Products'
-  import { Views, Stores, Types } from '@ikomida/shared-frontend'
+  import { Views, Stores, Types, Utils } from '@ikomida/shared-frontend'
   import { faSearch, faEdit, faGift } from '@fortawesome/free-solid-svg-icons'
   import { StatusBar } from '../../stores/Setup'
   import { onMount } from 'svelte'
@@ -32,6 +32,17 @@
   onMount(async () => {
     categoriesAndProducts = await all()
     sortItems()
+    const auth = await Stores.Auth.Auth.instance.data()
+    if (auth) {
+      const userInfo = await Utils.Jws.extractToken(auth)
+      if (userInfo.role === 'VENDOR') {
+        Stores.Menu.instance.addItem({
+          name: 'Cupons',
+          icon: faGift,
+          callback: goToCoupons
+        })
+      }
+    }
     Stores.Loading.instance.stop()
   })
 
@@ -156,12 +167,6 @@
   async function categoryDown(id?: string) {
     console.log('categoryDown:', id)
   }
-
-  Stores.Menu.instance.addItem({
-    name: 'Cupons',
-    icon: faGift,
-    callback: goToCoupons
-  })
 </script>
 
 <Views.TextEdit marginTop={0} icon={faSearch} bind:value={searchTerm} placeHolder="Buscar no cardápio" />

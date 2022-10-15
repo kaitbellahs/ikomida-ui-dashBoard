@@ -99,6 +99,7 @@
   }
 
   onMount(() => {
+    items.areaCode = '55'
     Stores.Loading.instance.stop()
   })
 

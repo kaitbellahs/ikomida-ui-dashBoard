@@ -153,4 +153,5 @@ main {
     padding: 20px;
     width: 100%;
     overflow: scroll;
+    background-color: rgb(223, 223, 223);
 }

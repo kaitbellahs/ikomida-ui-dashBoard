@@ -53,7 +53,7 @@
   $: canProceed = Utils.Objects.validateFields(profileValidation)
 
   $: if ((profile.address?.postalCode?.length ?? 0) === 8 && profile?.address?.postalCode != currentPostalCode) {
-    // findAddress();
+    findAddress()
   }
 
   function findAddress() {
@@ -65,6 +65,7 @@
           const address = response?.data
           currentPostalCode = address?.postalCode
           profile.address = { ...profile?.address, ...address }
+          profile.address.number = ''
           Utils?.Objects?.updateInputs(profileInputs, profile)
         } else {
           Stores.MessageAlert.instance.show(response?.data)

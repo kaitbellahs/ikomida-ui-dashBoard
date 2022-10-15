@@ -6,6 +6,7 @@
   import { deleteProduct, getProduct } from '../../network/Products'
   import { onMount } from 'svelte'
 
+  let userInfo: Types.Classes.CUser
   const router = Stores.Navigation.instance.router
   let product: Types.Classes.CProduct
   let initalProduct: Types.Classes.CProduct = $router.options
@@ -42,6 +43,10 @@
     const response = await getProduct(initalProduct.id)
     if (response?.success) {
       product = Types.Classes.CProduct.fromObject({ ...initalProduct.toJSON(), ...response?.data })
+      const auth = await Stores.Auth.Auth.instance.data()
+      if (auth) {
+        userInfo = await Utils.Jws.extractToken(auth)
+      }
     } else {
       Stores.MessageAlert.instance.show(response?.data)
     }
@@ -71,8 +76,8 @@
       unidade{product.quantity > 1 ? 's' : ''}
     </div>
     <Views.Divider />
-    <h2>Opções do produto:</h2>
     {#if (product.optionsCategories?.length ?? 0) > 0}
+      <h2>Opções do produto:</h2>
       {#each product.optionsCategories ?? [] as optionsCategory, index}
         <Views.Divider height={10} />
         <div class="optionsCategory">
@@ -122,8 +127,10 @@
       <Views.Status>Não há opções cadastradas neste produto.</Views.Status>
     {/if}
     <Views.Divider />
-    <Views.Button on:click={removeProduct}><Fa icon={faTrashAlt} /> <span>Remover este produto</span></Views.Button>
-    <Views.Button on:click={edit}><Fa icon={faEdit} /> <span>Editar</span></Views.Button>
+    {#if userInfo?.role === 'VENDOR'}
+      <Views.Button on:click={removeProduct}><Fa icon={faTrashAlt} /> <span>Remover este produto</span></Views.Button>
+      <Views.Button on:click={edit}><Fa icon={faEdit} /> <span>Editar</span></Views.Button>
+    {/if}
     <Views.Button on:click={newProduct}><Fa icon={faEdit} /> <span>Novo produto Similar</span></Views.Button>
   </div>
 {/if}
