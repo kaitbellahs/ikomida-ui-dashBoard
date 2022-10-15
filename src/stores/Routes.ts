@@ -1,4 +1,5 @@
 export default {
+  login: Symbol('/login'),
   home: Symbol('/home'),
   orders: Symbol('/orders'),
   order: Symbol('/order'),
@@ -13,6 +14,7 @@ export default {
   confirmSubscribe: Symbol('/confirmSubscribe'),
   subscribe: Symbol('/subscribe'),
   coupons: Symbol('/coupons'),
+  limits: Symbol('/limits'),
   newCoupon: Symbol('/newCoupon'),
   pushNotifications: Symbol('/pushNotifications'),
   newPushNotification: Symbol('/newPushNotification'),

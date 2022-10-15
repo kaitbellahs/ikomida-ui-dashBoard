@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import ikomidaID from '../../stores/ikomidaID'
   import * as AuthNetwork from '../../network/Auth'
   import Routes from '../../stores/Routes'
@@ -7,13 +7,14 @@
   import { Utils, Network } from '@ikomida/shared-frontend'
   import { registerPushNotificationToken } from '../../network/PushNotification'
   import { onMount } from 'svelte'
+  import { Capacitor } from '@capacitor/core'
 
   let ikomidaid = 'com.ikomida.br.'
-  let ikomidaidInput
-  let phone
-  let password
+  let ikomidaidInput: Views.TextEdit
+  let phone: string
+  let password: string
   let isValidPhone = false
-  let pushNotificationToken = Stores.PushNotificationToken.instance.store
+  let pushNotificationToken: Stores.PushNotificationToken = Stores.PushNotificationToken.instance
 
   $: canLogin = isValidPhone
 
@@ -24,14 +25,16 @@
   async function doLogin() {
     Stores.Loading.instance.start()
     await ikomidaID.set(ikomidaid)
-    Network.instance.setIkomidaID(ikomidaid)
-    const response = await AuthNetwork.doLogin(55, phone, password)
+    Network.instance?.setIkomidaID(ikomidaid)
+    const response = await AuthNetwork.doLogin('55', phone, password)
     if (response?.success) {
       const token = await Utils.Jws.extractToken(response?.data)
       if (token !== null) {
         await Stores.Auth.Auth.instance.setToken(response?.data)
-        if ($pushNotificationToken && $pushNotificationToken !== {}) {
-          await registerPushNotificationToken($pushNotificationToken)
+        const pNTData = pushNotificationToken.data
+        if (pNTData) {
+          const pNTObject = Types.Classes.CRegisterPushNotification.init(Capacitor.getPlatform(), pNTData)
+          await registerPushNotificationToken(pNTObject)
         }
         Stores.Navigation.instance.reset(Routes.home)
       } else {

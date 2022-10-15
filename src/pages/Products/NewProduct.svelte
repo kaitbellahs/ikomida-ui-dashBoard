@@ -200,9 +200,14 @@
     }
   }
 
-  function validateOptionsCategoryMin() {
+  function validateOptionsCategoryMin(optionsCategory: Types.Classes.CProductOptionsCategory) {
     return (value: any) => {
-      return Utils.Objects.isTrue(value) && value !== '' && !isNaN(Number(value))
+      return (
+        Utils.Objects.isTrue(value) &&
+        value !== '' &&
+        !isNaN(Number(value)) &&
+        Number(value) <= Number(optionsCategory.max)
+      )
     }
   }
 
@@ -332,7 +337,7 @@
         >
       {/if}
       {#each product.optionsCategories ?? [] as optionsCategory, index}
-        <Views.Divider />
+        <Views.Divider height={10} />
         <div class="optionsCategory">
           <Views.FloatRemove top={-10} right={-10} callback={() => removeOptionsCategory(index)} />
           <header>
@@ -364,7 +369,7 @@
                 bind:isValid={productsValidation.optionsCategories[index].min}
                 initialValue={optionsCategory.min}
                 type={Types.TTextEdit.NUMBER}
-                validation={validateOptionsCategoryMin()}
+                validation={validateOptionsCategoryMin(optionsCategory)}
                 buttonIcon={faQuestion}
                 callback={showOptionsCategoryMinExplication}
               />
@@ -385,7 +390,7 @@
           </header>
           {#if (optionsCategory.options?.length ?? 0) > 0}
             {#each optionsCategory.options ?? [] as option, optionIndex}
-              <Views.Divider />
+              <Views.Divider height={15} />
               <div class="option">
                 <Views.FloatRemove top={-10} right={-10} callback={() => removeOption(index, optionIndex)} />
                 <div class="img">
@@ -464,7 +469,7 @@
     padding-bottom: 50px;
   }
   .product > .optionsCategory {
-    background-color: #d6d6d6d4;
+    background-color: #ccccccfa;
     border: #ccd;
     border-radius: 5px;
     padding: 10px;
@@ -483,7 +488,7 @@
     margin-left: 10px;
   }
   .product > .optionsCategory > .option {
-    background-color: rgb(208 208 208);
+    background-color: #ffffff26;
     border: #ccd;
     border-radius: 5px;
     padding: 10px;

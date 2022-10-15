@@ -1,17 +1,17 @@
-<script>
+<script lang="ts">
   import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend'
   import { onMount } from 'svelte'
   import { updatePassword, logout } from '../../network/Auth'
 
-  let userInfo
+  let userInfo: Types.Classes.CUser
 
-  let auth
+  let auth: Stores.Auth.IStore
 
-  let passwordObject = {
-    oldPass: null,
-    newPass: null,
-    reNewPass: null
-  }
+  let passwordObject: Types.Classes.CUser = Types.Classes.CUser.fromObject({
+    oldPass: undefined,
+    newPass: undefined,
+    reNewPass: undefined
+  })
   let passwordValidationObject = {
     newPass: false,
     reNewPass: false
@@ -45,6 +45,10 @@
       return
     }
     Stores.Loading.instance.stop()
+  }
+
+  function validateRePassword(value: string) {
+    return passwordObject.newPass === value
   }
 
   onMount(async () => {
@@ -96,7 +100,7 @@
       placeHolder="Confirmação"
       bind:value={passwordObject.reNewPass}
       bind:isValid={passwordValidationObject.reNewPass}
-      validation={password => passwordObject.newPass === password}
+      validation={validateRePassword}
       error="A confirmação da senha não é válida"
     />
     <Views.Divider />

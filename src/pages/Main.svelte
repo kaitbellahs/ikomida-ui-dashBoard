@@ -1,26 +1,26 @@
-<script>
-  import Routes from '../stores/Routes';
-  import { Views, Utils, Stores } from '@ikomida/shared-frontend';
-  import Home from './Products/Home.svelte';
-  import Orders from './Orders/Orders.svelte';
-  import Order from './Orders/Order.svelte';
-  import CompanyProfile from './User/CompanyProfile.svelte';
-  import Profile from './User/Profile.svelte';
-  import Settings from './Control/Settings.svelte';
-  import Subscription from './Control/Subscription.svelte';
-  import Product from './Products/Product.svelte';
-  import Products from './Products/Products.svelte';
-  import Layout from './Control/Layout.svelte';
-  import NewProduct from './Products/NewProduct.svelte';
-  import Coupons from './Coupons/Coupons.svelte';
-  import NewCoupon from './Coupons/NewCoupon.svelte';
-  import PushNotifications from './PushNotifications/PushNotifications.svelte';
-  import NewPushNotification from './PushNotifications/NewPushNotification.svelte';
-  import Limits from './Control/Limits.svelte';
-  import NewCategory from './Products/NewCategory.svelte';
-  import Staff from './Staff/Staff.svelte';
-  import NewStaff from './Staff/NewStaff.svelte';
-  import { StatusBar } from '../stores/Setup';
+<script lang="ts">
+  import Routes from '../stores/Routes'
+  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend'
+  import Home from './Products/Home.svelte'
+  import Orders from './Orders/Orders.svelte'
+  import Order from './Orders/Order.svelte'
+  import CompanyProfile from './User/CompanyProfile.svelte'
+  import Profile from './User/Profile.svelte'
+  import Settings from './Control/Settings.svelte'
+  import Subscription from './Control/Subscription.svelte'
+  import Product from './Products/Product.svelte'
+  import Products from './Products/Products.svelte'
+  import Layout from './Control/Layout.svelte'
+  import NewProduct from './Products/NewProduct.svelte'
+  import Coupons from './Coupons/Coupons.svelte'
+  import NewCoupon from './Coupons/NewCoupon.svelte'
+  import PushNotifications from './PushNotifications/PushNotifications.svelte'
+  import NewPushNotification from './PushNotifications/NewPushNotification.svelte'
+  import Limits from './Control/Limits.svelte'
+  import NewCategory from './Products/NewCategory.svelte'
+  import Staff from './Staff/Staff.svelte'
+  import NewStaff from './Staff/NewStaff.svelte'
+  import { StatusBar } from '../stores/Setup'
   import {
     faHome,
     faList,
@@ -32,95 +32,98 @@
     faChartColumn,
     faUserGroup,
     faMessage,
-    faShop,
-  } from '@fortawesome/free-solid-svg-icons';
-  import { onMount } from 'svelte';
+    faShop
+  } from '@fortawesome/free-solid-svg-icons'
+  import { onMount } from 'svelte'
 
-  let userInfo;
-  let router = Stores.Navigation.instance.router;
+  let userInfo: Types.Classes.CUser
+  let router = Stores.Navigation.instance.router
   const tabs = [
     {
       name: 'Home',
       route: Routes.home,
-      icon: faHome,
+      icon: faHome
     },
     {
       name: 'Produtos',
       route: Routes.products,
-      icon: faList,
+      icon: faList
     },
     {
       name: 'Pedidos',
       route: Routes.orders,
-      icon: faBook,
-    },
-  ];
+      icon: faBook
+    }
+  ]
   $: menuHamburgerItems = [
     {
       name: 'Home',
       callback: () => Stores.Navigation.instance.reset(Routes.home),
-      icon: faHome,
+      icon: faHome
     },
     {
       name: 'Perfil',
       callback: () => Stores.Navigation.instance.goTo(Routes.profile),
-      icon: faUser,
+      icon: faUser
     },
     userInfo?.role === 'VENDOR'
       ? {
           name: 'Estabelecimento',
           callback: () => Stores.Navigation.instance.goTo(Routes.company),
-          icon: faShop,
+          icon: faShop
         }
       : null,
     userInfo?.role === 'VENDOR'
       ? {
           name: 'Assinatura',
           callback: () => Stores.Navigation.instance.goTo(Routes.subscription),
-          icon: faMoneyBill1Wave,
+          icon: faMoneyBill1Wave
         }
       : null,
     {
       name: 'Configurações',
       callback: () => Stores.Navigation.instance.goTo(Routes.settings),
-      icon: faSlidersH,
+      icon: faSlidersH
     },
     {
       name: 'Limites',
       callback: () => Stores.Navigation.instance.goTo(Routes.limits),
-      icon: faChartColumn,
+      icon: faChartColumn
     },
     {
       name: 'Comunicação',
       callback: () => Stores.Navigation.instance.goTo(Routes.pushNotifications),
-      icon: faMessage,
+      icon: faMessage
     },
     userInfo?.role === 'VENDOR'
       ? {
           name: 'Colaboradores',
           callback: () => Stores.Navigation.instance.goTo(Routes.staff),
-          icon: faUserGroup,
+          icon: faUserGroup
         }
       : null,
     {
       name: 'Layout',
       callback: () => Stores.Navigation.instance.goTo(Routes.layout),
-      icon: faIdCard,
-    },
-  ];
+      icon: faIdCard
+    }
+  ]
 
-  $: styleHeight = `${Number($StatusBar.height) + 60}px`;
-  $: route = $router.route;
+  $: styleHeight = `${Number($StatusBar.height) + 60}px`
+  $: route = $router.route
 
   onMount(async () => {
-    userInfo = await Utils.Jws.extractToken(await Stores.Auth.Auth.instance.data());
-  });
+    const auth = await Stores.Auth.Auth.instance.data()
+    if (auth) {
+      userInfo = await Utils.Jws.extractToken(auth)
+    }
+  })
 
   $: if (menuHamburgerItems) {
-    Stores.MenuHamburger.instance.reset();
-    menuHamburgerItems?.forEach((page) => Stores.MenuHamburger.instance.addItem(page));
+    Stores.MenuHamburger.instance.reset()
+    menuHamburgerItems?.forEach(page => Stores.MenuHamburger.instance.addItem(page))
   }
-  $: style = `--paddingTop:${styleHeight};--paddingBottom: ${70 + $StatusBar.bottomPadding}px; overflow: scroll;`;
+  $: style = `--paddingTop:${styleHeight};--paddingBottom: ${70 + $StatusBar.bottomPadding}px; overflow: scroll;`
 </script>
 
 <main {style}>
@@ -181,10 +184,8 @@
     overflow: hidden;
     max-width: 100%;
     position: relative;
-    /* padding-bottom: calc(55px + var(--marginBottom)); */
     display: flex;
     flex-direction: column;
-    /* flex: 1; */
     padding-bottom: var(--paddingBottom);
   }
   :global(*, *:before, *:after) {
@@ -194,7 +195,7 @@
     box-sizing: border-box;
   }
   :global(body) {
-    padding-top: 0; /*var(--paddingTop)*/
+    padding-top: 0;
     padding-bottom: 0;
   }
 </style>

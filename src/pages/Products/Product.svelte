@@ -74,7 +74,7 @@
     <h2>Opções do produto:</h2>
     {#if (product.optionsCategories?.length ?? 0) > 0}
       {#each product.optionsCategories ?? [] as optionsCategory, index}
-        <Views.Divider />
+        <Views.Divider height={10} />
         <div class="optionsCategory">
           <header>
             <Views.Image source={optionsCategory.image} name={optionsCategory.name} height="45px" width="45px" />
@@ -85,7 +85,7 @@
           </header>
           {#if (optionsCategory.options?.length ?? 0) > 0}
             {#each optionsCategory.options ?? [] as option, optionIndex}
-              <Views.Divider />
+              <Views.Divider height={15} />
               <div class="option">
                 <Views.Image source={option.image} name={option.name} height="45px" width="45px" />
                 <div>
@@ -178,7 +178,7 @@
     border-radius: 4px;
   }
   .product > .optionsCategory {
-    background-color: #d6d6d6d4;
+    background-color: #ccccccfa;
     border: #ccd;
     border-radius: 5px;
     padding: 10px;
@@ -197,7 +197,7 @@
     margin-left: 10px;
   }
   .product > .optionsCategory > .option {
-    background-color: rgb(208 208 208);
+    background-color: #ffffff26;
     border: #ccd;
     border-radius: 5px;
     padding: 10px;

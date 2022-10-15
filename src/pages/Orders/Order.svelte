@@ -62,10 +62,6 @@
     Stores.Loading.instance.stop()
   }
 
-  function hideCardBrand() {
-    showCardBrand = false
-  }
-
   async function goToProduct(id?: string) {
     Stores.Loading.instance.start()
     if (!id) {
@@ -209,6 +205,9 @@
               >
             </div>
           {/each}
+          {#if product.observation}
+            <small><b>Obs:</b> {product.observation}</small>
+          {/if}
         </div>
       {/if}
     </div>
@@ -333,6 +332,9 @@
     border-left: 1px solid #ccc;
     display: flex;
     flex-direction: column;
+  }
+  .product > small {
+    margin-left: 5px;
   }
   .product > header > .quantity {
     margin-right: 5px;

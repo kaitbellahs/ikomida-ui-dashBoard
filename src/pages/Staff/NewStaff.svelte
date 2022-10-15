@@ -1,48 +1,49 @@
-<script>
-  import Fa from 'svelte-fa';
-  import { faEdit, faSearch } from '@fortawesome/free-solid-svg-icons';
-  import { StatusBar } from '../../stores/Setup';
-  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend';
-  import { addStaff, GetAddressByCep } from '../../network/Staff';
-  import { onMount } from 'svelte';
+<script lang="ts">
+  import Fa from 'svelte-fa'
+  import { faEdit, faSearch } from '@fortawesome/free-solid-svg-icons'
+  import { StatusBar } from '../../stores/Setup'
+  import { Views, Utils, Stores, Types, Network } from '@ikomida/shared-frontend'
+  import { addStaff, GetAddressByCep } from '../../network/Staff'
+  import { onMount } from 'svelte'
 
-  let items = {
-    name: null,
-    lastName: null,
-    cpf: null,
-    areaCode: 55,
-    phone: null,
-    email: null,
+  interface IItemsInputs {
+    name: Views.TextEdit | undefined
+    lastName: Views.TextEdit | undefined
+    identity: Views.TextEdit | undefined
+    phone: Views.TextEdit | undefined
+    email: Views.TextEdit | undefined
     address: {
-      postalCode: null,
-      street: null,
-      number: null,
-      complement: null,
-      neighborhood: null,
-      city: null,
-      stat: null,
-    },
-  };
-  let itemsInputs = {
-    name: null,
-    lastName: null,
-    cpf: null,
-    phone: null,
-    email: null,
+      postalCode: Views.TextEdit | undefined
+      street: Views.TextEdit | undefined
+      number: Views.TextEdit | undefined
+      complement: Views.TextEdit | undefined
+      neighborhood: Views.TextEdit | undefined
+      city: Views.TextEdit | undefined
+      stat: Views.TextEdit | undefined
+    }
+  }
+
+  let items: Types.Classes.CUser = Types.Classes.CUser.fillWith(undefined)
+  let itemsInputs: IItemsInputs = {
+    name: undefined,
+    lastName: undefined,
+    identity: undefined,
+    phone: undefined,
+    email: undefined,
     address: {
-      postalCode: null,
-      street: null,
-      number: null,
-      complement: null,
-      neighborhood: null,
-      city: null,
-      stat: null,
-    },
-  };
+      postalCode: undefined,
+      street: undefined,
+      number: undefined,
+      complement: undefined,
+      neighborhood: undefined,
+      city: undefined,
+      stat: undefined
+    }
+  }
   let itemsValidation = {
     name: false,
     lastName: false,
-    cpf: false,
+    identity: false,
     phone: false,
     email: false,
     address: {
@@ -51,56 +52,57 @@
       number: false,
       neighborhood: false,
       city: false,
-      stat: false,
-    },
-  };
-  let currentPostalCode = null;
-
-  $: if ((items?.address?.postalCode?.length ?? 0) === 8 && items?.address?.postalCode != currentPostalCode) {
-    findAddress();
+      stat: false
+    }
   }
-  $: canProceed = Utils.Objects.validateFields(itemsValidation);
+  let currentPostalCode: string | undefined = undefined
+
+  $: if ((items.address?.postalCode?.length ?? 0) === 8 && items?.address?.postalCode != currentPostalCode) {
+    findAddress()
+  }
+  $: canProceed = Utils.Objects.validateFields(itemsValidation)
 
   function findAddress() {
-    Stores.Loading.instance.start();
-    currentPostalCode = items?.address?.postalCode;
-    GetAddressByCep(items.address.postalCode)
-      .then((response) => {
+    Stores.Loading.instance.start()
+    currentPostalCode = items?.address?.postalCode
+    GetAddressByCep(items.address?.postalCode ?? '')
+      .then(response => {
         if (response?.success) {
-          const address = response?.data;
-          currentPostalCode = address?.postalCode;
-          items.address = { ...items?.address, ...address };
-          Utils?.Objects?.updateInputs(itemsInputs, items);
+          const address = response?.data
+          currentPostalCode = address?.postalCode
+          items.address = { ...items?.address, ...address }
+          Utils?.Objects?.updateInputs(itemsInputs, items)
         } else {
-          Stores.MessageAlert.instance.show(response?.data);
+          Stores.MessageAlert.instance.show(response?.data)
         }
-        Stores.Loading.instance.stop();
+        Stores.Loading.instance.stop()
       })
-      .catch((exception) => {
-        Stores.MessageAlert.instance.show(exception);
-      });
+      .catch(exception => {
+        Stores.MessageAlert.instance.show(exception)
+      })
   }
 
   const submit = async () => {
     if (!Utils.Objects.validateFields(itemsValidation)) {
-      Stores.MessageAlert.instance.show('Por favor preenche os dados do formulario corretamente');
-      return;
+      Stores.MessageAlert.instance.show('Por favor preenche os dados do formulario corretamente')
+      return
     }
-    Stores.Loading.instance.start();
-    let response = await addStaff(items);
+    Stores.Loading.instance.start()
+    let response = await addStaff(items)
     if (response.success) {
-      Stores.Navigation.instance.pop();
+      await Network.instance?.clearCache(Stores.Cache.Types.STAFF)
+      Stores.Navigation.instance.pop()
     } else {
-      Stores.MessageAlert.instance.show(response?.data);
+      Stores.MessageAlert.instance.show(response?.data)
     }
-    Stores.Loading.instance.stop();
-  };
+    Stores.Loading.instance.stop()
+  }
 
   onMount(() => {
-    Stores.Loading.instance.stop();
-  });
+    Stores.Loading.instance.stop()
+  })
 
-  Stores.Title.instance.set('Novo colaborador');
+  Stores.Title.instance.set('Novo colaborador')
 </script>
 
 <div class="staff">
@@ -140,71 +142,73 @@
   <Views.TextEdit
     placeHolder="CPF"
     type={Types.TTextEdit.CPF}
-    bind:value={items.cpf}
-    bind:this={itemsInputs.cpf}
-    bind:isValid={itemsValidation.cpf}
+    bind:value={items.identity}
+    bind:this={itemsInputs.identity}
+    bind:isValid={itemsValidation.identity}
   />
-  <Views.Divider />
-  <h2>Endereço</h2>
-  <Views.TextEdit
-    type={Types.TTextEdit.CEP}
-    callback={findAddress}
-    buttonIcon={faSearch}
-    bind:value={items.address.postalCode}
-    bind:this={itemsInputs.address.postalCode}
-    bind:isValid={itemsValidation.address.postalCode}
-    placeHolder="CEP"
-  />
-  <Views.TextEdit
-    disabled={true}
-    placeHolder="Endereço"
-    bind:value={items.address.street}
-    bind:this={itemsInputs.address.street}
-    bind:isValid={itemsValidation.address.street}
-    min={2}
-    max={255}
-  />
-  <Views.TextEdit
-    placeHolder="Número"
-    bind:value={items.address.number}
-    bind:this={itemsInputs.address.number}
-    bind:isValid={itemsValidation.address.number}
-    min={1}
-    max={255}
-    empty={!itemsValidation.address.postalCode}
-  />
-  <Views.TextEdit
-    placeHolder="Complemento"
-    bind:value={items.address.complement}
-    bind:this={itemsInputs.address.complement}
-  />
-  <Views.TextEdit
-    disabled={true}
-    placeHolder="Bairro"
-    bind:value={items.address.neighborhood}
-    bind:isValid={itemsValidation.address.neighborhood}
-    bind:this={itemsInputs.address.neighborhood}
-    min={2}
-    max={255}
-  />
-  <Views.TextEdit
-    disabled={true}
-    placeHolder="Cidade"
-    bind:value={items.address.city}
-    bind:isValid={itemsValidation.address.city}
-    bind:this={itemsInputs.address.city}
-    min={2}
-    max={255}
-  />
-  <Views.TextEdit
-    disabled={true}
-    placeHolder="UF"
-    bind:value={items.address.stat}
-    bind:this={itemsInputs.address.stat}
-    bind:isValid={itemsValidation.address.stat}
-    min={2}
-    max={2}
-  />
+  {#if items.address}
+    <Views.Divider />
+    <h2>Endereço</h2>
+    <Views.TextEdit
+      type={Types.TTextEdit.CEP}
+      callback={findAddress}
+      buttonIcon={faSearch}
+      bind:value={items.address.postalCode}
+      bind:this={itemsInputs.address.postalCode}
+      bind:isValid={itemsValidation.address.postalCode}
+      placeHolder="CEP"
+    />
+    <Views.TextEdit
+      disabled={true}
+      placeHolder="Endereço"
+      bind:value={items.address.street}
+      bind:this={itemsInputs.address.street}
+      bind:isValid={itemsValidation.address.street}
+      min={2}
+      max={255}
+    />
+    <Views.TextEdit
+      placeHolder="Número"
+      bind:value={items.address.number}
+      bind:this={itemsInputs.address.number}
+      bind:isValid={itemsValidation.address.number}
+      min={1}
+      max={255}
+      empty={!itemsValidation.address.postalCode}
+    />
+    <Views.TextEdit
+      placeHolder="Complemento"
+      bind:value={items.address.complement}
+      bind:this={itemsInputs.address.complement}
+    />
+    <Views.TextEdit
+      disabled={true}
+      placeHolder="Bairro"
+      bind:value={items.address.neighborhood}
+      bind:isValid={itemsValidation.address.neighborhood}
+      bind:this={itemsInputs.address.neighborhood}
+      min={2}
+      max={255}
+    />
+    <Views.TextEdit
+      disabled={true}
+      placeHolder="Cidade"
+      bind:value={items.address.city}
+      bind:isValid={itemsValidation.address.city}
+      bind:this={itemsInputs.address.city}
+      min={2}
+      max={255}
+    />
+    <Views.TextEdit
+      disabled={true}
+      placeHolder="UF"
+      bind:value={items.address.stat}
+      bind:this={itemsInputs.address.stat}
+      bind:isValid={itemsValidation.address.stat}
+      min={2}
+      max={2}
+    />
+  {/if}
   <Views.Divider />
   <Views.Button disabled={!canProceed} on:click={submit} bottomPadding={$StatusBar.bottomPadding}
     ><Fa icon={faEdit} /> <span>Adicionar</span></Views.Button

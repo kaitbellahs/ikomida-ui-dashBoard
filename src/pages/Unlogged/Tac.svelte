@@ -1,21 +1,20 @@
-<script>
-  import { StatusBar } from '../../stores/Setup';
-  import { Views, Utils, Stores } from '@ikomida/shared-frontend';
-  import { onMount } from 'svelte';
-  import { getTermsOfUse } from '../../network/Terms';
+<script lang="ts">
+  import { StatusBar } from '../../stores/Setup'
+  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend'
+  import { onMount } from 'svelte'
+  import { getTermsOfUse } from '../../network/Terms'
 
-  Stores.Title.instance.set('Termos de uso');
-
-  $: styleHeight = `${Number($StatusBar.height) + 50}px`;
-  let term;
+  $: styleHeight = `${Number($StatusBar.height) + 50}px`
+  let term: Types.Classes.CTerm
 
   onMount(async () => {
-    term = await getTermsOfUse();
-    if (term) {
-      Stores.Title.instance.set(term?.name);
+    const response = await getTermsOfUse()
+    if (response && response?.success) {
+      term = Types.Classes.CTerm.fromObject(response?.data)
     }
-    Stores.Loading.instance.stop();
-  });
+    Stores.Loading.instance.stop()
+  })
+  $: Stores.Title.instance.set(term ? term.name : 'Termos de uso')
 </script>
 
 <Views.NavigationBar />
@@ -34,7 +33,7 @@
         </h3>
       </div>
       <div class="content">
-        {@html term?.body}
+        {@html term.text}
       </div>
       <small>Data do termo: {Utils.Strings.dateToDateString(term?.createdAt)}</small>
     {:else}

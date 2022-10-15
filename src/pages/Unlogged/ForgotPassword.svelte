@@ -1,114 +1,114 @@
-<script>
-  import Routes from '../../stores/Routes';
-  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend';
-  import { StatusBar } from '../../stores/Setup';
+<script lang="ts">
+  import Routes from '../../stores/Routes'
+  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend'
+  import { StatusBar } from '../../stores/Setup'
   import {
     requestPasswordPhoneValidation,
     validatePasswordPhoneValidationCode,
-    requestPassword,
-  } from '../../network/Auth';
-  import { onDestroy, onMount } from 'svelte';
+    requestPassword
+  } from '../../network/Auth'
+  import { onDestroy, onMount } from 'svelte'
 
-  const countdownWaitTime = 60;
+  const countdownWaitTime = 60
 
-  let requestPasswordObject = {
-    phone: null,
-    phoneValidationCode: null,
-    signature: null,
-    areaCode: 55,
-  };
-  let canDigitValidationCode = false;
-  let canRequestPassword = false;
-  let canRequestCode = false;
-  let isValidationValid = false;
-  let timer = null;
-  let countdownCanRequestCode = true;
-  let countdown = 0;
-  let showRequestValidatingCodeAlert = false;
-  let showPasswordRequistedAlert = false;
+  let requestPasswordObject: Types.Classes.CUser = Types.Classes.CUser.fromObject({
+    phone: '',
+    phoneValidationCode: '',
+    signature: '',
+    areaCode: '55'
+  })
+  let canDigitValidationCode = false
+  let canRequestPassword = false
+  let canRequestCode = false
+  let isValidationValid = false
+  let timer: NodeJS.Timeout | undefined = undefined
+  let countdownCanRequestCode = true
+  let countdown = 0
+  let showRequestValidatingCodeAlert = false
+  let showPasswordRequistedAlert = false
 
   $: if (countdown === 0) {
     if (timer) {
-      clearInterval(timer);
+      clearInterval(timer)
     }
-    countdownCanRequestCode = true;
-    countdown = countdownWaitTime;
+    countdownCanRequestCode = true
+    countdown = countdownWaitTime
   }
-  $: styleHeight = `${Number($StatusBar.height) + 50}px`;
+  $: styleHeight = `${Number($StatusBar.height) + 50}px`
 
   function toggleshowRequestValidatingCodeAlert() {
-    showRequestValidatingCodeAlert = !showRequestValidatingCodeAlert;
+    showRequestValidatingCodeAlert = !showRequestValidatingCodeAlert
   }
 
   function toggleshowPasswordRequistedAlert() {
-    showPasswordRequistedAlert = !showPasswordRequistedAlert;
+    showPasswordRequistedAlert = !showPasswordRequistedAlert
   }
 
-  function validateValidationCode(validationValid) {
-    return (validationValid?.length ?? 0) == 4;
+  function validateValidationCode(code: string) {
+    return (code.length ?? 0) == 4
   }
 
   async function requestNewPassword() {
-    Stores.Loading.instance.start();
-    const response = await requestPassword(requestPasswordObject);
+    Stores.Loading.instance.start()
+    const response = await requestPassword(requestPasswordObject)
     if (response?.success) {
-      showPasswordRequistedAlert = true;
+      showPasswordRequistedAlert = true
     } else {
-      Stores.MessageAlert.instance.show(response?.data);
+      Stores.MessageAlert.instance.show(response?.data)
     }
-    Stores.Loading.instance.stop();
+    Stores.Loading.instance.stop()
   }
 
   async function requestPhoneValidation() {
-    showRequestValidatingCodeAlert = false;
-    Stores.Loading.instance.start();
-    requestPasswordObject.phone = requestPasswordObject.phone;
-    const response = await requestPasswordPhoneValidation(requestPasswordObject);
+    showRequestValidatingCodeAlert = false
+    Stores.Loading.instance.start()
+    requestPasswordObject.phone = requestPasswordObject.phone
+    const response = await requestPasswordPhoneValidation(requestPasswordObject)
     if (response?.success) {
-      requestPasswordObject = {
-        ...requestPasswordObject,
-        signature: response?.data,
-      };
-      canDigitValidationCode = true;
-      countdownCanRequestCode = false;
-      countdown = countdownWaitTime;
+      requestPasswordObject = Types.Classes.CUser.fromObject({
+        ...requestPasswordObject.toJSON(),
+        signature: response?.data
+      })
+      canDigitValidationCode = true
+      countdownCanRequestCode = false
+      countdown = countdownWaitTime
       timer = setInterval(() => {
-        countdown--;
-      }, 1000);
+        countdown--
+      }, 1000)
       Stores.MessageAlert.instance.show(
-        `Digite o código que você receberá em instantes no seu celular no campo seguinte `,
-      );
+        `Digite o código que você receberá em instantes no seu celular no campo seguinte `
+      )
     } else {
-      Stores.MessageAlert.instance.show(response?.data);
+      Stores.MessageAlert.instance.show(response?.data)
     }
-    Stores.Loading.instance.stop();
+    Stores.Loading.instance.stop()
   }
 
   async function ValidatePhoneCode() {
-    Stores.Loading.instance.start();
-    const response = await validatePasswordPhoneValidationCode(requestPasswordObject);
+    Stores.Loading.instance.start()
+    const response = await validatePasswordPhoneValidationCode(requestPasswordObject)
     if (response?.success) {
-      canRequestPassword = true;
+      canRequestPassword = true
       Stores.MessageAlert.instance.show(
-        `O código inserido é correto!, agora é só clicar no botão “CONTINUAR” para gerar um nova senha aleatória!`,
-      );
+        `O código inserido é correto!, agora é só clicar no botão “CONTINUAR” para gerar um nova senha aleatória!`
+      )
     } else {
-      Stores.MessageAlert.instance.show(response?.data);
+      Stores.MessageAlert.instance.show(response?.data)
     }
-    Stores.Loading.instance.stop();
+    Stores.Loading.instance.stop()
   }
 
   onMount(() => {
-    Stores.Loading.instance.stop();
-  });
+    Stores.Loading.instance.stop()
+  })
 
   onDestroy(() => {
     if (timer) {
-      clearInterval(timer);
+      clearInterval(timer)
     }
-  });
+  })
 
-  Stores.Title.instance.set('Recuperar senha');
+  Stores.Title.instance.set('Recuperar senha')
 </script>
 
 <main
@@ -150,19 +150,19 @@
     <Views.Alert
       title="Alerta"
       message={`Verifica se seu número de telefone inserido ${Utils.Strings.formatAsPhone(
-        requestPasswordObject?.phone,
+        requestPasswordObject?.phone
       )} está correto para prosseguir`}
       closeCallBack={toggleshowRequestValidatingCodeAlert}
       buttons={[
         {
           name: 'Quero corrigir',
-          callback: toggleshowRequestValidatingCodeAlert,
+          callback: toggleshowRequestValidatingCodeAlert
         },
         {
           name: 'Está correto',
           callback: requestPhoneValidation,
-          principal: true,
-        },
+          principal: true
+        }
       ]}
     />
   {/if}
@@ -175,8 +175,8 @@
         {
           name: 'Fazer login',
           callback: () => Stores.Navigation.instance.reset(Routes.login),
-          principal: true,
-        },
+          principal: true
+        }
       ]}
     />
   {/if}

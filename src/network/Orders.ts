@@ -24,6 +24,10 @@ export async function countOrders() {
   return 0
 }
 
+export async function getOrder(id?: string) {
+  return Network.instance?.get(`/order/${id}`, true)
+}
+
 export function OrderStatus(status?: Types.Types.TOrderStatus) {
   switch (status) {
     case Types.Types.TOrderStatus.WAITING_PAYMENT:

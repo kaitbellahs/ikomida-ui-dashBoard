@@ -81,7 +81,8 @@
   let:index
 >
   <div class="leftShadow orderContainer">
-    <div on:click={() => goToOrder(items[index])}>
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <div on:click={() => goToOrder(items[index])} >
       <h3 class="title">Pedido N˚: {items[index].customID}</h3>
       {#if [initailOrderStatus, Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY].includes(items[index].status ?? initailOrderStatus) && new Date((items[index].createdAt?.getTime() ?? 0) + items[index].preparation?.max * 1000) < new Date()}
         <Views.Status type={Types.Status.ERROR} circle={false} showIcon={false}>Pedido atrasado</Views.Status>

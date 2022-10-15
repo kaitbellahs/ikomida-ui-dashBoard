@@ -1,48 +1,50 @@
 <script lang="ts">
-  import Routes from '../../stores/Routes';
-  import Fa from 'svelte-fa';
-  import { faEdit } from '@fortawesome/free-solid-svg-icons';
-  import { StatusBar } from '../../stores/Setup';
-  import { Views, Types, Utils, Stores } from '@ikomida/shared-frontend';
-  import { newCoupon } from '../../network/Payment';
-  import { onMount } from 'svelte';
+  import Fa from 'svelte-fa'
+  import { faEdit } from '@fortawesome/free-solid-svg-icons'
+  import { StatusBar } from '../../stores/Setup'
+  import { Views, Types, Utils, Stores, Network } from '@ikomida/shared-frontend'
+  import { newCoupon } from '../../network/Payment'
+  import { onMount } from 'svelte'
 
-  let valueType: Types.Types.TDiscount | null = null;
+  let valueType: Types.Types.TDiscount | null = null
   let item: Types.Classes.CCoupon = Types.Classes.CCoupon.fromObject({
     name: null,
     value: 0,
     valueType: null,
     quantity: null,
-    validity: null,
-  });
+    validity: null
+  })
   let itemsValidation = {
     name: false,
     value: false,
     quantity: false,
-    validity: false,
-  };
+    validity: false
+  }
 
   $: if (valueType !== item.valueType) {
-    valueType = item.valueType;
-    item.value = 0;
+    valueType = item.valueType
+    item.value = 0
   }
-  $: canContinue = Utils.Objects.validateFields(itemsValidation);
+  $: canContinue = Utils.Objects.validateFields(itemsValidation)
 
   const submit = async () => {
-    Stores.Loading.instance.start();
-    let response;
-    response = await newCoupon(item);
+    Stores.Loading.instance.start()
+    let response
+    response = await newCoupon(item)
     if (response?.success) {
-      Stores.Navigation.instance.pop(Routes.coupons);
+      await Network.instance?.clearCache(Stores.Cache.Types.COUPONS)
+      Stores.Navigation.instance.pop(1)
     } else {
-      Stores.MessageAlert.instance.show(response?.data);
+      Stores.MessageAlert.instance.show(response?.data)
     }
-    Stores.Loading.instance.stop();
-  };
+    Stores.Loading.instance.stop()
+  }
+
   onMount(() => {
-    Stores.Loading.instance.stop();
-  });
-  Stores.Title.instance.set('Novo cupom');
+    Stores.Loading.instance.stop()
+  })
+
+  Stores.Title.instance.set('Novo cupom')
 </script>
 
 <div class="coupon">

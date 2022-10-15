@@ -1,49 +1,53 @@
-<script>
-  import Routes from '../../stores/Routes';
-  import { removeStaff } from '../../network/Staff';
-  import { Views, Utils, Stores } from '@ikomida/shared-frontend';
-  import { StatusBar } from '../../stores/Setup';
-  import { onMount } from 'svelte';
-  import Fa from 'svelte-fa';
-  import { faEdit } from '@fortawesome/free-solid-svg-icons';
+<script lang="ts">
+  import Routes from '../../stores/Routes'
+  import { removeStaff } from '../../network/Staff'
+  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend'
+  import { StatusBar } from '../../stores/Setup'
+  import { onMount } from 'svelte'
+  import Fa from 'svelte-fa'
+  import { faEdit } from '@fortawesome/free-solid-svg-icons'
 
-  let userInfo;
-  let auth;
+  let userInfo: Types.Classes.CUser
+  let auth: Stores.Auth.IStore
+  let items: Types.Classes.CUser[]
 
   onMount(async () => {
-    auth = await Stores.Auth.Auth.instance.store();
-    userInfo = await Utils.Jws.extractToken($auth);
-    Stores.Loading.instance.stop();
-  });
+    auth = await Stores.Auth.Auth.instance.store()
+    userInfo = await Utils.Jws.extractToken($auth)
+    Stores.Loading.instance.stop()
+  })
 
-  async function onRemoveClick(id) {
-    Stores.Loading.instance.start();
-    let response = await removeStaff(id);
-    if (response.success) {
-      Stores.LoadMore.instance.refresh();
-    } else {
-      Stores.MessageAlert.instance.show(response?.data);
-      Stores.Loading.instance.stop();
-      return;
+  async function onRemoveClick(id?: string) {
+    if (!id) {
+      return
     }
-    Stores.Loading.instance.stop();
+    Stores.Loading.instance.start()
+    let response = await removeStaff(id)
+    if (response.success) {
+      Stores.LoadMore.instance.refresh()
+    } else {
+      Stores.MessageAlert.instance.show(response?.data)
+      Stores.Loading.instance.stop()
+      return
+    }
+    Stores.Loading.instance.stop()
   }
 
   async function newStaff() {
-    Stores.Navigation.instance.goTo(Routes.newStaff);
+    Stores.Navigation.instance.goTo(Routes.newStaff)
   }
 
-  function roleName(role) {
+  function roleName(role: string) {
     switch (role.toUpperCase()) {
       case 'VENDOR':
-        return 'Responsável';
+        return 'Responsável'
       case 'STAFF':
-        return 'Colaborador';
+        return 'Colaborador'
       default:
-        return '-';
+        return '-'
     }
   }
-  Stores.Title.instance.set('Lista de colaboradores');
+  Stores.Title.instance.set('Lista de colaboradores')
 </script>
 
 <Views.Button on:click={newStaff} bottomPadding={$StatusBar.bottomPadding}
@@ -54,15 +58,16 @@
   noItems="Não há colaboradores cadastrados para exibir!"
   cache={Stores.Cache.Types.STAFF}
   url="/vendor/staff"
-  let:item
+  bind:items
+  let:index
 >
   <article>
-    {#if userInfo?.id !== item?.id}
-      <Views.FloatRemove callback={() => onRemoveClick(item?.id)} />
+    {#if userInfo?.id !== items[index].id}
+      <Views.FloatRemove callback={() => onRemoveClick(items[index].id)} />
     {/if}
-    <h2>{item?.name} {item?.lastName}</h2>
-    <div>Telefone: {Utils?.Strings?.formatAsPhone(item?.phone)}</div>
-    <div>Título: {roleName(item?.role)}</div>
+    <h2>{items[index].name} {items[index].lastName}</h2>
+    <div>Telefone: {Utils?.Strings?.formatAsPhone(items[index].phone)}</div>
+    <div>Título: {roleName(items[index].role)}</div>
   </article>
 </Views.LoadMoreReusableList>
 

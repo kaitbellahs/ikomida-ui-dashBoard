@@ -53,7 +53,7 @@
   $: billing = percent(limits?.billing?.limits, limits?.billing?.used)
 </script>
 
-<h2>Aqui você analisa métricas de uso do seu plano</h2>
+<h2>Métricas do uso do seu plano</h2>
 
 <section>
   {#if limits}

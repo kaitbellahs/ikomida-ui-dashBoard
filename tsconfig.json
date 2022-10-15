@@ -1,15 +1,4 @@
 {
-  "extends": "@tsconfig/svelte/tsconfig.json",
-  "include": [
-    "src/**/*.ts",
-  ],
-  "exclude": [
-    "node_modules/*",
-    "**/*.spec.ts",
-    "__sapper__/*",
-    "public/*",
-    "App/*"
-  ],
   "compilerOptions": {
     "lib": [
       "dom",
@@ -21,9 +10,13 @@
     "noImplicitAny": true,
     "strict": true,
     "declaration": true,
-    "rootDir": "src",
-    "outDir": "lib",
     "declarationDir": "lib",
-    "target": "ESNext",
-  }
+    "useDefineForClassFields": false,
+    "target": "ESNext"
+  },
+  "plugins": [
+    {
+      "name": "typescript-svelte-plugin"
+    }
+  ]
 }
