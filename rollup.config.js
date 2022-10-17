@@ -51,10 +51,15 @@ export default {
 		warn(warning);
 	},
 	input: 'src/main.ts',
+	strictDeprecations: true,
 	output: {
 		inlineDynamicImports: true,
 		sourcemap: !production,
 		format: 'iife',
+		generatedCode: 'es2015',
+		compact: true,
+		validate: true,
+		generatedCode: { constBindings: true },
 		name: 'app',
 		file: 'App/build/bundle.js'
 	},
@@ -102,12 +107,12 @@ export default {
 			exportConditions: ['browser'],
 			dedupe: ['svelte']
 		}),
-		commonjs(),
 		typescript({
 			...tsconfig,
 			sourceMap: !production,
 			inlineSources: !production
 		}),
+		commonjs(),
 
 		// In dev mode, call `npm run start` once
 		// the bundle has been generated
@@ -119,7 +124,7 @@ export default {
 
 		// If we're building for production (npm run build
 		// instead of npm run dev), minify
-		production && terser({ compress: { ecma: 'ESNext', drop_console: true } })
+		// production && terser({ compress: { ecma: 'ESNext', drop_console: true } })
 	],
 	watch: {
 		clearScreen: false
