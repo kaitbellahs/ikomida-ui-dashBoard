@@ -13,6 +13,7 @@ import {
 } from 'svelte-as-markup-preprocessor';
 import replace from "@rollup/plugin-replace";
 import typescript from '@rollup/plugin-typescript';
+import json from '@rollup/plugin-json';
 import { createRequire } from 'module'
 const require = createRequire(import.meta.url)
 const tsconfig = require('./tsconfig.json')
@@ -84,6 +85,7 @@ export default {
 				dev: !production
 			}
 		}),
+		json(),
 		// we'll extract any component CSS out into
 		// a separate file - better for performance
 		css({

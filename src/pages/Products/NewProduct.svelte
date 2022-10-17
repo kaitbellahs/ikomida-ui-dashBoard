@@ -12,7 +12,6 @@
     deleteProductOption
   } from '../../network/Products'
   import { onMount } from 'svelte'
-  import Divider from '@ikomida/shared-frontend/lib/components/Divider.svelte'
 
   const router = Stores.Navigation.instance.router
   const discountTypeOptions = Types.Types.TDiscount.values() as Types.SelectorOptions[]
@@ -111,7 +110,7 @@
   function validateOptionsCategory(index?: number, showMessage = true) {
     const toValidate = !isNaN(Number(index))
       ? [productsValidation.optionsCategories[index ?? 0]]
-      : productsValidation.optionsCategories
+      : productsValidation.optionsCategories ?? []
     if (toValidate.length > 0) {
       if (!Utils.Objects.validateFields(toValidate)) {
         if (showMessage) {

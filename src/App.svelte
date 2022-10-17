@@ -16,7 +16,6 @@
   import { Capacitor } from '@capacitor/core'
   import type { IAlertButton } from '@ikomida/shared-frontend/lib/components/Alert.svelte'
   import { getOrder } from './network/Orders'
-  import { Store } from './stores/Products'
 
   let logedIn = false
   let showNotificationPopup = false
@@ -41,12 +40,6 @@
     hasErrorCallBack,
     permissionStatus
   )
-
-  // const checkAppLaunchUrl = async () => {
-  //   const { url } = await App.getLaunchUrl();
-
-  //   alert('App opened with URL: ' + url);
-  // };
 
   $: route = $router.route
   $: if (logedIn) {

@@ -3,8 +3,9 @@ window.environment = 'ENVIRONMENT'
 import App from './App.svelte'
 import { Network, Stores } from '@ikomida/shared-frontend'
 import Routes from './stores/Routes'
+import pkg from '../package.json' assert { type: "json" }
 
-const appVersion = '0.0.1'
+const appVersion = pkg.version
 const agent = 'VENDOR'
 const url: any = {
   production: 'https://api.ikomida.com',

@@ -12,7 +12,7 @@
     "declaration": true,
     "declarationDir": "lib",
     "useDefineForClassFields": false,
-    "target": "ESNext"
+    "target": "ES2021"
   },
   "plugins": [
     {
