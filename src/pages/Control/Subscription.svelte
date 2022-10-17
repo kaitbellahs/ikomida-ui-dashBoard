@@ -75,13 +75,13 @@
   {#each subscription?.charges?.sort((i1, i2) => (i2?.dueDate.getTime() ?? 0) - (i1?.dueDate.getTime() ?? 0)) as charges (charges?.invoiceUrl)}
     <div class="charge">
       {#if charges?.invoiceUrl}
-        <span name="Abrir comprovante de pagamento" on:click={() => open(charges?.invoiceUrl)} class="invoice"
-          ><Fa icon={faFileInvoice} /></span
+        <button name="Abrir comprovante de pagamento" on:click={() => open(charges?.invoiceUrl)} class="invoice"
+          ><Fa icon={faFileInvoice} /></button
         >
       {/if}
       {#if charges?.transactionReceiptUrl}
-        <span name="Abrir a nota fiscal" on:click={() => open(charges?.transactionReceiptUrl)} class="receipt"
-          ><Fa icon={faReceipt} /></span
+        <button name="Abrir a nota fiscal" on:click={() => open(charges?.transactionReceiptUrl)} class="receipt"
+          ><Fa icon={faReceipt} /></button
         >
       {/if}
       <Views.TextValue text="value:" value={Utils.Strings.currency(charges?.value)} fontSize="0.9em" leftMargin={50} />
@@ -120,6 +120,10 @@
 {/if}
 
 <style>
+  button{
+    background-color: transparent;
+    border: 0;
+  }
   .charge {
     position: relative;
     background: #cccccc22;

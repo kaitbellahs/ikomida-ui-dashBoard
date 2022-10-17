@@ -193,8 +193,7 @@
       </header>
       {#if (product.options?.length ?? 0) > 0}
         <div>
-          <!-- <h4>Opções do produto:</h4> -->
-          {#each product.options ?? [] as option, optionIndex}
+          {#each product.options ?? [] as option}
             <div class="option">
               <span class="units">{option.units}</span><span class="name">{option.name}</span><span class="price"
                 >{Utils.Strings.currency(
@@ -334,9 +333,6 @@
     display: flex;
     flex-direction: column;
     background-color: transparent;
-  }
-  .product > small {
-    margin-left: 5px;
   }
   .product > header > .quantity {
     margin-right: 5px;

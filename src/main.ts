@@ -3,7 +3,7 @@ window.environment = 'ENVIRONMENT'
 import App from './App.svelte'
 import { Network, Stores } from '@ikomida/shared-frontend'
 import Routes from './stores/Routes'
-import pkg from '../package.json' assert { type: "json" }
+import pkg from '../package.json' assert { type: 'json' }
 
 const appVersion = pkg.version
 const agent = 'VENDOR'

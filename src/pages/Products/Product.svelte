@@ -78,7 +78,7 @@
     <Views.Divider />
     {#if (product.optionsCategories?.length ?? 0) > 0}
       <h2>Opções do produto:</h2>
-      {#each product.optionsCategories ?? [] as optionsCategory, index}
+      {#each product.optionsCategories ?? [] as optionsCategory}
         <Views.Divider height={10} />
         <div class="optionsCategory">
           <header>
@@ -89,7 +89,7 @@
             </div>
           </header>
           {#if (optionsCategory.options?.length ?? 0) > 0}
-            {#each optionsCategory.options ?? [] as option, optionIndex}
+            {#each optionsCategory.options ?? [] as option}
               <Views.Divider height={15} />
               <div class="option">
                 <Views.Image source={option.image} name={option.name} height="45px" width="45px" />
@@ -178,7 +178,7 @@
   .serves {
     font-size: 0.8rem;
   }
-  img {
+  .product > :global(img) {
     width: 100%;
     max-width: 100%;
     object-fit: contain;

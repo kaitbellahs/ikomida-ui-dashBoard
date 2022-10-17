@@ -12,6 +12,7 @@
     "declaration": true,
     "declarationDir": "lib",
     "useDefineForClassFields": false,
+    "resolveJsonModule": true,
     "target": "ES2021"
   },
   "plugins": [

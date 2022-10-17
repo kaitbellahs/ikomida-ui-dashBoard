@@ -48,8 +48,7 @@
     productsValidation.price &&
     (productsValidation.discount || product.discountType === Types.Types.TDiscount.NO) &&
     productsValidation.serves &&
-    productsValidation.quantity &&
-    validateOptionsCategory(undefined, false)
+    productsValidation.quantity
 
   $: for (let index = 0; index < (product.optionsCategories?.length ?? 0); index++) {
     const min = product.optionsCategories?.[index].min
@@ -63,7 +62,7 @@
   }
 
   async function submit() {
-    if (!canContinue) {
+    if (!canContinue || !validateOptionsCategory(undefined, true)) {
       return
     }
     Stores.Loading.instance.start()
@@ -93,13 +92,13 @@
   const percentValidation = (value: string) => {
     return Number(value) > 0 && Number(value) < 10000
   }
-  function validateCategoriesOptions(index?: number) {
+  function validateCategoriesOptions(index?: number, isSubmit = false) {
     for (const optionsCategorValidation of isNaN(Number(index))
       ? [productsValidation.optionsCategories[index ?? 0]]
       : productsValidation.optionsCategories) {
       if ((optionsCategorValidation.options?.length ?? 0) === 0) {
         Stores.MessageAlert.instance.show(
-          'Precisa adicionar pelo menos uma opção na categoria de opções antes de adicionar nova categoria.'
+          `Precisa adicionar pelo menos uma opção na categoria de opções antes de ${isSubmit ? 'salvar o produto': 'adicionar nova categoria'}.`
         )
         return false
       }
@@ -107,20 +106,18 @@
     return true
   }
 
-  function validateOptionsCategory(index?: number, showMessage = true) {
+  function validateOptionsCategory(index?: number, isSubmit = false) {
     const toValidate = !isNaN(Number(index))
       ? [productsValidation.optionsCategories[index ?? 0]]
       : productsValidation.optionsCategories ?? []
     if (toValidate.length > 0) {
       if (!Utils.Objects.validateFields(toValidate)) {
-        if (showMessage) {
           Stores.MessageAlert.instance.show(
-            'Precisa preencher todos campos da categoria de opções e/ou opção corretamente antes de adicionar nova opção ou categoria.'
+            'Precisa preencher todos campos da "categoria de opções" e/ou "opção" corretamente antes de adicionar nova opção ou categoria.'
           )
-        }
         return false
       }
-      return !isNaN(Number(index)) || validateCategoriesOptions(index)
+      return !isNaN(Number(index)) || validateCategoriesOptions(index, isSubmit)
     }
     return true
   }

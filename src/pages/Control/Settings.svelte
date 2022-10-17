@@ -262,7 +262,7 @@
     {#if (business?.hours?.length ?? 0) > 0}
       {#each business?.hours ?? [] as businessHour}
         <div class="busninessHours">
-          <span on:click={() => onRemoveClick(businessHour.id)} class="remove"><Fa icon={faTrashAlt} /></span>
+          <button on:click={() => onRemoveClick(businessHour.id)} class="remove"><Fa icon={faTrashAlt} /></button>
           <div class="twoCells">
             <Views.TextEdit
               placeHolder="Abertura"
@@ -379,6 +379,10 @@
 <Views.GTerms />
 
 <style>
+  button{
+    background-color: transparent;
+    border: 0;
+  }
   .settings {
     padding-bottom: 50px;
   }
