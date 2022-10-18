@@ -1,10 +1,21 @@
 {
+  "extends": "@tsconfig/svelte/tsconfig.json",
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.svelte"
+  ],
+  "exclude": [
+    "node_modules/*",
+    "**/*.spec.ts",
+    "App/**/*"
+  ],
   "compilerOptions": {
     "lib": [
       "dom",
       "dom.iterable",
       "esnext"
     ],
+    "skipLibCheck": true,
     "module": "esnext",
     "isolatedModules": false,
     "noImplicitAny": true,

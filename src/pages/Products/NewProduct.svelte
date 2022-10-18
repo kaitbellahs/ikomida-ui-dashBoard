@@ -15,6 +15,7 @@
 
   const router = Stores.Navigation.instance.router
   const discountTypeOptions = Types.Types.TDiscount.values() as Types.SelectorOptions[]
+  const measureTypeOptions = Types.Types.TMeasure.values() as Types.SelectorOptions[]
 
   let product: Types.Classes.CProduct = $router.options.product
     ? $router.options.product
@@ -41,12 +42,10 @@
     }
   }
   $: canContinue =
-    product.category &&
     productsValidation.title &&
     productsValidation.description &&
-    productsValidation.weight &&
+    productsValidation.measure &&
     productsValidation.price &&
-    (productsValidation.discount || product.discountType === Types.Types.TDiscount.NO) &&
     productsValidation.serves &&
     productsValidation.quantity
 
@@ -63,6 +62,18 @@
 
   async function submit() {
     if (!canContinue || !validateOptionsCategory(undefined, true)) {
+      return
+    }
+    if (!product.category) {
+      Stores.MessageAlert.instance.show('Escolha uma categoria ou volta e cria uma nova')
+      return
+    }
+    if (!product.discountType || (!productsValidation.discount && product.discountType !== Types.Types.TDiscount.NO)) {
+      Stores.MessageAlert.instance.show('Escolha um tipo de discunto')
+      return
+    }
+    if (!product.measureUnit) {
+      Stores.MessageAlert.instance.show('Escolha uma medida do produto')
       return
     }
     Stores.Loading.instance.start()
@@ -98,7 +109,9 @@
       : productsValidation.optionsCategories) {
       if ((optionsCategorValidation.options?.length ?? 0) === 0) {
         Stores.MessageAlert.instance.show(
-          `Precisa adicionar pelo menos uma opção na categoria de opções antes de ${isSubmit ? 'salvar o produto': 'adicionar nova categoria'}.`
+          `Precisa adicionar pelo menos uma opção na categoria de opções antes de ${
+            isSubmit ? 'salvar o produto' : 'adicionar nova categoria'
+          }.`
         )
         return false
       }
@@ -112,9 +125,9 @@
       : productsValidation.optionsCategories ?? []
     if (toValidate.length > 0) {
       if (!Utils.Objects.validateFields(toValidate)) {
-          Stores.MessageAlert.instance.show(
-            'Precisa preencher todos campos da "categoria de opções" e/ou "opção" corretamente antes de adicionar nova opção ou categoria.'
-          )
+        Stores.MessageAlert.instance.show(
+          'Precisa preencher todos campos da "categoria de opções" e/ou "opção" corretamente antes de adicionar nova opção ou categoria.'
+        )
         return false
       }
       return !isNaN(Number(index)) || validateCategoriesOptions(index, isSubmit)
@@ -240,14 +253,14 @@
 {#if product}
   <div class="product">
     <Views.UploadablePhoto bind:image={product.image} title={product.title} />
-    <Views.Selector bind:selected={product.category} name="Selecione uma opção" options={categoriesOptions} />
+    <Views.Selector bind:selected={product.category} name="Selecione uma categoria" options={categoriesOptions} />
     <Views.TextEdit
       placeHolder="Nome do produto"
       bind:value={product.title}
       bind:isValid={productsValidation.title}
       initialValue={product.title}
       min={3}
-      max={255}
+      max={100}
     />
     <Views.TextEdit
       type={Types.TTextEdit.TEXT}
@@ -258,15 +271,18 @@
       min={1}
       max={500}
     />
-    <Views.TextEdit
-      type={Types.TTextEdit.NUMBER}
-      placeHolder="Peso do produto em gramas (g)"
-      bind:value={product.weight}
-      bind:isValid={productsValidation.weight}
-      initialValue={product.weight}
-      min={1}
-      max={9}
-    />
+    <Views.Selector bind:selected={product.measureUnit} name="Selecione uma medida" options={measureTypeOptions} />
+    {#if product.measureUnit}
+      <Views.TextEdit
+        type={Types.TTextEdit.NUMBER}
+        placeHolder="Medida do produto em {product.measureUnit.description} ({product.measureUnit.name})"
+        bind:value={product.measure}
+        bind:isValid={productsValidation.measure}
+        initialValue={product.measure}
+        min={1}
+        max={9}
+      />
+    {/if}
     <Views.TextEdit
       type={Types.TTextEdit.NUMBER}
       placeHolder="Serve quantas pessoas?"
@@ -295,7 +311,7 @@
       max={9}
     />
     <Views.Divider />
-    <Views.Selector bind:selected={product.discountType} name="selecione uma opção" options={discountTypeOptions} />
+    <Views.Selector bind:selected={product.discountType} name="selecione seu discunto" options={discountTypeOptions} />
     {#if product.discountType}
       {#if product.discountType === Types.Types.TDiscount.PERCENT}
         <Views.TextEdit

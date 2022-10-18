@@ -24,7 +24,8 @@
   let notificationIds: string[] = []
   let networkStatus: ConnectionStatus | null = null
   let cache: Stores.Cache = Stores.Cache.instance
-  let network: Stores.Navigation = Stores.Navigation.instance
+  let network: iKomidaNetwork | undefined = iKomidaNetwork.instance
+  let navigation: Stores.Navigation = Stores.Navigation.instance
   let notificationPopup = {
     title: '',
     body: '',
@@ -42,19 +43,15 @@
   )
 
   $: route = $router.route
-  $: if (logedIn) {
-    Utils.Jws.extractToken($auth).then(async token => {
-      await ikomidaID.set(token?.ikomidaID)
-      iKomidaNetwork.instance?.setIkomidaID(token?.ikomidaID)
-    })
-  }
   $: if ($auth) {
     logedIn = false
     Utils.Jws.extractToken($auth).then(async token => {
       logedIn = token !== null
+      await ikomidaID.set(token?.ikomidaID)
+      network?.setIkomidaID(token?.ikomidaID)
     })
   } else {
-    ikomidaID.get().then(id => (id && id !== 'undefined' ? iKomidaNetwork.instance?.setIkomidaID(id) : null))
+    ikomidaID.get().then(id => (id && id !== 'undefined' ? network?.setIkomidaID(id) : null))
     logedIn = false
   }
 
@@ -64,7 +61,7 @@
         const cachedOrders = (cache.getObject(Stores.Cache.Types.ORDERS) ?? []) as Types.Classes.COrder[]
         if (cachedOrders.length > 0) {
           const order = cachedOrders.filter(cachedOrder => cachedOrder.id === notification.data?.payload)?.[0]
-          network.goTo(Routes.order, order)
+          navigation.goTo(Routes.order, order)
         }
       }
     }
@@ -142,15 +139,15 @@
           }
           cache.setObject(Stores.Cache.Types.ORDERS, cachedOrders)
           if (route == Routes.order || go) {
-            network.reset(Routes.orders)
+            navigation.reset(Routes.orders)
             await tick()
             Stores.Loading.instance.reset()
-            network.goTo(Routes.order, order)
+            navigation.goTo(Routes.order, order)
           } else if (route == Routes.orders) {
-            network.reset(Routes.home)
+            navigation.reset(Routes.home)
             await tick()
             Stores.Loading.instance.reset()
-            network.reset(Routes.orders)
+            navigation.reset(Routes.orders)
           } else {
             togglePushNotificationPopup()
           }
@@ -181,7 +178,7 @@
   })
 
   App.addListener('appUrlOpen', data => {
-    network.goTo(Routes.settings, {
+    navigation.goTo(Routes.settings, {
       callback: true,
       ...data
     })

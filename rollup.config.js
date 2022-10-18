@@ -2,9 +2,6 @@ import svelte from 'rollup-plugin-svelte';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
 import livereload from 'rollup-plugin-livereload';
-import {
-	terser
-} from 'rollup-plugin-terser';
 import css from 'rollup-plugin-css-only';
 import cssModules from 'svelte-preprocess-cssmodules';
 import sveltePreprocess from 'svelte-preprocess';
@@ -17,7 +14,7 @@ import json from '@rollup/plugin-json';
 import { createRequire } from 'module'
 const require = createRequire(import.meta.url)
 const tsconfig = require('./tsconfig.json')
-
+delete tsconfig.extends
 const production = !process.env.ROLLUP_WATCH;
 
 function serve() {
@@ -70,16 +67,6 @@ export default {
 		}),
 		svelte({
 			preprocess: [
-				// obfuscatorPlugin({
-				// 	compact: true,
-				// 	controlFlowFlattening: true,
-				// 	deadCodeInjection: true,
-				// 	debugProtection: true,
-				// 	identifierNamesGenerator: 'mangled-shuffled',
-				// 	log: false,
-				// 	numbersToExpressions: true,
-				// 	optionsPreset: 'medium-obfuscation',
-				// }),
 				asMarkupPreprocessor([
 					sveltePreprocess({ sourceMap: !production })
 				]),
@@ -120,11 +107,7 @@ export default {
 
 		// Watch the `public` directory and refresh the
 		// browser on changes when not in production
-		!production && livereload('App'),
-
-		// If we're building for production (npm run build
-		// instead of npm run dev), minify
-		// production && terser({ compress: { ecma: 'ESNext', drop_console: true } })
+		!production && livereload('App')
 	],
 	watch: {
 		clearScreen: false

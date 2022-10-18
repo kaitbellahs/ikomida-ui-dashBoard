@@ -60,7 +60,11 @@
     <Views.Image source={product.image} name={product.title} />
     <h2>{product.title}</h2>
     <p>{product.description}</p>
-    <span class="serves">Aproximadamente {Logics.Finances.formatWeight(product.weight ?? 0)}</span>
+    <span class="serves"
+      >Aproximadamente {product.measureUnit && product.measure
+        ? Logics.Finances.formatMeasure(product.measure, product.measureUnit)
+        : '-'}</span
+    >
     <div class="price">
       {#if [Types.Types.TDiscount.PERCENT, Types.Types.TDiscount.VALUE].includes(product.discountType)}
         <span class="oldPrice">{Utils.Strings.currency(product.price)}</span>

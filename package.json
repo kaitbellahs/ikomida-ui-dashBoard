@@ -45,7 +45,7 @@
     "postversion": "git push && git push --tags",
     "test": "mocha",
     "local:watch:dev": "yarn glogin && ncu -u && yarn && yarn format && yarn lint && yarn svelte-check && yarn watch:dev",
-    "check": "svelte-check --tsconfig ./tsconfig.json"
+    "sveltecheck": "svelte-check --tsconfig ./tsconfig.json --ignore lib --use-new-transformation  true"
   },
   "devDependencies": {
     "@capacitor/cli": "^4.3.0",
@@ -56,8 +56,8 @@
     "@rollup/plugin-typescript": "^9.0.1",
     "@tsconfig/svelte": "^3.0.0",
     "@types/uuid": "^8.3.4",
-    "@typescript-eslint/eslint-plugin": "^5.40.0",
-    "@typescript-eslint/parser": "^5.40.0",
+    "@typescript-eslint/eslint-plugin": "^5.40.1",
+    "@typescript-eslint/parser": "^5.40.1",
     "eslint": "^8.25.0",
     "eslint-config-prettier": "^8.5.0",
     "google-artifactregistry-auth": "^3.0.2",
@@ -70,7 +70,7 @@
     "postcss-load-config": "^4.0.1",
     "prettier": "^2.7.1",
     "rimraf": "^3.0.2",
-    "rollup": "^3.2.2",
+    "rollup": "^3.2.3",
     "rollup-plugin-auto-external": "^2.0.0",
     "rollup-plugin-css-only": "^3.1.0",
     "rollup-plugin-livereload": "^2.0.5",
@@ -84,7 +84,7 @@
     "svelte-preprocess": "^4.10.7",
     "svelte-preprocess-cssmodules": "^2.2.3",
     "tslib": "^2.4.0",
-    "typedoc": "^0.23.16",
+    "typedoc": "^0.23.17",
     "typescript": "^4.8.4",
     "typescript-svelte-plugin": "^0.3.10"
   },
@@ -106,7 +106,7 @@
     "@capacitor/share": "^4.0.1",
     "@fortawesome/free-solid-svg-icons": "^6.2.0",
     "@ikomida/capacitor-plugin-status-bar": "github:TIAltoNivel/capacitor-plugin-statusbar",
-    "@ikomida/shared-frontend": "^1.3.26",
+    "@ikomida/shared-frontend": "^1.3.28",
     "html2canvas": "^1.4.1",
     "uuid": "^9.0.0"
   }
