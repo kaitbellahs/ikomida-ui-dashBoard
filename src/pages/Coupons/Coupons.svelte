@@ -1,36 +1,36 @@
 <script lang="ts">
-  import Routes from '../../stores/Routes';
-  import Fa from 'svelte-fa';
-  import { faEdit } from '@fortawesome/free-solid-svg-icons';
-  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend';
-  import { deleteCoupon } from '../../network/Payment';
-  import { StatusBar } from '../../stores/Setup';
-  import { onMount } from 'svelte';
-  let items: Types.Classes.CCoupon[];
+  import Routes from '../../stores/Routes'
+  import Fa from 'svelte-fa'
+  import { faEdit } from '@fortawesome/free-solid-svg-icons'
+  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend'
+  import { deleteCoupon } from '../../network/Payment'
+  import { StatusBar } from '../../stores/Setup'
+  import { onMount } from 'svelte'
+  let items: Types.Classes.CCoupon[]
   onMount(async () => {
-    Stores.Loading.instance.stop();
-  });
+    Stores.Loading.instance.stop()
+  })
 
   const newCoupon = async () => {
-    Stores.Navigation.instance.goTo(Routes.newCoupon);
-  };
+    Stores.Navigation.instance.goTo(Routes.newCoupon)
+  }
 
   async function removeCoupon(id?: string) {
-    Stores.Loading.instance.start();
-    const response = await deleteCoupon(id);
+    Stores.Loading.instance.start()
+    const response = await deleteCoupon(id)
     if (response?.success) {
-      Stores.LoadMore.instance.refresh();
+      Stores.LoadMore.instance.refresh()
     } else {
-      Stores.MessageAlert.instance.show(response?.data);
+      Stores.MessageAlert.instance.show(response?.data)
     }
-    Stores.Loading.instance.stop();
+    Stores.Loading.instance.stop()
   }
 
   $: if (items) {
-    items = Types.Classes.CCoupon.fromObject(items);
+    items = Types.Classes.CCoupon.fromObject(items)
   }
 
-  Stores.Title.instance.set('Cupons');
+  Stores.Title.instance.set('Cupons')
 </script>
 
 <Views.Button on:click={newCoupon} bottomPadding={$StatusBar.bottomPadding}
@@ -46,8 +46,12 @@
 >
   <article>
     <Views.FloatRemove callback={() => removeCoupon(item?.id)} />
-    <h2>{item?.name}</h2>
-    <div>{Utils.Strings.currency(item.value)}</div>
+    <h2>{item.name}</h2>
+    <div>
+      {Types.Types.TDiscount.VALUE === item.valueType
+        ? Utils.Strings.currency(item.value)
+        : Utils.Strings.percent(item.value)}
+    </div>
     <div>{Utils.Strings.dateToDateString(item.validity?.toString())}</div>
   </article>
 </Views.LoadMoreReusableList>
