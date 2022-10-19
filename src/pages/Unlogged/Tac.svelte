@@ -17,7 +17,6 @@
   $: Stores.Title.instance.set(term ? term.name : 'Termos de uso')
 </script>
 
-<Views.NavigationBar />
 <main
   style="margin-top:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; overflow: hidden;max-width: 100%;"
 >
@@ -41,6 +40,13 @@
     {/if}
   </div>
 </main>
+
+<Views.NavigationBar
+  logo="/assets/icons/transparent-logo-1.svg"
+  paddingTop={$StatusBar.height}
+  topMargin={$StatusBar.height}
+  paddingBottom={$StatusBar.bottomPadding}
+/>
 
 <style>
   .jambtron {

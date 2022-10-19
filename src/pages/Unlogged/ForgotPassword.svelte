@@ -182,7 +182,12 @@
   {/if}
 </main>
 
-<Views.NavigationBar paddingTop={$StatusBar.height} />
+<Views.NavigationBar
+  logo="/assets/icons/transparent-logo-1.svg"
+  paddingTop={$StatusBar.height}
+  topMargin={$StatusBar.height}
+  paddingBottom={$StatusBar.bottomPadding}
+/>
 
 <style>
   main {
