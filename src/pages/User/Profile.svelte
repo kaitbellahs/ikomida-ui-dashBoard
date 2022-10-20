@@ -2,23 +2,33 @@
   import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend'
   import { onMount } from 'svelte'
   import { updatePassword, logout } from '../../network/Auth'
+  import { UpdateAvatar, profile } from '../../network/User'
+  const Layout = Stores.Layout.instance.store
 
   let userInfo: Types.Classes.CUser
+  let avatar: string | undefined = undefined
 
-  let auth: Stores.Auth.IStore
-
-  let passwordObject: Types.Classes.CUser = Types.Classes.CUser.fromObject({
-    oldPass: undefined,
-    newPass: undefined,
-    reNewPass: undefined
-  })
+  let passwordObject: Types.Classes.CUser = Types.Classes.CUser.fillWith(null)
   let passwordValidationObject = {
     newPass: false,
     reNewPass: false
   }
 
-  $: if (userInfo?.avatar) {
-    // update()
+  $: if (userInfo?.avatar && userInfo?.avatar !== avatar) {
+    updateAvatar()
+  }
+
+  async function updateAvatar() {
+    Stores.Loading.instance.start()
+    let response = await UpdateAvatar(userInfo)
+    if (response.success) {
+      avatar = userInfo?.avatar
+      Stores.MessageAlert.instance.show('A sua foto de perfil foi atualizada com sucesso!')
+    } else {
+      userInfo.avatar = avatar
+      Stores.MessageAlert.instance.show(response?.data)
+    }
+    Stores.Loading.instance.stop()
   }
 
   async function out() {
@@ -41,21 +51,25 @@
       Stores.MessageAlert.instance.show('Senha atualizada com sucesso!')
     } else {
       Stores.MessageAlert.instance.show(response?.data)
-      Stores.Loading.instance.stop()
-      return
     }
     Stores.Loading.instance.stop()
   }
 
-  function validateRePassword(value: string) {
-    return passwordObject.newPass === value
-  }
-
   onMount(async () => {
-    auth = await Stores.Auth.Auth.instance.store()
-    userInfo = await Utils.Jws.extractToken($auth)
+    let response = await profile()
+    if (response?.success) {
+      userInfo = Types.Classes.CUser.fromObject(response?.data)
+      avatar = userInfo.avatar
+    } else {
+      Stores.MessageAlert.instance.show('Não foi possível carregar os dados do seu perfil!')
+      userInfo = await Utils.Jws.extractToken((await Stores.Auth.Auth.instance.data()) ?? '')
+    }
     Stores.Loading.instance.stop()
   })
+
+  function validatePassword(password: string) {
+    return passwordObject.newPass === password
+  }
 
   Stores.Title.instance.set('Perfil')
 </script>
@@ -63,12 +77,12 @@
 {#if userInfo}
   <Views.UploadablePhoto
     type={Types.TUploadablePhoto.PROFILE}
-    image={userInfo?.avatar}
+    bind:image={userInfo.avatar}
     name={userInfo.name[0]}
     lastName={userInfo.lastName[0]}
   />
   <Views.Divider />
-  <div class="data">
+  <div class="data" style="--color:{$Layout?.button?.background ?? '#4c0708'};">
     <h2 class="name">{userInfo.name} {userInfo.lastName}</h2>
     <Views.Divider />
     <Views.TextValue
@@ -83,7 +97,7 @@
       fontSize="1.3em"
       leftMargin={30}
     />
-    <Views.TextValue text="email:" value={userInfo.email} fontSize="1.3em" leftMargin={30} />
+    <Views.TextValue text="mail:" value={userInfo.email} fontSize="1.3em" leftMargin={30} />
     <Views.Divider />
     <h2>Senha</h2>
     <Views.TextEdit type={Types.TTextEdit.PASSWORD} placeHolder="Senha atual" bind:value={passwordObject.oldPass} />
@@ -100,7 +114,7 @@
       placeHolder="Confirmação"
       bind:value={passwordObject.reNewPass}
       bind:isValid={passwordValidationObject.reNewPass}
-      validation={validateRePassword}
+      validation={validatePassword}
       error="A confirmação da senha não é válida"
     />
     <Views.Divider />
@@ -115,6 +129,6 @@
     text-align: center;
   }
   h2.name {
-    color: #4c0708;
+    color: var(--color);
   }
 </style>

@@ -1,6 +1,6 @@
 <script lang="ts">
   import Routes from '../../stores/Routes'
-  import { search, all, deleteProduct, deleteCategory, updateProduct } from '../../network/Products'
+  import { search, all, deleteProduct, deleteCategory, updateProduct, updateCategory } from '../../network/Products'
   import { Views, Stores, Types, Utils } from '@ikomida/shared-frontend'
   import { faSearch, faEdit, faGift } from '@fortawesome/free-solid-svg-icons'
   import { StatusBar } from '../../stores/Setup'
@@ -102,36 +102,39 @@
       .sort((i1, i2) => (i1.order ?? 0) - (i2.order ?? 0))
   }
   async function productUp(categoryId?: string, id?: string) {
+    Stores.Loading.instance.start()
     const category = categoriesAndProducts?.filter(category => category.id === categoryId)?.[0]
     const indexOfCategory = categoriesAndProducts?.indexOf(category)
     const product = category?.products?.filter(product => product.id === id)?.[0]
     const indexOfProduct = product ? category?.products?.indexOf(product) : -1
     const productOrder = product?.order ?? indexOfProduct
-    const beforItemOrder = category?.products?.[(indexOfProduct ?? -1) - 1]?.order ?? (indexOfProduct ?? -1) - 1
+    const beforeItemOrder = category?.products?.[(indexOfProduct ?? -1) - 1]?.order ?? (indexOfProduct ?? -1) - 1
     let objects: Types.Classes.CProduct[] = []
     objects.push(Types.Classes.CProduct.fromObject({ id: product?.id, order: (productOrder ?? -1) - 1 }))
     objects.push(
       Types.Classes.CProduct.fromObject({
         id: category?.products?.[(indexOfProduct ?? -1) - 1]?.id,
-        order: beforItemOrder + 1
+        order: beforeItemOrder + 1
       })
     )
     const response = await updateProduct(objects)
     if (response?.success) {
-      let order = categoriesAndProducts[indexOfCategory ?? -1].products?.[(indexOfProduct ?? -1) - 1].order
-      if (order) {
-        order = beforItemOrder + 1
+      let product = categoriesAndProducts[indexOfCategory ?? -1].products?.[(indexOfProduct ?? -1) - 1]
+      if (product) {
+        product.order = beforeItemOrder + 1
       }
-      order = categoriesAndProducts[indexOfCategory ?? -1].products?.[indexOfProduct ?? -1].order
-      if (order) {
-        order = (productOrder ?? -1) - 1
+      product = categoriesAndProducts[indexOfCategory ?? -1].products?.[indexOfProduct ?? -1]
+      if (product) {
+        product.order = (productOrder ?? -1) - 1
       }
       sortItems()
     } else {
       Stores.MessageAlert.instance.show(response?.data)
     }
+    Stores.Loading.instance.stop()
   }
   async function productDown(categoryId?: string, id?: string) {
+    Stores.Loading.instance.start()
     const category = categoriesAndProducts?.filter(category => category.id === categoryId)?.[0]
     const indexOfCategory = categoriesAndProducts?.indexOf(category)
     const product = category?.products?.filter(product => product.id === id)?.[0]
@@ -148,24 +151,78 @@
     )
     const response = await updateProduct(objects)
     if (response?.success) {
-      let order = categoriesAndProducts[indexOfCategory].products?.[(indexOfProduct ?? -1) + 1].order
-      if (order) {
-        order = nextItemOrder - 1
+      let product = categoriesAndProducts[indexOfCategory].products?.[(indexOfProduct ?? -1) + 1]
+      if (product) {
+        product.order = nextItemOrder - 1
       }
-      order = categoriesAndProducts[indexOfCategory].products?.[indexOfProduct ?? -1].order
-      if (order) {
-        order = (productOrder ?? -1) + 1
+      product = categoriesAndProducts[indexOfCategory].products?.[indexOfProduct ?? -1]
+      if (product) {
+        product.order = (productOrder ?? -1) + 1
       }
       sortItems()
     } else {
       Stores.MessageAlert.instance.show(response?.data)
     }
+    Stores.Loading.instance.stop()
   }
   async function categoryUp(id?: string) {
-    console.log('categoryUp:', id)
+    Stores.Loading.instance.start()
+    const category = categoriesAndProducts?.filter(category => category.id === id)?.[0]
+    const indexOfCategory = categoriesAndProducts?.indexOf(category) ?? -1
+    const categoryOrder = category?.order ?? indexOfCategory
+    const beforeItemOrder = categoriesAndProducts?.[(indexOfCategory ?? -1) - 1]?.order ?? (indexOfCategory ?? -1) - 1
+    let objects: Types.Classes.CCategoryProducts[] = [
+      Types.Classes.CCategoryProducts.fromObject({ id: category?.id, order: (categoryOrder ?? -1) - 1 }),
+      Types.Classes.CCategoryProducts.fromObject({
+        id: categoriesAndProducts?.[(categoryOrder ?? -1) - 1]?.id,
+        order: beforeItemOrder + 1
+      })
+    ]
+    const response = await updateCategory(objects)
+    if (response?.success) {
+      let category = categoriesAndProducts?.[(indexOfCategory ?? -1) - 1]
+      if (category) {
+        category.order = beforeItemOrder + 1
+      }
+      category = categoriesAndProducts?.[indexOfCategory ?? -1]
+      if (category) {
+        category.order = (categoryOrder ?? -1) - 1
+      }
+      sortItems()
+    } else {
+      Stores.MessageAlert.instance.show(response?.data)
+    }
+    Stores.Loading.instance.stop()
   }
   async function categoryDown(id?: string) {
-    console.log('categoryDown:', id)
+    Stores.Loading.instance.start()
+    const category = categoriesAndProducts?.filter(category => category.id === id)?.[0]
+    const indexOfCategory = categoriesAndProducts?.indexOf(category) ?? -1
+    const categoryOrder = category?.order ?? indexOfCategory
+    const nextItemOrder = categoriesAndProducts?.[(indexOfCategory ?? -1) + 1]?.order ?? (indexOfCategory ?? -1) + 1
+    let objects: Types.Classes.CCategoryProducts[] = []
+    objects.push(Types.Classes.CCategoryProducts.fromObject({ id: category?.id, order: (categoryOrder ?? -1) + 1 }))
+    objects.push(
+      Types.Classes.CCategoryProducts.fromObject({
+        id: categoriesAndProducts?.[(indexOfCategory ?? -1) + 1]?.id,
+        order: nextItemOrder - 1
+      })
+    )
+    const response = await updateCategory(objects)
+    if (response?.success) {
+      let category = categoriesAndProducts?.[(indexOfCategory ?? -1) + 1]
+      if (category) {
+        category.order = nextItemOrder - 1
+      }
+      category = categoriesAndProducts?.[indexOfCategory ?? -1]
+      if (category) {
+        category.order = (categoryOrder ?? -1) + 1
+      }
+      sortItems()
+    } else {
+      Stores.MessageAlert.instance.show(response?.data)
+    }
+    Stores.Loading.instance.stop()
   }
 </script>
 

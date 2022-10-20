@@ -2,7 +2,7 @@
   import Fa from 'svelte-fa'
   import { faEdit } from '@fortawesome/free-solid-svg-icons'
   import { StatusBar } from '../../stores/Setup'
-  import { Views, Types, Utils, Stores, Network } from '@ikomida/shared-frontend'
+  import { Views, Types, Utils, Stores, Network, Logics } from '@ikomida/shared-frontend'
   import { newCoupon } from '../../network/Payment'
   import { onMount } from 'svelte'
 
@@ -40,6 +40,14 @@
     Stores.Loading.instance.stop()
   }
 
+  function validateCardValidation(date: string) {
+    const dateString = `${date.substring(0, 4)}-${date.substring(4, 6)}-${date.substring(6, 8)}`
+    if (date.length !== 8 || !Logics.Validations.validateDate(dateString) || new Date(dateString) < new Date()) {
+      return false
+    }
+    return true
+  }
+
   onMount(() => {
     Stores.Loading.instance.stop()
   })
@@ -72,6 +80,7 @@
     placeHolder="Validade"
     bind:value={item.validity}
     bind:isValid={itemsValidation.validity}
+    validation={validateCardValidation}
   />
   <Views.Selector bind:selected={item.valueType} name="selecione uma opção" options={Types.Types.TDiscount.values()} />
   {#if item.valueType}
