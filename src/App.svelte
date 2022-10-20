@@ -95,6 +95,7 @@
   }
 
   async function receivedCallBack(notification: Types.Classes.CNotificationPayload, go = false) {
+    await tick()
     console.log(`level: 'receivedCallBack', message: ${JSON.stringify(notification)}`)
     if (
       $Settings?.popups.newOrder &&
@@ -179,6 +180,15 @@
 
   onMount(async () => {
     auth = await Stores.Auth.Auth.instance.store()
+    if ($auth) {
+      const token = await Utils.Jws.extractToken($auth)
+      logedIn = token !== null
+      await ikomidaID.set(token?.ikomidaID)
+      network?.setIkomidaID(token?.ikomidaID)
+    } else {
+      ikomidaID.get().then(id => (id && id !== 'undefined' ? network?.setIkomidaID(id) : null))
+      logedIn = false
+    }
     networkStatus = await Network.getStatus()
     if (Capacitor.isNativePlatform()) {
       pushNotification.init()

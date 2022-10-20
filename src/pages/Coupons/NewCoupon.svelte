@@ -25,7 +25,7 @@
     valueType = item.valueType
     item.value = 0
   }
-  $: canContinue = Utils.Objects.validateFields(itemsValidation)
+  $: canContinue = Utils.Objects.validateFields(itemsValidation) && item.valueType !== Types.Types.TDiscount.NO
 
   const submit = async () => {
     Stores.Loading.instance.start()
