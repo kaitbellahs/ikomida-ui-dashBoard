@@ -63,6 +63,11 @@
           const order = cachedOrders.filter(cachedOrder => cachedOrder.id === notification.data?.payload)?.[0]
           navigation.goTo(Routes.order, order)
         }
+      } else if (notification?.data?.uri && ['/subscription/'].includes(notification?.data?.uri)) {
+        navigation.reset(Routes.home)
+        await tick()
+        Stores.Loading.instance.reset()
+        navigation.goTo(Routes.subscription)
       }
     }
   }
@@ -148,6 +153,15 @@
             await tick()
             Stores.Loading.instance.reset()
             navigation.reset(Routes.orders)
+          } else {
+            togglePushNotificationPopup()
+          }
+        } else if (notification?.data?.uri && ['/subscription/'].includes(notification?.data?.uri)) {
+          if (route == Routes.subscription || go) {
+            navigation.reset(Routes.home)
+            await tick()
+            Stores.Loading.instance.reset()
+            navigation.goTo(Routes.subscription)
           } else {
             togglePushNotificationPopup()
           }

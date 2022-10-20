@@ -25,9 +25,5 @@ export async function deleteCoupon(id?: string) {
 }
 
 export async function getSubscription() {
-  const response = await Network.instance?.get('/vendor/subscription', true)
-  if (response?.success) {
-    return response?.data
-  }
-  return null
+  return Network.instance?.get('/vendor/subscription', true)
 }
