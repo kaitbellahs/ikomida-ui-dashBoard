@@ -40,8 +40,8 @@
     Stores.Loading.instance.stop()
   }
 
-  function validateCardValidation(date: string) {
-    const dateString = `${date.substring(0, 4)}-${date.substring(4, 6)}-${date.substring(6, 8)}`
+  function validateCouponValidation(date: string) {
+    const dateString = `${date.substring(4, 8)}-${date.substring(2, 4)}-${date.substring(0, 2)}`
     if (date.length !== 8 || !Logics.Validations.validateDate(dateString) || new Date(dateString) < new Date()) {
       return false
     }
@@ -80,7 +80,7 @@
     placeHolder="Validade"
     bind:value={item.validity}
     bind:isValid={itemsValidation.validity}
-    validation={validateCardValidation}
+    validation={validateCouponValidation}
   />
   <Views.Selector bind:selected={item.valueType} name="selecione uma opção" options={Types.Types.TDiscount.values()} />
   {#if item.valueType}
