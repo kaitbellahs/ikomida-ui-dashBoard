@@ -27,12 +27,12 @@ function createStatusBar() {
 export const StatusBar = createStatusBar()
 
 function createSettings() {
-	const store = writable(
-		Types.Classes.CVendorSettings.fromObject({
-			popups: {
-				newOrder: true,
-				paymentStatus: true
-			},
+	const store = writable({
+		popups: {
+			newOrder: true,
+			paymentStatus: true
+		},
+		...Types.Classes.CVendorSettings.fromObject({
 			profile: {
 				areaCode: 55,
 				mainPicture: '',
@@ -46,8 +46,8 @@ function createSettings() {
 				days: []
 			},
 			isActive: ''
-		})
-	)
+		}).toJSON()
+	})
 
 	return {
 		subscribe: store.subscribe,
