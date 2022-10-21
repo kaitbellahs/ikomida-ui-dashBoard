@@ -5,6 +5,7 @@
   import { Views, Types, Utils, Stores, Network, Logics } from '@ikomida/shared-frontend'
   import { newCoupon } from '../../network/Payment'
   import { onMount } from 'svelte'
+  import { Capacitor } from '@capacitor/core'
 
   let valueType: Types.Types.TDiscount | null = null
   let item: Types.Classes.CCoupon = Types.Classes.CCoupon.fromObject({
@@ -41,7 +42,10 @@
   }
 
   function validateCouponValidation(date: string) {
-    const dateString = `${date.substring(4, 8)}-${date.substring(2, 4)}-${date.substring(0, 2)}`
+    let dateString = `${date.substring(4, 8)}-${date.substring(2, 4)}-${date.substring(0, 2)}`
+    if (!Capacitor.isNativePlatform()) {
+      dateString = `${date.substring(0, 4)}-${date.substring(4, 6)}-${date.substring(6, 8)}`
+    }
     if (date.length !== 8 || !Logics.Validations.validateDate(dateString) || new Date(dateString) < new Date()) {
       return false
     }
