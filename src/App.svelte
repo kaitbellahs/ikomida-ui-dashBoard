@@ -5,7 +5,7 @@
   import type { ConnectionStatus } from '@capacitor/network'
   import { onMount, tick } from 'svelte'
   import Routes from './stores/Routes'
-  import { StatusBar as _StatusBar, Settings } from './stores/Setup'
+  import { StatusBar as _StatusBar, Settings, StatusBarType } from './stores/Setup'
   import { StatusBar } from '@ikomida/capacitor-plugin-status-bar'
   import { Utils, Views, Network as iKomidaNetwork, Stores, Types } from '@ikomida/shared-frontend'
   import { registerPushNotificationToken } from './network/PushNotification'
@@ -55,6 +55,15 @@
   } else {
     ikomidaID.get().then(id => (id && id !== 'undefined' ? network?.setIkomidaID(id) : null))
     logedIn = false
+  }
+  $: if (!networkStatus?.connected) {
+    const statusBar = $_StatusBar
+    statusBar.topMargin = 22
+    _StatusBar.setStatusBar(statusBar)
+  } else {
+    const statusBar = $_StatusBar
+    statusBar.topMargin = 0
+    _StatusBar.setStatusBar(statusBar)
   }
 
   async function openNotification(notification: Types.Classes.CNotificationPayload) {
@@ -194,8 +203,9 @@
     networkStatus = await Network.getStatus()
     if (Capacitor.isNativePlatform()) {
       pushNotification.init()
-      const sbarInfo = await StatusBar.getInfo()
-      _StatusBar.setStatusBar(sbarInfo)
+      const statusBar = (await StatusBar.getInfo()) as StatusBarType
+      statusBar.topMargin = statusBar?.topMargin ?? 0
+      _StatusBar.setStatusBar(statusBar)
     }
     await tick()
     initialazation = false

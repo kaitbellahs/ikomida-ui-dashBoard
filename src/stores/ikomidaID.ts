@@ -5,7 +5,7 @@ import {
 const ikomidaIDKey = 'ikomidaID';
 
 export default {
-	set: async (id) => await Preferences.set({
+	set: async (id: string) => await Preferences.set({
 		key: ikomidaIDKey,
 		value: id
 	}),

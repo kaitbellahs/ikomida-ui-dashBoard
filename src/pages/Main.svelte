@@ -109,7 +109,7 @@
     }
   ]
 
-  $: styleHeight = `${Number($StatusBar.height) + 60}px`
+  $: styleHeight = `${Number($StatusBar.height + ($StatusBar.topMargin ?? 0)) + 60}px`
   $: route = $router.route
 
   onMount(async () => {
@@ -172,7 +172,7 @@
 <Views.NavigationBar
   logo="/assets/icons/transparent-logo-1.svg"
   paddingTop={$StatusBar.height}
-  topMargin={$StatusBar.height}
+  topMargin={$StatusBar.topMargin}
   paddingBottom={$StatusBar.bottomPadding}
 />
 <Views.Tabs {tabs} bottomPadding={$StatusBar.bottomPadding} />
