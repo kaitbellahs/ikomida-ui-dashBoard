@@ -13,9 +13,5 @@ export async function getTermOfUse() {
 }
 
 export async function getPrivacyPolicy() {
-  const response = await Network.instance?.get(`/term/${Types.Types.TTerm.PRIVACY_POLICY}`)
-  if (response && response?.success) {
-    return response?.data
-  }
-  return null
+  return await Network.instance?.get(`/term/${Types.Types.TTerm.PRIVACY_POLICY}`)
 }

@@ -25,11 +25,7 @@ export async function countProducts() {
 }
 
 export async function getCategories() {
-  const response = await Network.instance?.get(`/categories`, true)
-  if (response.success) {
-    return Types.Classes.CProductCategory.fromObject(response.data)
-  }
-  return []
+  return await Network.instance?.get(`/categories`, true)
 }
 
 export async function getOrder(id: string) {

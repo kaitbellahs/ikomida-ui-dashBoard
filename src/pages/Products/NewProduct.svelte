@@ -22,7 +22,7 @@
     : Types.Classes.CProduct.fillWith(null)
   const edit = $router.options.edit
 
-  let categoriesOptions: Types.Classes.CProduct[] = []
+  let categoriesOptions: Types.Classes.CProductCategory[] = []
   let productsValidation = product.toValidation()
   $: if (productsValidation) {
     for (const optionsCategoryValidation of productsValidation.optionsCategories ?? []) {
@@ -88,12 +88,6 @@
     } else {
       Stores.MessageAlert.instance.show(response?.data)
     }
-    Stores.Loading.instance.stop()
-  }
-
-  async function generateOptions() {
-    Stores.Loading.instance.start()
-    categoriesOptions = await getCategories()
     Stores.Loading.instance.stop()
   }
 
@@ -242,10 +236,19 @@
   }
 
   onMount(async () => {
+    const response = await getCategories()
+    if (response.success) {
+      categoriesOptions = Types.Classes.CProductCategory.fromObject(response.data)
+      if (categoriesOptions.length <= 0) {
+        Stores.MessageAlert.instance.show(
+          'Não há categorias cadastradas, por favor volte e cadastre pelo menos uma categoria para poder adicionar produtos'
+        )
+      }
+    } else {
+      Stores.MessageAlert.instance.show(response.data)
+    }
     Stores.Loading.instance.stop()
   })
-
-  generateOptions()
 
   $: Stores.Title.instance.set(edit ? 'Editar produto' : 'Novo produto')
 </script>

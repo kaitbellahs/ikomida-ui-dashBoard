@@ -228,15 +228,24 @@
 
 <Views.TextEdit marginTop={0} icon={faSearch} bind:value={searchTerm} placeHolder="Buscar no cardápio" />
 <Views.Divider />
-<Views.Button on:click={newProduct} bottomPadding={$StatusBar.bottomPadding}
-  ><Fa icon={faEdit} /> <span>Novo produto</span></Views.Button
+
+<Views.Button
+  disabled={categoriesAndProducts.length <= 0}
+  on:click={newProduct}
+  bottomPadding={$StatusBar.bottomPadding}><Fa icon={faEdit} /> <span>Novo produto</span></Views.Button
 >
 <Views.Button on:click={newCategory} bottomPadding={$StatusBar.bottomPadding}
   ><Fa icon={faEdit} /> <span>Nova categoria</span></Views.Button
 >
 <Views.Divider />
 {#if (listableCategoryProducts.length > 0 || searchTerm) && !error}
-  <Views.ItemsList bind:categoriesAndProducts={listableCategoryProducts} productPage={Routes.product} {removeProduct} />
+  <Views.ItemsList
+    {removeCategory}
+    {editCategory}
+    bind:categoriesAndProducts={listableCategoryProducts}
+    productPage={Routes.product}
+    {removeProduct}
+  />
 {:else if error}
   <h2>Nenhum produto foi encontrado</h2>
   <h3>Tente usar outro termo para pequisar</h3>

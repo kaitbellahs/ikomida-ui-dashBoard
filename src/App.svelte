@@ -16,7 +16,9 @@
   import { Capacitor } from '@capacitor/core'
   import type { IAlertButton } from '@ikomida/shared-frontend/lib/components/Alert.svelte'
   import { getOrder } from './network/Orders'
+  import LaunchScreen from './pages/Unlogged/LaunchScreen.svelte'
 
+  let initialazation = true
   let logedIn = false
   let showNotificationPopup = false
   let auth: Stores.Auth.IStore
@@ -195,6 +197,8 @@
       const sbarInfo = await StatusBar.getInfo()
       _StatusBar.setStatusBar(sbarInfo)
     }
+    await tick()
+    initialazation = false
   })
 
   Network.addListener('networkStatusChange', status => {
@@ -209,7 +213,9 @@
   })
 </script>
 
-{#if logedIn}
+{#if initialazation}
+  <LaunchScreen />
+{:else if logedIn}
   <Main />
 {:else if route == Routes.forgotPassword}
   <ForgotPassword />
