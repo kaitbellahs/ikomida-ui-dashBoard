@@ -47,13 +47,12 @@
 
   $: route = $router.route
   $: if ($auth) {
-    logedIn = false
     Utils.Jws.extractToken($auth).then(async token => {
       logedIn = token !== null
       await ikomidaID.set(token?.ikomidaID)
       network?.setIkomidaID(token?.ikomidaID)
     })
-  } else {
+  } else if (!$auth && logedIn) {
     ikomidaID.get().then(id => (id && id !== 'undefined' ? network?.setIkomidaID(id) : null))
     logedIn = false
   }
@@ -108,7 +107,6 @@
 
   async function receivedCallBack(notification: Types.Classes.CNotificationPayload, go = false) {
     await tick()
-    console.log(`level: 'receivedCallBack', message: ${JSON.stringify(notification)}`)
     if (
       $Settings?.popups.newOrder &&
       notification?.id &&
@@ -136,7 +134,6 @@
         })
       }
       notificationPopup = notificationPopup
-      console.log(`level: info, message: Inside`)
       if (logedIn) {
         if (notification?.data?.uri && ['/order/', '/orders/'].includes(notification?.data?.uri)) {
           const response = await getOrder(notification.data.payload)
@@ -186,7 +183,6 @@
   }
 
   async function actionPerformedCallBack(notification: any) {
-    console.log(`level: 'actionPerformedCallBack', message: ${JSON.stringify(notification)}`)
     await receivedCallBack(notification.notification, true)
   }
 
@@ -203,13 +199,26 @@
     }
     networkStatus = await Network.getStatus()
     if (Capacitor.isNativePlatform()) {
-      pushNotification.init()
       const statusBar = (await StatusBar.getInfo()) as StatusBarType
       statusBar.topMargin = statusBar?.topMargin ?? 0
       _StatusBar.setStatusBar(statusBar)
+      pushNotification.init()
     }
-    await tick()
     initialazation = false
+    await tick()
+    // MARK: --test push notification
+    // await actionPerformedCallBack({
+    //   notification: {
+    //     id: new Date().getTime(),
+    //     title: 'test',
+    //     body: 'test body',
+    //     data: {
+    //       logon: 'true',
+    //       uri: '/order/',
+    //       payload: 'c2445df0-1abe-4da9-836e-fb0108b396a7'
+    //     }
+    //   }
+    // })
   })
 
   Network.addListener('networkStatusChange', status => {
