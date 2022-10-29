@@ -49,8 +49,12 @@
   $: if ($auth) {
     Utils.Jws.extractToken($auth).then(async token => {
       logedIn = token !== null
-      await ikomidaID.set(token?.ikomidaID)
-      network?.setIkomidaID(token?.ikomidaID)
+      if (token?.ikomidaID && token?.ikomidaID !== 'undefined') {
+        await ikomidaID.set(token?.ikomidaID)
+        network?.setIkomidaID(token?.ikomidaID)
+      } else {
+        await ikomidaID.set('com.ikomida.br.')
+      }
     })
   } else if (!$auth && logedIn) {
     ikomidaID.get().then(id => (id && id !== 'undefined' ? network?.setIkomidaID(id) : null))
@@ -191,10 +195,20 @@
     if ($auth) {
       const token = await Utils.Jws.extractToken($auth)
       logedIn = token !== null
-      await ikomidaID.set(token?.ikomidaID)
-      network?.setIkomidaID(token?.ikomidaID)
+      if (token?.ikomidaID && token?.ikomidaID !== 'undefined') {
+        await ikomidaID.set(token?.ikomidaID)
+        network?.setIkomidaID(token?.ikomidaID)
+      } else {
+        await ikomidaID.set('com.ikomida.br.')
+      }
     } else {
-      ikomidaID.get().then(id => (id && id !== 'undefined' ? network?.setIkomidaID(id) : null))
+      ikomidaID.get().then(async id => {
+        if (id && id !== 'undefined') {
+          network?.setIkomidaID(id)
+        } else {
+          await ikomidaID.set('com.ikomida.br.')
+        }
+      })
       logedIn = false
     }
     networkStatus = await Network.getStatus()
