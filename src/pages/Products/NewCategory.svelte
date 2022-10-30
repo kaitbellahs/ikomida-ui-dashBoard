@@ -3,19 +3,67 @@
   import Fa from 'svelte-fa'
   import { faEdit } from '@fortawesome/free-solid-svg-icons'
   import { StatusBar } from '../../stores/Setup'
-  import { Views, Stores, Types } from '@ikomida/shared-frontend'
+  import { Views, Stores, Types, Logics } from '@ikomida/shared-frontend'
   import { newCategory, updateCategory } from '../../network/Products'
   import { onMount } from 'svelte'
 
   const router = Stores.Navigation.instance.router
-  let { category, edit } = $router.options
-  $: canContinue = itemValidation?.title
+
+  let category: Types.Classes.CProductCategory = $router.options.category
+  let edit: boolean = $router.options.edit
   let itemValidation = {
     title: false
+  }
+  let alwaysShowCategory = true
+
+  $: canContinue = itemValidation?.title
+
+  function validateDatePeriods() {
+    if (
+      !alwaysShowCategory &&
+      ((category.business?.hours?.length ?? 0) === 0 || (category.business?.days?.length ?? 0) === 0)
+    ) {
+      Stores.MessageAlert.instance.show('Precisa escolher dias e horários de ativação da categoria!')
+      return false
+    }
+    for (const businessHour of category.business?.hours ?? []) {
+      if (!Logics.DateTime.validateTime(businessHour?.start)) {
+        Stores.MessageAlert.instance.show(
+          'O horário do início é inválido, o formato deve ser HH:mm e entre 00:00 e 23:59!'
+        )
+        Stores.Loading.instance.stop()
+        return false
+      } else if (!Logics.DateTime.validateTime(businessHour?.end)) {
+        Stores.MessageAlert.instance.show(
+          'O horário do fim é inválido, o formato deve ser HH:mm e entre 00:00 e 23:59!'
+        )
+        Stores.Loading.instance.stop()
+        return false
+      } else if (Number(businessHour.start) > Number(businessHour.end)) {
+        Stores.MessageAlert.instance.show(
+          'O horário do início deve ser menor que o horário do fim, exemplo do início: 09:00 e fim: 18:00!'
+        )
+        Stores.Loading.instance.stop()
+        return false
+      }
+    }
+    if (category.business?.hours && (!category.business.days || category.business.days.length < 1)) {
+      Stores.MessageAlert.instance.show('Precisa escolher pelo menos um dia de funcionamento!')
+      Stores.Loading.instance.stop()
+      return false
+    }
+    return true
   }
 
   const submit = async () => {
     Stores.Loading.instance.start()
+    if (alwaysShowCategory) {
+      category.business = undefined
+    }
+    if (!validateDatePeriods()) {
+      Stores.Loading.instance.stop()
+      return
+    }
     let response
     if (edit) {
       response = await updateCategory(category)
@@ -30,7 +78,12 @@
     Stores.Loading.instance.stop()
   }
 
+  function isBusinessTime(business?: Types.Classes.CBusinessTime) {
+    return !business || (!business.days && !business.hours) || Logics.DateTime.isBusinessTime(business!)
+  }
+
   onMount(() => {
+    alwaysShowCategory = !isBusinessTime(category.business)
     Stores.Loading.instance.stop()
   })
 
@@ -44,17 +97,21 @@
     bind:isValid={itemValidation.title}
     initialValue={category.title}
     min={3}
-    max={255}
+    max={100}
   />
   <Views.TextEdit
     type={Types.TTextEdit.TEXT}
     placeHolder="Descrição da categoria"
     bind:value={category.description}
     initialValue={category.description}
-    min={1}
-    max={500}
+    min={3}
+    max={256}
   />
   <Views.Divider />
+  <Views.Switch name="Aparecer sempre" bind:checked={alwaysShowCategory} />
+  {#if !alwaysShowCategory}
+    <Views.DatePeriods title="Horário de ativação da categoria" mandatory={true} bind:business={category.business} />
+  {/if}
   <Views.Divider />
   <Views.Button disabled={!canContinue} on:click={submit} bottomPadding={$StatusBar.bottomPadding}
     ><Fa icon={faEdit} /> <span>Salvar</span></Views.Button
