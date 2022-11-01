@@ -10,7 +10,7 @@
   } from '../../network/Settings'
   import { Settings } from '../../stores/Setup'
   import Fa from 'svelte-fa'
-  import { faClock, faTrashAlt } from '@fortawesome/free-solid-svg-icons'
+  import { faClock } from '@fortawesome/free-solid-svg-icons'
   import { AppLauncher } from '@capacitor/app-launcher'
   import { Clipboard } from '@capacitor/clipboard'
   import { onMount } from 'svelte'
@@ -31,6 +31,9 @@
     days: [],
     hours: []
   })
+
+  let order: { types: Types.Types.TOrderType[] | undefined; tip: number | undefined } = { types: [], tip: 0 }
+  let orderInputs: { tip?: Views.TextEdit } = { tip: undefined }
 
   let integratePagSeguro = { callback: false, url: null }
 
@@ -124,7 +127,9 @@
   async function updateDelivery() {
     const vendorSettings: Types.Classes.CVendorSettings = Types.Classes.CVendorSettings.fromObject({
       preparation,
-      delivery
+      delivery,
+      orderTypes: order.types,
+      tip: order.tip
     })
     if (!vendorSettings.validate()) {
       Stores.MessageAlert.instance.show(`Algum dos dados fornecidos não é válido!`)
@@ -190,6 +195,8 @@
       deliveryInputs.min?.updateValue(String(delivery?.min))
       deliveryInputs.value?.updateValue(String(delivery?.value))
       preparation = data?.preparation
+      order.types = data?.orderTypes
+      order.tip = data?.tip
       preparationInputs?.min?.updateValue(String(preparation?.min))
       preparationInputs?.max?.updateValue(String(preparation?.max))
     } else {
@@ -237,30 +244,48 @@
       </div>
       <Views.Divider />
     {/if}
-    <h3>Valor de entrega</h3>
-    <small
-      >Vai querer pagar seus entregador quanto por entrega por Km? (o quanto mais você paga seus entregadores ficaram
-      felizes e seus clientes tristes e vice versa)</small
-    >
-    <Views.Switch name="Frete grátis" bind:checked={delivery.free} />
-    {#if !(delivery?.free || false)}
+    <Views.Divider />
+    <Views.CheckboxList
+      title="Tipos dos pedidos"
+      bind:selected={order.types}
+      options={Types.Types.TOrderType.values()}
+    />
+    {#if order.types?.includes(Types.Types.TOrderType.DELIVERY)}
+      <Views.Divider />
+      <h3>Valor de entrega</h3>
+      <small
+        >Vai querer pagar seus entregador quanto por entrega por Km? (o quanto mais você paga seus entregadores ficaram
+        felizes e seus clientes tristes e vice versa)</small
+      >
+      <Views.Switch name="Frete grátis" bind:checked={delivery.free} />
+      {#if !(delivery?.free || false)}
+        <Views.TextEdit
+          type={Types.TTextEdit.CURRENCY}
+          bind:value={delivery.value}
+          bind:this={deliveryInputs.value}
+          initialValue={delivery.value}
+          placeHolder="Valor por KM"
+        />
+        <Views.TextEdit
+          type={Types.TTextEdit.CURRENCY}
+          bind:value={delivery.min}
+          bind:this={deliveryInputs.min}
+          initialValue={delivery.min}
+          placeHolder="Valor mínimo"
+        />
+      {/if}
+    {/if}
+    {#if order.types?.includes(Types.Types.TOrderType.LOCAL)}
       <Views.TextEdit
-        type={Types.TTextEdit.CURRENCY}
-        bind:value={delivery.value}
-        bind:this={deliveryInputs.value}
-        initialValue={delivery.value}
-        placeHolder="Valor por KM"
-      />
-      <Views.TextEdit
-        type={Types.TTextEdit.CURRENCY}
-        bind:value={delivery.min}
-        bind:this={deliveryInputs.min}
-        initialValue={delivery.min}
-        placeHolder="Valor mínimo"
+        type={Types.TTextEdit.PERCENT}
+        bind:value={order.tip}
+        bind:this={orderInputs.tip}
+        initialValue={order.tip}
+        placeHolder="Percentagem da gorjeta"
       />
     {/if}
     <Views.Divider />
-    <Views.Button on:click={updateDelivery}>Atualizar a entrega</Views.Button>
+    <Views.Button on:click={updateDelivery}>Atualizar tipos de pedidos</Views.Button>
     <Views.Divider />
     <h3>Exibir popups</h3>
     <small>Aqui você escolhe quais popups vão ser exibidos a você:</small>

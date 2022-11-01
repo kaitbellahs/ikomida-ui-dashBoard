@@ -82,17 +82,24 @@
 >
   <div class="leftShadow orderContainer">
     <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <div on:click={() => goToOrder(items[index])} >
+    <div on:click={() => goToOrder(items[index])}>
       <h3 class="title">Pedido N˚: {items[index].customID}</h3>
       {#if [initailOrderStatus, Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY].includes(items[index].status ?? initailOrderStatus) && new Date((items[index].createdAt?.getTime() ?? 0) + items[index].preparation?.max * 1000) < new Date()}
+        <Views.Divider height={5} />
         <Views.Status type={Types.Status.ERROR} circle={false} showIcon={false}>Pedido atrasado</Views.Status>
       {/if}
       {#if [Types.Types.TOrderStatus.DELIVERED].includes(items[index].status ?? initailOrderStatus)}
+        <Views.Divider height={5} />
         <Views.Status type={Types.Status.SUCCESS} circle={false} showIcon={false}>Pedido entregue</Views.Status>
       {/if}
       {#if [Types.Types.TOrderStatus.CANCELED].includes(items[index].status ?? initailOrderStatus)}
+        <Views.Divider height={5} />
         <Views.Status type={Types.Status.ERROR} circle={false} showIcon={false}>Pedido cancelado</Views.Status>
       {/if}
+      <Views.Divider height={5} />
+      <Views.Status type={Types.Status.INFO} showIcon={false}
+        >Pedido para {items[index].orderType?.description ?? '-'}</Views.Status
+      >
       <Views.Divider height={5} />
       <div class="info">
         {#if [initailOrderStatus, Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY].includes(items[index].status ?? initailOrderStatus)}
@@ -124,10 +131,22 @@
           {items[index].products?.length - 1 == 1 ? 'items[index]' : 'itens'}
         </div>
       {/if}
-      <Views.Divider height={5} />
-      <div class="address">
-        Entregua na: <b>{items[index].address?.street ?? '-'}</b>
-      </div>
+      {#if items[index].orderType === Types.Types.TOrderType.DELIVERY}
+        <Views.Divider height={5} />
+        <div class="address">
+          Entregua na: <b>{items[index].address?.street ?? '-'}</b>
+        </div>
+      {:else if items[index].orderType === Types.Types.TOrderType.PICKUP}
+        <Views.Divider height={5} />
+        <h3>Seu cliente vai retirar o pedido no seu estabelecimento.</h3>
+      {:else if items[index].orderType === Types.Types.TOrderType.LOCAL}
+        <Views.Divider height={5} />
+        <h3>Leva o pedido até a mesa: <b>{items[index].table}</b></h3>
+      {:else}
+        <Views.Status type={Types.Status.ERROR}
+          >Não foi possível definir o tipo do pedido, entre em contato com o suporte.</Views.Status
+        >
+      {/if}
       <div class="paymentMethod">
         Forma de pagamento: <b
           >{items[index].payment?.type?.name}

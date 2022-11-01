@@ -10,13 +10,21 @@
   import { getOrder } from '../../network/Products'
   import { Settings } from '../../stores/Setup'
   import { getSettings } from '../../network/Settings'
+  import Status from '@ikomida/shared-frontend/lib/components/Status.svelte'
 
   const router = Stores.Navigation.instance.router
   const order: Types.Classes.COrder = $router.options
 
   let screenShot = false
   let orderScreen: HTMLElement
-  let showCardBrand = false
+  let loadImagesComplete = {
+    mainPicture: false,
+    ikomida: false
+  }
+  let loadImagesError = {
+    mainPicture: true,
+    ikomida: true
+  }
 
   $: total = Number(order?.subtotal ?? 0) + Number(order?.delivery ?? 0) - Number(order?.discount ?? 0)
 
@@ -100,7 +108,13 @@
     //TODO: -- report identifier of the app that received the share action. Can be an empty string in some cases. On web it will be undefined.
     await Share.share({
       title: `Pedido #${order?.customID}`,
-      // text: "Eu estou compartilhando com você esse pedido",
+      text: `${order?.address?.street ?? '-'}, ${order?.address?.number ?? '-'}${
+        order?.address?.complement ? ` - ${order?.address?.complement}` : ''
+      }
+        ${order?.address?.neighborhood ?? '-'}
+        ${order?.address?.city ?? '-'}/${order?.address?.stat ?? '-'} CEP: ${order?.address?.postalCode ?? '-'}
+        Tipo: ${order?.address?.kind?.name ?? '-'}
+        Ref: ${order?.address?.reference ?? '-'}`,
       url: `file://${screenShotFile?.uri}`,
       dialogTitle: 'Compartilhar o pedido'
     })
@@ -128,10 +142,12 @@
   Stores.Title.instance.set('Detalhes do pedido')
 </script>
 
-<div class="order screenShot {screenShot ? 'screenShot' : ''}" bind:this={orderScreen}>
+<div class="order {screenShot ? 'screenShot' : ''}" bind:this={orderScreen}>
   <div class="avatar {screenShot ? 'screenShot' : ''}">
     {#if $Settings?.profile?.mainPicture}
       <Views.Image
+        loadComplete={loadImagesComplete.mainPicture}
+        showImage={loadImagesError.mainPicture}
         source={$Settings?.profile?.mainPicture ?? 'assets/icons/transparent-logo-1.svg'}
         name={$Settings?.profile?.contractName ?? 'iKomida'}
       />
@@ -156,6 +172,10 @@
     <Views.Divider />
   </div>
   <h3 class="title">Pedido N˚: {order?.customID}</h3>
+  <Views.Divider />
+  <Views.Status type={Types.Status.INFO} showIcon={false}
+    >Pedido para {order.orderType?.description ?? '-'}</Views.Status
+  >
   <Views.Divider />
   <div class="info" data-html2canvas-ignore>
     {#if order.status && [Types.Types.TOrderStatus.WAITING_PAYMENT, Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY].includes(order.status)}
@@ -211,29 +231,43 @@
       {/if}
     </button>
   {/each}
-  <Views.Divider />
-  <h3>Dados da entrega</h3>
-  <Views.Divider />
-  <div class="user">
-    <span>Nome: <b>{Utils.Strings.formatAsName(`${order?.user?.name} ${order?.user?.lastName}`)}</b></span>
-    <span>Contato: <b>{Utils.Strings.formatAsPhone(order?.user?.phone)}</b></span>
-  </div>
-  <div class="address">
-    Endereço:
-    <span class="street"
-      >{order?.address?.street ?? '-'}, {order?.address?.number ?? '-'}{order?.address?.complement
-        ? ` - ${order?.address?.complement}`
-        : ''}</span
-    ><br />
-    <span class="neighborhood"
-      >{order?.address?.neighborhood ?? '-'}<br />
-      <span class="city"
-        >{order?.address?.city ?? '-'}/{order?.address?.stat ?? '-'} CEP: {order?.address?.postalCode ?? '-'}</span
-      >
-      <span class="city">Tipo: {order?.address?.kind?.name ?? '-'}</span>
-      <span class="city">Ref: {order?.address?.reference ?? '-'}</span>
-    </span>
-  </div>
+  {#if order.orderType === Types.Types.TOrderType.DELIVERY}
+    <Views.Divider />
+    <h3>Dados da entrega</h3>
+    <Views.Divider />
+    <div class="user">
+      <span>Nome: <b>{Utils.Strings.formatAsName(`${order?.user?.name} ${order?.user?.lastName}`)}</b></span>
+      <span>Contato: <b>{Utils.Strings.formatAsPhone(order?.user?.phone)}</b></span>
+      <span data-html2canvas-ignore>Pedidos acomulados: <b>{order?.user?.orders ?? '-'}</b></span>
+      <span data-html2canvas-ignore>Compras acomuladas: <b>{Utils.Strings.currency(order?.user?.billing)}</b></span>
+    </div>
+    <div class="address">
+      Endereço:
+      <span class="street"
+        >{order?.address?.street ?? '-'}, {order?.address?.number ?? '-'}{order?.address?.complement
+          ? ` - ${order?.address?.complement}`
+          : ''}</span
+      ><br />
+      <span class="neighborhood"
+        >{order?.address?.neighborhood ?? '-'}<br />
+        <span class="city"
+          >{order?.address?.city ?? '-'}/{order?.address?.stat ?? '-'} CEP: {order?.address?.postalCode ?? '-'}</span
+        >
+        <span class="city">Tipo: {order?.address?.kind?.name ?? '-'}</span>
+        <span class="city">Ref: {order?.address?.reference ?? '-'}</span>
+      </span>
+    </div>
+  {:else if order.orderType === Types.Types.TOrderType.PICKUP}
+    <Views.Divider />
+    <h3>Seu cliente vai retirar o pedido no seu estabelecimento.</h3>
+  {:else if order.orderType === Types.Types.TOrderType.LOCAL}
+    <Views.Divider />
+    <h3>Leva o pedido até a mesa: <b>{order.table}</b></h3>
+  {:else}
+    <Views.Status type={Types.Status.ERROR}
+      >Não foi possível definir o tipo do pedido, entre em contato com o suporte.</Views.Status
+    >
+  {/if}
   <Views.Divider />
   <h3>Dados de pagamento</h3>
   <Views.Divider />
@@ -246,11 +280,7 @@
     >
     <span class="brand">
       {#if order?.payment?.type === Types.Types.TPaymentMethod.CREDIT_CARD_ONLINE}
-        {#if showCardBrand}
-          <div style="object-fit: contain;">
-            <Views.Image source="/assets/cardBrand/{order?.payment.brand}.svg" name={order?.payment.brand} />
-          </div>
-        {/if}
+        <Views.Image source="/assets/cardBrand/{order?.payment.brand}.svg" name={order?.payment.brand} />
         **** {order?.payment.lastDigits}
       {/if}
     </span>
@@ -287,12 +317,22 @@
           >
         </tr>
       {/if}
-      <tr>
-        <td class="resumeText">Taxa de entrega</td>
-        <td class="resumeValue"
-          ><span class:deliveryFree={order?.delivery == 0}>{Utils.Strings.currency(order?.delivery)}</span></td
-        >
-      </tr>
+      {#if order.orderType === Types.Types.TOrderType.DELIVERY}
+        <tr>
+          <td class="resumeText">Taxa de entrega</td>
+          <td class="resumeValue"
+            ><span class:deliveryFree={order?.delivery == 0}>{Utils.Strings.currency(order?.delivery)}</span></td
+          >
+        </tr>
+      {:else if order.orderType === Types.Types.TOrderType.LOCAL}
+        <tr>
+          <td class="resumeText">Gorjeta sugerida</td>
+          <td class="resumeValue"
+            ><span class:deliveryFree={order?.delivery == 0}>{Utils.Strings.currency(total * (order?.tip ?? 0))}</span
+            ></td
+          >
+        </tr>
+      {/if}
       <tr>
         <td class="resumeText"><b>Total</b></td>
         <td class="resumeValue"><b>{Utils.Strings.currency(total)}</b></td>
@@ -301,7 +341,12 @@
   </table>
   <div class="signature {screenShot ? 'screenShot' : ''}">
     <Views.Divider height={30} />
-    <span>Feito com carinho por</span><Views.Image source="/assets/icons/transparent-logo-1.png" name="iKomida" />
+    <span>Feito com carinho por</span><Views.Image
+      loadComplete={loadImagesComplete.ikomida}
+      showImage={loadImagesError.ikomida}
+      source="/assets/icons/transparent-logo-1.png"
+      name="iKomida"
+    />
   </div>
 </div>
 <Views.GTerms />
@@ -396,6 +441,7 @@
   }
   .paymentMethod > .brand > :global(img) {
     height: 14px;
+    width: fit-content;
   }
   .paymentMethod > .brand {
     font-weight: lighter;
@@ -467,9 +513,6 @@
     align-items: center;
     flex-direction: column;
   }
-  .avatar.screenShot {
-    display: flex;
-  }
   .avatar > :global(img) {
     font-size: 3em;
     width: 100%;
@@ -486,7 +529,7 @@
     align-items: center;
     place-content: center;
   }
-  .signature.screenShot {
+  .screenShot {
     display: flex;
   }
   .signature > :global(img) {

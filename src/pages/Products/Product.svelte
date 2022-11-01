@@ -9,7 +9,8 @@
   let userInfo: Types.Classes.CUser
   const router = Stores.Navigation.instance.router
   let product: Types.Classes.CProduct
-  let initalProduct: Types.Classes.CProduct = $router.options
+  let initalProduct: Types.Classes.CProduct = $router.options.product
+
   const edit = async () => {
     Stores.Navigation.instance.goTo(Routes.editProduct, {
       product,
@@ -23,6 +24,8 @@
       edit: false
     })
   }
+
+  $: productStatus = `Produto ${product?.active ? 'habilitado' : 'desabilitado'}`
 
   async function removeProduct() {
     Stores.Loading.instance.start()
@@ -52,6 +55,7 @@
     }
     Stores.Loading.instance.stop()
   })
+
   $: Stores.Title.instance.set(product?.title ?? '')
 </script>
 
@@ -131,6 +135,7 @@
       <Views.Status>Não há opções cadastradas neste produto.</Views.Status>
     {/if}
     <Views.Divider />
+    <Views.Switch bind:name={productStatus} bind:checked={product.active} />
     {#if userInfo?.role === 'VENDOR'}
       <Views.Button on:click={removeProduct}><Fa icon={faTrashAlt} /> <span>Remover este produto</span></Views.Button>
       <Views.Button on:click={edit}><Fa icon={faEdit} /> <span>Editar</span></Views.Button>

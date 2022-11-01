@@ -314,6 +314,11 @@
       max={9}
     />
     <Views.Divider />
+    <Views.CheckboxList
+      title="Tipos dos pedidos"
+      bind:selected={product.orderTypes}
+      options={Types.Types.TOrderType.values()}
+    />
     <Views.Selector bind:selected={product.discountType} name="selecione seu discunto" options={discountTypeOptions} />
     {#if product.discountType}
       {#if product.discountType === Types.Types.TDiscount.PERCENT}
