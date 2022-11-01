@@ -8,6 +8,8 @@
   import { registerPushNotificationToken } from '../../network/PushNotification'
   import { onMount } from 'svelte'
   import { Capacitor } from '@capacitor/core'
+  import { AppLauncher } from '@capacitor/app-launcher'
+  import { Clipboard } from '@capacitor/clipboard'
 
   let ikomidaid = 'com.ikomida.br.'
   let ikomidaidInput: Views.TextEdit
@@ -20,6 +22,18 @@
 
   async function forgotPassword() {
     Stores.Navigation.instance.goTo(Routes.forgotPassword)
+  }
+
+  async function newAccount() {
+    const url = 'https://ikomida.com/plans'
+    const { value } = await AppLauncher.canOpenUrl({ url })
+    await AppLauncher.openUrl({ url })
+    if (!value) {
+      await Clipboard.write({ string: url })
+      Stores.MessageAlert.instance.show(
+        `Se o navigador externo nao abriu: abra o e digitar essa URL: ${url}, também foi copiado para sua área de transferência para colar-lo!`
+      )
+    }
   }
 
   async function doLogin() {
@@ -78,6 +92,7 @@
   <div />
   <Views.Button on:click={doLogin} disabled={!canLogin}>Entrar</Views.Button>
   <Views.Button type={Types.TButton.TRANSPARENT} on:click={forgotPassword}>Recuperar a senha</Views.Button>
+  <Views.Button type={Types.TButton.TRANSPARENT} on:click={newAccount}>Crie sua conta agora</Views.Button>
   <Views.GTerms />
 </main>
 

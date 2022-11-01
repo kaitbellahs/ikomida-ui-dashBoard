@@ -314,7 +314,7 @@
       max={9}
     />
     <Views.Divider />
-    <Views.CheckboxList
+    <Views.CheckBoxList
       title="Tipos dos pedidos"
       bind:selected={product.orderTypes}
       options={Types.Types.TOrderType.values()}

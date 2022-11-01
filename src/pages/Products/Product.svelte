@@ -3,13 +3,14 @@
   import Fa from 'svelte-fa'
   import { faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons'
   import { Views, Utils, Types, Logics, Stores } from '@ikomida/shared-frontend'
-  import { deleteProduct, getProduct } from '../../network/Products'
+  import { activateProduct, deleteProduct, getProduct } from '../../network/Products'
   import { onMount } from 'svelte'
 
   let userInfo: Types.Classes.CUser
   const router = Stores.Navigation.instance.router
   let product: Types.Classes.CProduct
   let initalProduct: Types.Classes.CProduct = $router.options.product
+  let working = false
 
   const edit = async () => {
     Stores.Navigation.instance.goTo(Routes.editProduct, {
@@ -28,32 +29,54 @@
   $: productStatus = `Produto ${product?.active ? 'habilitado' : 'desabilitado'}`
 
   async function removeProduct() {
-    Stores.Loading.instance.start()
-    const response = await deleteProduct(product.id)
-    if (response?.success) {
-      Stores.Navigation.instance.pop()
-    } else {
-      Stores.MessageAlert.instance.show(response?.data)
+    if (!working) {
+      working = true
+      Stores.Loading.instance.start()
+      const response = await deleteProduct(product.id)
+      if (response?.success) {
+        Stores.Navigation.instance.pop()
+      } else {
+        Stores.MessageAlert.instance.show(response?.data)
+      }
+      Stores.Loading.instance.stop()
+      working = false
     }
-    Stores.Loading.instance.stop()
+  }
+
+  async function enableProduct() {
+    if (!working) {
+      working = true
+      Stores.Loading.instance.start()
+      const response = await activateProduct(product.id)
+      if (!response?.success) {
+        product.active = !product.active
+        Stores.MessageAlert.instance.show(response?.data)
+      }
+      Stores.Loading.instance.stop()
+      working = false
+    }
   }
 
   onMount(async () => {
-    if (!initalProduct.id) {
-      Stores.Loading.instance.stop()
-      return
-    }
-    const response = await getProduct(initalProduct.id)
-    if (response?.success) {
-      product = Types.Classes.CProduct.fromObject({ ...initalProduct.toJSON(), ...response?.data })
-      const auth = await Stores.Auth.Auth.instance.data()
-      if (auth) {
-        userInfo = await Utils.Jws.extractToken(auth)
+    if (!working) {
+      working = true
+      if (!initalProduct.id) {
+        Stores.Loading.instance.stop()
+        return
       }
-    } else {
-      Stores.MessageAlert.instance.show(response?.data)
+      const response = await getProduct(initalProduct.id)
+      if (response?.success) {
+        product = Types.Classes.CProduct.fromObject({ ...initalProduct.toJSON(), ...response?.data })
+        const auth = await Stores.Auth.Auth.instance.data()
+        if (auth) {
+          userInfo = await Utils.Jws.extractToken(auth)
+        }
+      } else {
+        Stores.MessageAlert.instance.show(response?.data)
+      }
+      Stores.Loading.instance.stop()
+      working = false
     }
-    Stores.Loading.instance.stop()
   })
 
   $: Stores.Title.instance.set(product?.title ?? '')
@@ -135,7 +158,7 @@
       <Views.Status>Não há opções cadastradas neste produto.</Views.Status>
     {/if}
     <Views.Divider />
-    <Views.Switch bind:name={productStatus} bind:checked={product.active} />
+    <Views.Switch bind:name={productStatus} bind:checked={product.active} on:check={enableProduct} />
     {#if userInfo?.role === 'VENDOR'}
       <Views.Button on:click={removeProduct}><Fa icon={faTrashAlt} /> <span>Remover este produto</span></Views.Button>
       <Views.Button on:click={edit}><Fa icon={faEdit} /> <span>Editar</span></Views.Button>

@@ -10,7 +10,6 @@
   import { getOrder } from '../../network/Products'
   import { Settings } from '../../stores/Setup'
   import { getSettings } from '../../network/Settings'
-  import Status from '@ikomida/shared-frontend/lib/components/Status.svelte'
 
   const router = Stores.Navigation.instance.router
   const order: Types.Classes.COrder = $router.options
@@ -26,7 +25,17 @@
     ikomida: true
   }
 
-  $: total = Number(order?.subtotal ?? 0) + Number(order?.delivery ?? 0) - Number(order?.discount ?? 0)
+  $: tip = Number(Logics.Finances.calcDiscount(order.subtotal, order.tip ?? 0, Types.Types.TDiscount.PERCENT))
+  $: total =
+    Number(order.subtotal ?? 0) +
+    Number(
+      order.orderType === Types.Types.TOrderType.DELIVERY
+        ? order.delivery
+        : order.orderType === Types.Types.TOrderType.LOCAL
+        ? Logics.Finances.calcDiscount(order.subtotal ?? 0, tip ?? 0, Types.Types.TDiscount.PERCENT)
+        : 0
+    ) -
+    Number(order.discount ?? 0)
 
   const nextButtonText = (order: Types.Classes.COrder) => {
     switch (order?.status) {
@@ -326,11 +335,8 @@
         </tr>
       {:else if order.orderType === Types.Types.TOrderType.LOCAL}
         <tr>
-          <td class="resumeText">Gorjeta sugerida</td>
-          <td class="resumeValue"
-            ><span class:deliveryFree={order?.delivery == 0}>{Utils.Strings.currency(total * (order?.tip ?? 0))}</span
-            ></td
-          >
+          <td class="resumeText">Gorjeta sugerida ({Utils.Strings.percent(order?.tip ?? 0)})</td>
+          <td class="resumeValue"><span class:deliveryFree={order?.tip == 0}>{Utils.Strings.currency(tip)}</span></td>
         </tr>
       {/if}
       <tr>
@@ -462,7 +468,7 @@
   }
   .resumeText {
     text-align: left;
-    width: 50%;
+    width: 70%;
     font-size: 1em;
     font-weight: lighter;
   }

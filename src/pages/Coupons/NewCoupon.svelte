@@ -109,6 +109,14 @@
         max={11}
       />
     {/if}
+    <Views.TextEdit
+      placeHolder="Valor mínimo"
+      bind:value={item.minValue}
+      initialValue={item.minValue}
+      type={Types.TTextEdit.CURRENCY}
+      min={1}
+      max={11}
+    />
   {/if}
   <Views.Divider />
   <Views.Button disabled={!canContinue} on:click={submit} bottomPadding={$StatusBar.bottomPadding}

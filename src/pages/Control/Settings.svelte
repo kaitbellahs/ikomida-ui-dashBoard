@@ -245,7 +245,7 @@
       <Views.Divider />
     {/if}
     <Views.Divider />
-    <Views.CheckboxList
+    <Views.CheckBoxList
       title="Tipos dos pedidos"
       bind:selected={order.types}
       options={Types.Types.TOrderType.values()}

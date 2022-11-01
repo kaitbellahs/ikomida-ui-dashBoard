@@ -36,6 +36,10 @@ export async function deleteProduct(id?: string) {
   return Network.instance?.remove(`/product/${id}`, true)
 }
 
+export async function activateProduct(id?: string) {
+  return Network.instance?.patch(`/product/${id}`, true)
+}
+
 export async function deleteProductOption(id?: string) {
   return Network.instance?.remove(`/productoption/${id}`, true)
 }
