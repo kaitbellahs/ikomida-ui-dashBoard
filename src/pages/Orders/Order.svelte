@@ -44,10 +44,22 @@
       case Types.Types.TOrderStatus.OPEN:
         return 'Aceitar o pedido'
       case Types.Types.TOrderStatus.ACCEPTED:
-        return 'Esperando o entregador'
+        switch (order.orderType) {
+          case Types.Types.TOrderType.LOCAL:
+            return 'Esperando o garçom'
+          case Types.Types.TOrderType.PICKUP:
+            return 'Esperando o cliente'
+          default:
+            return 'Esperando o entregador'
+        }
       case Types.Types.TOrderStatus.WAITING_DELIVERY:
         return 'Saiu para entrega'
+      case Types.Types.TOrderStatus.WAITING_LOCAL:
+        return 'Na mão do garçom'
+      case Types.Types.TOrderStatus.WAITING_PICKUP:
+        return 'Cliente retirou'
       case Types.Types.TOrderStatus.IN_DELIVERY:
+      case Types.Types.TOrderStatus.IN_TABLE_DELIVERY:
         return 'Pedido entrege'
       default:
         return '-'
@@ -67,8 +79,11 @@
   }
 
   async function next() {
+    if (!order.orderType) {
+      return
+    }
     Stores.Loading.instance.start()
-    const newStatus = order.status?.next()
+    const newStatus = order.status?.nextStatus(order.orderType)
     const response = await ChangeOrderStatus(order?.id, newStatus)
     if (response?.success) {
       order.status = newStatus

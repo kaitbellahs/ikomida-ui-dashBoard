@@ -1,11 +1,21 @@
 <script lang="ts">
   import Routes from '../../stores/Routes'
-  import { search, all, deleteProduct, deleteCategory, updateProduct, updateCategory } from '../../network/Products'
+  import {
+    resetTimeout,
+    search,
+    all,
+    deleteProduct,
+    deleteCategory,
+    updateProduct,
+    updateCategory
+  } from '../../network/Products'
   import { Views, Stores, Types, Utils } from '@ikomida/shared-frontend'
   import { faSearch, faEdit, faGift } from '@fortawesome/free-solid-svg-icons'
   import { StatusBar } from '../../stores/Setup'
   import { onMount } from 'svelte'
   import Fa from 'svelte-fa'
+
+  const navigation: Stores.Navigation = Stores.Navigation.instance
 
   let searchTerm: string = ''
   let oldValue: string
@@ -48,14 +58,14 @@
 
   function newProduct() {
     const product = Types.Classes.CProduct.fromObject({})
-    Stores.Navigation.instance.goTo(Routes.editProduct, {
+    navigation.goTo(Routes.editProduct, {
       product: product,
       edit: false
     })
   }
 
   function newCategory() {
-    Stores.Navigation.instance.goTo(Routes.editCategory, {
+    navigation.goTo(Routes.editCategory, {
       category: Types.Classes.CProductCategory.fillWith(undefined),
       edit: false
     })
@@ -65,6 +75,7 @@
     Stores.Loading.instance.start()
     const response = await deleteProduct(product.id)
     if (!response?.success) {
+      resetTimeout()
       Stores.MessageAlert.instance.show(response?.data)
     } else {
       categoriesAndProducts = await all()
@@ -76,6 +87,7 @@
     Stores.Loading.instance.start()
     const response = await deleteCategory(id)
     if (!response?.success) {
+      resetTimeout()
       Stores.MessageAlert.instance.show(response?.data)
       return
     }
@@ -84,14 +96,14 @@
   }
 
   async function editCategory(category: Types.Classes.CCategoryProducts) {
-    Stores.Navigation.instance.goTo(Routes.editCategory, {
+    navigation.goTo(Routes.editCategory, {
       category,
       edit: true
     })
   }
 
   async function goToCoupons() {
-    Stores.Navigation.instance.goTo(Routes.coupons)
+    navigation.goTo(Routes.coupons)
   }
   function sortItems() {
     categoriesAndProducts = categoriesAndProducts

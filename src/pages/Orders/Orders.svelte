@@ -1,10 +1,15 @@
 <script lang="ts">
   import Routes from '../../stores/Routes'
-  import { Views, Utils, Types, Stores } from '@ikomida/shared-frontend'
+  import { Views, Utils, Types, Stores, Logics } from '@ikomida/shared-frontend'
   import { ChangeOrderStatus } from '../../network/Orders'
   import { onMount } from 'svelte'
   const initailOrderStatus = Types.Types.TOrderStatus.WAITING_PAYMENT
   let items: Types.Classes.COrder[]
+  let orderType: Types.Types.TOrderType | undefined = undefined
+
+  $: if (orderType) {
+    Stores.LoadMore.instance.refresh()
+  }
 
   $: if (items) {
     for (let index = 0; index < items.length; index++) {
@@ -20,10 +25,22 @@
       case Types.Types.TOrderStatus.OPEN:
         return 'Aceitar o pedido'
       case Types.Types.TOrderStatus.ACCEPTED:
-        return 'Esperando o entregador'
+        switch (order.orderType) {
+          case Types.Types.TOrderType.LOCAL:
+            return 'Esperando o garçom'
+          case Types.Types.TOrderType.PICKUP:
+            return 'Esperando o cliente'
+          default:
+            return 'Esperando o entregador'
+        }
       case Types.Types.TOrderStatus.WAITING_DELIVERY:
         return 'Saiu para entrega'
+      case Types.Types.TOrderStatus.WAITING_LOCAL:
+        return 'Na mão do garçom'
+      case Types.Types.TOrderStatus.WAITING_PICKUP:
+        return 'Cliente retirou'
       case Types.Types.TOrderStatus.IN_DELIVERY:
+      case Types.Types.TOrderStatus.IN_TABLE_DELIVERY:
         return 'Pedido entrege'
       default:
         return '-'
@@ -44,8 +61,8 @@
 
   async function next(order: Types.Classes.COrder, index: number) {
     Stores.Loading.instance.start()
-    if (order?.status && order?.status !== Types.Types.TOrderStatus.DELIVERED) {
-      const newStatus = order?.status.next()
+    if (order.orderType && order?.status && order?.status !== Types.Types.TOrderStatus.DELIVERED) {
+      const newStatus = order?.status.nextStatus(order.orderType)
       const response = await ChangeOrderStatus(order?.id, newStatus)
       if (response?.success) {
         order.status = newStatus
@@ -72,10 +89,14 @@
   Stores.Title.instance.set('Pedidos')
 </script>
 
+<div class="filters">
+  <Views.Selector bind:selected={orderType} options={Types.Types.TOrderType.values()} name="Tipo dos pedidos" />
+</div>
 <Views.LoadMoreReusableList
   noItems="Não há pedido para exibir por enquanto, aproveite e divulgue seu app para seus clientes, e se precisar de ajuda para fazer suas campanhas de propaganda nos dê um toque pra gente, que vamos te ajudar a turbinar suas vendas!"
   cache={Stores.Cache.Types.ORDERS}
   url="/orders"
+  params={orderType ? { orderType: orderType?.id } : undefined}
   bind:items
   hasRecaptcha={true}
   let:index
@@ -158,7 +179,19 @@
     <div class="value">
       Total:&nbsp;<span
         >{Utils.Strings.currency(
-          Number(items[index].subtotal ?? 0) + Number(items[index].delivery ?? 0) - Number(items[index].discount ?? 0)
+          Number(items[index].subtotal ?? 0) +
+            Number(
+              items[index].orderType === Types.Types.TOrderType.DELIVERY
+                ? items[index].delivery
+                : items[index].orderType === Types.Types.TOrderType.LOCAL
+                ? Logics.Finances.calcDiscount(
+                    items[index].subtotal ?? 0,
+                    items[index].tip ?? 0,
+                    Types.Types.TDiscount.PERCENT
+                  )
+                : 0
+            ) -
+            Number(items[index].discount ?? 0)
         )}</span
       >
     </div>
@@ -180,15 +213,12 @@
   </div></Views.LoadMoreReusableList
 >
 
-<!-- <Views.Link url="https://ikomida.com/contact"
-      >Solicite seu orçamento agora!</Views.Link
-    > -->
 <style>
   .orderContainer {
     border-radius: 4px;
     border: 1px solid #ccc;
     padding: 20px;
-    background: #eeeeee33;
+    background: #ffffffab;
     display: flex;
     flex-direction: column;
   }
@@ -237,5 +267,11 @@
   .orderContainer > .value > span {
     color: green;
     font-size: 1.1em;
+  }
+  .filters {
+    width: 100%;
+    height: 73px;
+    display: flex;
+    flex-direction: row;
   }
 </style>

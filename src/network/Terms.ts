@@ -9,7 +9,7 @@ export async function getTermOfUse() {
   if (response && response?.success) {
     return response?.data
   }
-  return null
+  return undefined
 }
 
 export async function getPrivacyPolicy() {

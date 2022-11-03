@@ -38,8 +38,14 @@ export function OrderStatus(status?: Types.Types.TOrderStatus) {
       return 'em preparação'
     case Types.Types.TOrderStatus.WAITING_DELIVERY:
       return 'esperando o entregador'
+    case Types.Types.TOrderStatus.WAITING_LOCAL:
+      return 'esperando o garçom'
+    case Types.Types.TOrderStatus.WAITING_PICKUP:
+      return 'esperando o cliente'
     case Types.Types.TOrderStatus.IN_DELIVERY:
       return 'a caminho do cliente'
+    case Types.Types.TOrderStatus.IN_TABLE_DELIVERY:
+      return 'a caminho da mesa do cliente'
     case Types.Types.TOrderStatus.DELIVERED:
       return 'entregue'
     case Types.Types.TOrderStatus.CANCELED:

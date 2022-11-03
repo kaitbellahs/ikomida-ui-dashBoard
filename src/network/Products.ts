@@ -1,18 +1,22 @@
 import { Network, Types, Stores } from '@ikomida/shared-frontend'
 const cache = Stores.Cache.createInstance('Products')
-let timeout: Date
+let timeout = 0
+export function resetTimeout() {
+  timeout = 0
+}
+
 export async function all(): Promise<Types.Classes.CCategoryProducts[]> {
-  if (!timeout || timeout < new Date(new Date().setMinutes(new Date().getMinutes() + 2))) {
+  if (timeout < new Date().getTime() - 2 * 60 * 1000) {
     const response = await Network.instance?.get('/products', true)
     if (response?.success) {
       cache.setObject('Products', response?.data)
-      timeout = new Date()
+      timeout = new Date().getTime()
       return Types.Classes.CCategoryProducts.fromObject(response?.data)
     } else {
       return []
     }
   } else {
-    return cache.getObject('Products')
+    return Types.Classes.CCategoryProducts.fromObject(cache.getObject('Products'))
   }
 }
 

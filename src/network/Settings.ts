@@ -10,7 +10,7 @@ export async function getLimits() {
 }
 
 export async function getPagSeguroUrl() {
-  return Network.instance?.get('/vendor/pagSeguroUrl', true, null, 'pagSeguroUrl')
+  return Network.instance?.get('/vendor/pagSeguroUrl', true, undefined, 'pagSeguroUrl')
 }
 
 export async function setSettings(object: Types.Classes.CVendorSettings) {
@@ -22,7 +22,7 @@ export async function updatePaymentGateway(object: any) {
 }
 
 export async function revokePaymentGateway() {
-  return Network.instance?.remove('/vendor/revokePaymentGateway', true, null, 'revokePaymentGateway')
+  return Network.instance?.remove('/vendor/revokePaymentGateway', true, undefined, 'revokePaymentGateway')
 }
 
 export async function updateBusinessHours(object: Types.Classes.CBusinessTime) {

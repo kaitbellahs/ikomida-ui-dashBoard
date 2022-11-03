@@ -4,7 +4,7 @@
   import { faEdit } from '@fortawesome/free-solid-svg-icons'
   import { StatusBar } from '../../stores/Setup'
   import { Views, Stores, Types, Logics } from '@ikomida/shared-frontend'
-  import { newCategory, updateCategory } from '../../network/Products'
+  import { resetTimeout, newCategory, updateCategory } from '../../network/Products'
   import { onMount } from 'svelte'
 
   const router = Stores.Navigation.instance.router
@@ -71,6 +71,7 @@
       response = await newCategory(category)
     }
     if (response?.success) {
+      resetTimeout()
       Stores.Navigation.instance.reset(Routes.products)
     } else {
       Stores.MessageAlert.instance.show(response?.data)
@@ -79,11 +80,11 @@
   }
 
   function isBusinessTime(business?: Types.Classes.CBusinessTime) {
-    return !business || (!business.days && !business.hours) || Logics.DateTime.isBusinessTime(business!)
+    return !business || (!business.days && !business.hours)
   }
 
   onMount(() => {
-    alwaysShowCategory = !isBusinessTime(category.business)
+    alwaysShowCategory = isBusinessTime(category.business)
     Stores.Loading.instance.stop()
   })
 

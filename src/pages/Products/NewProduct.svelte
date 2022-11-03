@@ -5,6 +5,7 @@
   import { StatusBar } from '../../stores/Setup'
   import { Views, Types, Stores, Utils } from '@ikomida/shared-frontend'
   import {
+    resetTimeout,
     newProduct,
     updateProduct,
     getCategories,
@@ -84,6 +85,7 @@
       response = await newProduct(product)
     }
     if (response?.success) {
+      resetTimeout()
       Stores.Navigation.instance.reset(Routes.products)
     } else {
       Stores.MessageAlert.instance.show(response?.data)
@@ -181,6 +183,7 @@
     if (optionsCategory?.id) {
       const response = await deleteProductOptionsCategory(optionsCategory.id)
       if (!response.success) {
+      resetTimeout()
         remove = false
         Stores.MessageAlert.instance.show('Não foi possível remover esta categoria de opções.')
       }
@@ -199,6 +202,7 @@
     if (option?.id) {
       const response = await deleteProductOption(option.id)
       if (!response.success) {
+      resetTimeout()
         remove = false
         Stores.MessageAlert.instance.show('Não foi possível remover esta opção.')
       }
