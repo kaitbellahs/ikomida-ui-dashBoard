@@ -41,23 +41,23 @@
   noItems="Não há cupons para exibir por enquanto, aproveite e cadastre novos cupons para agradar seus clientes!"
   cache={Stores.Cache.Types.COUPONS}
   url="/coupons"
-  {items}
-  let:item
+  bind:items
+  let:index
 >
   <article>
-    <Views.FloatRemove callback={() => removeCoupon(item?.id)} />
-    <h2>{item.name}</h2>
+    <Views.FloatRemove callback={() => removeCoupon(items[index].id)} />
+    <h2>{items[index].name}</h2>
     <div>
-      Disconto: {Types.Types.TDiscount.VALUE === item.valueType
-        ? Utils.Strings.currency(item.value)
-        : Utils.Strings.percent(item.value)}
+      Disconto: {Types.Types.TDiscount.VALUE === items[index].valueType
+        ? Utils.Strings.currency(items[index].value)
+        : Utils.Strings.percent(items[index].value)}
     </div>
-    <div>Valor mínimo: {Utils.Strings.currency(item.minValue)}</div>
-    <div>{Utils.Strings.dateToDateString(item.validity?.toString())}</div>
-    {#if item.orderTypes}
+    <div>Valor mínimo: {Utils.Strings.currency(items[index].minValue)}</div>
+    <div>{Utils.Strings.dateToDateString(items[index].validity?.toString())}</div>
+    {#if items[index].orderTypes}
       <Views.Divider height={7} />
       <div class="orderTypes">
-        {#each item.orderTypes ?? [] as orderType}
+        {#each items[index].orderTypes ?? [] as orderType}
           <span>{orderType.name}</span>
         {/each}
       </div>
@@ -82,6 +82,6 @@
     border-radius: 5px;
     margin: 5px;
     font-size: 0.9em;
-    border: var(--buttonBackground) solid 1px;
+    border: #4c0708 solid 1px;
   }
 </style>

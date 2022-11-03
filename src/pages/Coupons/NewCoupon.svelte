@@ -13,6 +13,7 @@
     value: 0,
     valueType: null,
     quantity: null,
+    orderTypes: null,
     validity: null
   })
   let itemsValidation = {
@@ -26,7 +27,10 @@
     valueType = item.valueType
     item.value = 0
   }
-  $: canContinue = Utils.Objects.validateFields(itemsValidation) && item.valueType !== Types.Types.TDiscount.NO
+  $: canContinue =
+    Utils.Objects.validateFields(itemsValidation) &&
+    item.valueType !== Types.Types.TDiscount.NO &&
+    (item.orderTypes?.length ?? 0) > 0
 
   const submit = async () => {
     Stores.Loading.instance.start()
