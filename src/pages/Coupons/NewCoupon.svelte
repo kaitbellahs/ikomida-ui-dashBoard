@@ -119,6 +119,12 @@
     />
   {/if}
   <Views.Divider />
+  <Views.CheckBoxList
+    title="Tipos dos pedidos"
+    bind:selected={item.orderTypes}
+    options={Types.Types.TOrderType.values()}
+  />
+  <Views.Divider />
   <Views.Button disabled={!canContinue} on:click={submit} bottomPadding={$StatusBar.bottomPadding}
     ><Fa icon={faEdit} /> <span>Salvar</span></Views.Button
   >

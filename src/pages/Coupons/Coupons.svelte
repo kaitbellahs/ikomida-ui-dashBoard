@@ -48,11 +48,20 @@
     <Views.FloatRemove callback={() => removeCoupon(item?.id)} />
     <h2>{item.name}</h2>
     <div>
-      {Types.Types.TDiscount.VALUE === item.valueType
+      Disconto: {Types.Types.TDiscount.VALUE === item.valueType
         ? Utils.Strings.currency(item.value)
         : Utils.Strings.percent(item.value)}
     </div>
+    <div>Valor mínimo: {Utils.Strings.currency(item.minValue)}</div>
     <div>{Utils.Strings.dateToDateString(item.validity?.toString())}</div>
+    {#if item.orderTypes}
+      <Views.Divider height={7} />
+      <div class="orderTypes">
+        {#each item.orderTypes ?? [] as orderType}
+          <span>{orderType.name}</span>
+        {/each}
+      </div>
+    {/if}
   </article>
 </Views.LoadMoreReusableList>
 
@@ -63,5 +72,16 @@
     border-radius: 4px;
     margin-top: 10px;
     padding: 10px;
+  }
+  article > .orderTypes {
+    display: flex;
+    flex-direction: row;
+  }
+  article > .orderTypes > span {
+    padding: 2px;
+    border-radius: 5px;
+    margin: 5px;
+    font-size: 0.9em;
+    border: var(--buttonBackground) solid 1px;
   }
 </style>
