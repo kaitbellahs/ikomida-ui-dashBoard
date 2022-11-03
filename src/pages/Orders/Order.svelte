@@ -10,6 +10,7 @@
   import { getOrder } from '../../network/Products'
   import { Settings } from '../../stores/Setup'
   import { getSettings } from '../../network/Settings'
+  import { Capacitor } from '@capacitor/core'
 
   const router = Stores.Navigation.instance.router
   const order: Types.Classes.COrder = $router.options
@@ -109,12 +110,36 @@
     }
     Stores.Loading.instance.stop()
   }
+
+  async function sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+  }
+
+  async function isImageReady() {
+    let ready = false
+    return new Promise(async (resolve, reject) => {
+      const startTime = new Date().getTime()
+      do {
+        ready =
+          loadImagesComplete.ikomida === true &&
+          loadImagesComplete.mainPicture === true &&
+          loadImagesError.ikomida === false &&
+          loadImagesError.mainPicture === false
+        if (!ready) {
+          await sleep(100)
+        }
+      } while (!ready && startTime < new Date().getTime() - 40 * 1000)
+      resolve(ready)
+    })
+  }
+
   async function share() {
     Stores.Loading.instance.start()
     screenShot = true
     await tick()
+    await isImageReady()
     const canvas = await html2canvas(orderScreen, {
-      logging: false,
+      logging: true,
       backgroundColor: '#fff',
       allowTaint: true,
       useCORS: true
@@ -122,26 +147,35 @@
     screenShot = false
     await tick()
     Stores.Loading.instance.stop()
-    const data = canvas.toDataURL('image/jpeg', 1.0).split(',')
-    const screenShotFile = await Filesystem.writeFile({
-      path: `screenshots/order-${order?.customID}.jpg`,
-      data: data?.[1],
-      directory: Directory.Cache,
-      recursive: true
-    })
-    //TODO: -- report identifier of the app that received the share action. Can be an empty string in some cases. On web it will be undefined.
-    await Share.share({
-      title: `Pedido #${order?.customID}`,
-      text: `${order?.address?.street ?? '-'}, ${order?.address?.number ?? '-'}${
-        order?.address?.complement ? ` - ${order?.address?.complement}` : ''
-      }
-        ${order?.address?.neighborhood ?? '-'}
-        ${order?.address?.city ?? '-'}/${order?.address?.stat ?? '-'} CEP: ${order?.address?.postalCode ?? '-'}
-        Tipo: ${order?.address?.kind?.name ?? '-'}
-        Ref: ${order?.address?.reference ?? '-'}`,
-      url: `file://${screenShotFile?.uri}`,
-      dialogTitle: 'Compartilhar o pedido'
-    })
+    if (Capacitor.isNativePlatform()) {
+      const data = canvas.toDataURL().split(',')
+      const screenShotFile = await Filesystem.writeFile({
+        path: `screenshots/order-${order?.customID}.png`,
+        data: data?.[1],
+        directory: Directory.Cache,
+        recursive: true
+      })
+      //TODO: -- report identifier of the app that received the share action. Can be an empty string in some cases. On web it will be undefined.
+      await Share.share({
+        title: `Pedido #${order?.customID}`,
+        text: `${order?.address?.street ?? '-'}, ${order?.address?.number ?? '-'}${
+          order?.address?.complement ? ` - ${order?.address?.complement}` : ''
+        }
+          ${order?.address?.neighborhood ?? '-'}
+          ${order?.address?.city ?? '-'}/${order?.address?.stat ?? '-'} CEP: ${order?.address?.postalCode ?? '-'}
+          Tipo: ${order?.address?.kind?.name ?? '-'}
+          Ref: ${order?.address?.reference ?? '-'}`,
+        url: `file://${screenShotFile?.uri}`,
+        dialogTitle: 'Compartilhar o pedido'
+      })
+    } else {
+      canvas.toBlob(function (blob) {
+        if (blob) {
+          const url = URL.createObjectURL(blob)
+          window.open(url, '_blank')
+        }
+      })
+    }
   }
 
   onMount(async () => {
@@ -159,7 +193,7 @@
         Settings.set($Settings)
       }
     }
-    tick()
+    await tick()
     Stores.Loading.instance.stop()
   })
 
@@ -170,8 +204,8 @@
   <div class="avatar {screenShot ? 'screenShot' : ''}">
     {#if $Settings?.profile?.mainPicture}
       <Views.Image
-        loadComplete={loadImagesComplete.mainPicture}
-        showImage={loadImagesError.mainPicture}
+        bind:loadComplete={loadImagesComplete.mainPicture}
+        bind:showImage={loadImagesError.mainPicture}
         source={$Settings?.profile?.mainPicture ?? 'assets/icons/transparent-logo-1.svg'}
         name={$Settings?.profile?.contractName ?? 'iKomida'}
       />
@@ -197,11 +231,11 @@
   </div>
   <h3 class="title">Pedido N˚: {order?.customID}</h3>
   <Views.Divider />
-  <Views.Status type={Types.Status.INFO} showIcon={false}
-    >Pedido para {order.orderType?.description ?? '-'}</Views.Status
-  >
-  <Views.Divider />
   <div class="info" data-html2canvas-ignore>
+    <Views.Divider />
+    <Views.Status type={Types.Status.INFO} showIcon={false}
+      >Pedido para {order.orderType?.description ?? '-'}</Views.Status
+    >
     {#if order.status && [Types.Types.TOrderStatus.WAITING_PAYMENT, Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY].includes(order.status)}
       <Views.Status showIcon={false} type={Types.Status.WARNING}
         >Prepare o pedido antes de
@@ -363,8 +397,8 @@
   <div class="signature {screenShot ? 'screenShot' : ''}">
     <Views.Divider height={30} />
     <span>Feito com carinho por</span><Views.Image
-      loadComplete={loadImagesComplete.ikomida}
-      showImage={loadImagesError.ikomida}
+      bind:loadComplete={loadImagesComplete.ikomida}
+      bind:showImage={loadImagesError.ikomida}
       source="/assets/icons/transparent-logo-1.png"
       name="iKomida"
     />
