@@ -14,6 +14,7 @@
   import { StatusBar } from '../../stores/Setup'
   import { onMount } from 'svelte'
   import Fa from 'svelte-fa'
+  const cache = Stores.Cache.createInstance('Products')
 
   const navigation: Stores.Navigation = Stores.Navigation.instance
 
@@ -112,6 +113,10 @@
         return category
       })
       .sort((i1, i2) => (i1.order ?? 0) - (i2.order ?? 0))
+    cache.setObject(
+      'Products',
+      categoriesAndProducts.map(category => category.toJSON())
+    )
   }
   async function productUp(categoryId?: string, id?: string) {
     Stores.Loading.instance.start()
