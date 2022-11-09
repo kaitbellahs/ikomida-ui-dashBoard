@@ -29,6 +29,7 @@
         : 0
     ) -
     Number(order.discount ?? 0)
+  $: change = (order.change ?? 0) - total
 
   const nextButtonText = (order: Types.Classes.COrder) => {
     switch (order?.status) {
@@ -308,6 +309,9 @@
       {#if order?.payment?.type === Types.Types.TPaymentMethod.CREDIT_CARD_ONLINE}
         <Views.Image source="/assets/cardBrand/{order?.payment.brand}.svg" name={order?.payment.brand} />
         **** {order?.payment.lastDigits}
+      {:else if order.payment?.type === Types.Types.TPaymentMethod.CASH_ON_DELIVERY}
+        Você receberia <b>{Utils.Strings.currency(order.change)}</b> do cliente e deve devolver
+        <b>{Utils.Strings.currency(change)}</b> de troco.
       {/if}
     </span>
   </div>

@@ -183,7 +183,7 @@
     if (optionsCategory?.id) {
       const response = await deleteProductOptionsCategory(optionsCategory.id)
       if (!response.success) {
-      resetTimeout()
+        resetTimeout()
         remove = false
         Stores.MessageAlert.instance.show('Não foi possível remover esta categoria de opções.')
       }
@@ -202,7 +202,7 @@
     if (option?.id) {
       const response = await deleteProductOption(option.id)
       if (!response.success) {
-      resetTimeout()
+        resetTimeout()
         remove = false
         Stores.MessageAlert.instance.show('Não foi possível remover esta opção.')
       }
@@ -305,6 +305,15 @@
       bind:value={product.quantity}
       bind:isValid={productsValidation.quantity}
       initialValue={product.quantity}
+      min={1}
+      max={9}
+    />
+    <Views.TextEdit
+      type={Types.TTextEdit.NUMBER}
+      placeHolder="Quantos itens por pedido?"
+      bind:value={product.maxQuantityPerOrder}
+      bind:isValid={productsValidation.maxQuantityPerOrder}
+      initialValue={product.maxQuantityPerOrder}
       min={1}
       max={9}
     />

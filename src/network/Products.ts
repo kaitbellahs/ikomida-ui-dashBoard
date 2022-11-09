@@ -28,6 +28,10 @@ export async function countProducts() {
   return 0
 }
 
+export async function getLowQuantityProducts() {
+  return await Network.instance?.get(`/lowQuantityProducts`, true)
+}
+
 export async function getCategories() {
   return await Network.instance?.get(`/categories`, true)
 }
