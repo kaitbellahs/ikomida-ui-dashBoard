@@ -6,8 +6,6 @@
   import { Views, Stores, Types } from '@ikomida/shared-frontend'
   import { onMount, tick } from 'svelte'
   import Routes from '../../stores/Routes'
-  import Image from '@ikomida/shared-frontend/lib/components/Image.svelte'
-  import Divider from '@ikomida/shared-frontend/lib/components/Divider.svelte'
 
   let products: Types.Classes.CProduct[]
 
@@ -76,7 +74,7 @@
           <div>
             {#if product.image}
               <div class="image">
-                <Image source={product.image} name={product.title} />
+                <Views.Image source={product.image} name={product.title} />
               </div>
             {/if}
             <div class="body">
