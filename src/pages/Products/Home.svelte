@@ -23,7 +23,6 @@
   Stores.Title.instance.set('iKomida - Dashboard')
 </script>
 
-<h2>Estatísticas</h2>
 <Views.Divider />
 <section>
   <Views.Button type={Types.TButton.CONTAINER} route={Routes.products}>
@@ -60,7 +59,7 @@
   </Views.Button>
 </section>
 <Views.Divider />
-<section class="product">
+<section class="product shadow">
   <header>
     <h2>Área de atenção.</h2>
     <small>Produtos que precisam de atenção aparecerem aqui</small>
@@ -68,7 +67,7 @@
   {#if (products?.length ?? 0) > 0}
     {#each products as product}<div
         class="leftShadow item"
-        style="--itemBackground: #ffffffab;--buttonBackground:#4c0708;--buttonColor:#fff;"
+        style="--itemBackground: #fffffffc;--buttonBackground:#4c0708;--buttonColor:#fff;"
       >
         <button on:click={() => onClick(product)}>
           <div>
@@ -109,9 +108,9 @@
   section.product {
     height: 100%;
     flex-direction: row;
-    border: 1px solid red;
-    padding: 10px;
-    border-radius: 10px;
+    border: 1pt solid red;
+    padding: 16pt;
+    border-radius: 8pt;
     overflow-y: scroll;
     overflow-x: hidden;
   }
@@ -126,16 +125,16 @@
   }
   section > :global(button) {
     flex: 1;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    margin: 5px;
+    padding: 8pt;
+    border: 1pt solid #ccc;
+    border-radius: 4pt;
+    margin: 8pt;
     width: 50%;
     display: flex;
     flex-direction: column;
     flex-basis: 40%;
-    text-shadow: 0.5px 1px #18056b66;
-    box-shadow: 1px 1.5px #00000099;
+    text-shadow: 0.8pt 1pt #18056b66;
+    box-shadow: 0 4pt 8pt #0000009e;
   }
   section.product > :global(button) {
     width: 100%;
@@ -159,12 +158,12 @@
   }
   .item {
     width: 100%;
-    margin: 15px 0;
-    border: 1px solid #ccc;
-    padding: 10px;
+    margin: 16pt 0;
+    border: 1pt solid #ccc;
+    padding: 8pt;
     background: var(--itemBackground);
     position: relative;
-    border-radius: 10px;
+    border-radius: 8pt;
   }
   .item > button {
     background-color: transparent;
@@ -177,20 +176,21 @@
   .item > button > .orderTypes {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
   }
   .item > button > .orderTypes > span {
-    padding: 2px;
-    border-radius: 5px;
-    margin: 5px;
+    padding: 4pt;
+    border-radius: 8pt;
+    margin: 4pt;
     font-size: 0.9em;
-    border: var(--buttonBackground) solid 1px;
+    border: var(--buttonBackground) solid 1pt;
   }
   .item > button > div > .body > h3 {
     padding: 0;
     margin: 0;
     font-size: 1.5em;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 16pt;
   }
   .item > button > div {
     display: flex;
@@ -201,7 +201,7 @@
   }
   .item > button > div > div {
     width: 100%;
-    min-height: 1px;
+    min-height: 1pt;
     display: flex;
     -o-flex-wrap: wrap;
     flex-wrap: wrap;

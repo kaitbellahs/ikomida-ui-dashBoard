@@ -6,7 +6,7 @@
   import { addStaff, GetAddressByCep } from '../../network/Staff'
   import { onMount } from 'svelte'
 
-  interface IItemsInputs {
+  interface IitemInputs {
     name: Views.TextEdit | undefined
     lastName: Views.TextEdit | undefined
     identity: Views.TextEdit | undefined
@@ -23,8 +23,8 @@
     }
   }
 
-  let items: Types.Classes.CUser = Types.Classes.CUser.fillWith(undefined)
-  let itemsInputs: IItemsInputs = {
+  let item: Types.Classes.CUser = Types.Classes.CUser.fillWith(undefined)
+  let itemInputs: IitemInputs = {
     name: undefined,
     lastName: undefined,
     identity: undefined,
@@ -40,7 +40,7 @@
       stat: undefined
     }
   }
-  let itemsValidation = {
+  let itemValidation = {
     name: false,
     lastName: false,
     identity: false,
@@ -57,21 +57,21 @@
   }
   let currentPostalCode: string | undefined = undefined
 
-  $: if ((items.address?.postalCode?.length ?? 0) === 8 && items?.address?.postalCode != currentPostalCode) {
+  $: if ((item.address?.postalCode?.length ?? 0) === 8 && item?.address?.postalCode != currentPostalCode) {
     findAddress()
   }
-  $: canProceed = Utils.Objects.validateFields(itemsValidation)
+  $: canProceed = Utils.Objects.validateFields(itemValidation)
 
   function findAddress() {
     Stores.Loading.instance.start()
-    currentPostalCode = items?.address?.postalCode
-    GetAddressByCep(items.address?.postalCode ?? '')
+    currentPostalCode = item?.address?.postalCode
+    GetAddressByCep(item.address?.postalCode ?? '')
       .then(response => {
         if (response?.success) {
           const address = response?.data
           currentPostalCode = address?.postalCode
-          items.address = { ...items?.address, ...address }
-          Utils?.Objects?.updateInputs(itemsInputs, items)
+          item.address = { ...item?.address, ...address }
+          Utils?.Objects?.updateInputs(itemInputs, item)
         } else {
           Stores.MessageAlert.instance.show(response?.data)
         }
@@ -83,12 +83,12 @@
   }
 
   const submit = async () => {
-    if (!Utils.Objects.validateFields(itemsValidation)) {
+    if (!Utils.Objects.validateFields(itemValidation)) {
       Stores.MessageAlert.instance.show('Por favor preenche os dados do formulario corretamente')
       return
     }
     Stores.Loading.instance.start()
-    let response = await addStaff(items)
+    let response = await addStaff(item)
     if (response.success) {
       await Network.instance?.clearCache(Stores.Cache.Types.STAFF)
       Stores.Navigation.instance.pop()
@@ -99,7 +99,7 @@
   }
 
   onMount(() => {
-    items.areaCode = '55'
+    item.areaCode = '55'
     Stores.Loading.instance.stop()
   })
 
@@ -108,104 +108,105 @@
 
 <div class="staff">
   <h2>Dados pessoais</h2>
+  <Views.Selector bind:selected={item.role} options={Types.Types.TRoles.vendors} name="Tipo do colaborador" />
   <Views.TextEdit
     placeHolder="Nome"
-    bind:value={items.name}
-    bind:this={itemsInputs.name}
-    bind:isValid={itemsValidation.name}
+    bind:value={item.name}
+    bind:this={itemInputs.name}
+    bind:isValid={itemValidation.name}
     type={Types.TTextEdit.NAME}
     min={2}
     max={255}
   />
   <Views.TextEdit
     placeHolder="Sobre nome"
-    bind:value={items.lastName}
-    bind:this={itemsInputs.lastName}
-    bind:isValid={itemsValidation.lastName}
+    bind:value={item.lastName}
+    bind:this={itemInputs.lastName}
+    bind:isValid={itemValidation.lastName}
     type={Types.TTextEdit.NAME}
     min={2}
     max={255}
   />
   <Views.TextEdit
     placeHolder="Email"
-    bind:value={items.email}
-    bind:isValid={itemsValidation.email}
-    bind:this={itemsInputs.email}
+    bind:value={item.email}
+    bind:isValid={itemValidation.email}
+    bind:this={itemInputs.email}
     type={Types.TTextEdit.EMAIL}
   />
   <Views.TextEdit
-    bind:value={items.phone}
-    bind:this={itemsInputs.phone}
-    bind:isValid={itemsValidation.phone}
+    bind:value={item.phone}
+    bind:this={itemInputs.phone}
+    bind:isValid={itemValidation.phone}
     type={Types.TTextEdit.PHONE}
     placeHolder="Número de celular"
   />
   <Views.TextEdit
     placeHolder="CPF"
     type={Types.TTextEdit.CPF}
-    bind:value={items.identity}
-    bind:this={itemsInputs.identity}
-    bind:isValid={itemsValidation.identity}
+    bind:value={item.identity}
+    bind:this={itemInputs.identity}
+    bind:isValid={itemValidation.identity}
   />
-  {#if items.address}
+  {#if item.address}
     <Views.Divider />
     <h2>Endereço</h2>
     <Views.TextEdit
       type={Types.TTextEdit.CEP}
       callback={findAddress}
       buttonIcon={faSearch}
-      bind:value={items.address.postalCode}
-      bind:this={itemsInputs.address.postalCode}
-      bind:isValid={itemsValidation.address.postalCode}
+      bind:value={item.address.postalCode}
+      bind:this={itemInputs.address.postalCode}
+      bind:isValid={itemValidation.address.postalCode}
       placeHolder="CEP"
     />
     <Views.TextEdit
       disabled={true}
       placeHolder="Endereço"
-      bind:value={items.address.street}
-      bind:this={itemsInputs.address.street}
-      bind:isValid={itemsValidation.address.street}
+      bind:value={item.address.street}
+      bind:this={itemInputs.address.street}
+      bind:isValid={itemValidation.address.street}
       min={2}
       max={255}
     />
     <Views.TextEdit
       placeHolder="Número"
-      bind:value={items.address.number}
-      bind:this={itemsInputs.address.number}
-      bind:isValid={itemsValidation.address.number}
+      bind:value={item.address.number}
+      bind:this={itemInputs.address.number}
+      bind:isValid={itemValidation.address.number}
       min={1}
       max={255}
-      empty={!itemsValidation.address.postalCode}
+      empty={!itemValidation.address.postalCode}
     />
     <Views.TextEdit
       placeHolder="Complemento"
-      bind:value={items.address.complement}
-      bind:this={itemsInputs.address.complement}
+      bind:value={item.address.complement}
+      bind:this={itemInputs.address.complement}
     />
     <Views.TextEdit
       disabled={true}
       placeHolder="Bairro"
-      bind:value={items.address.neighborhood}
-      bind:isValid={itemsValidation.address.neighborhood}
-      bind:this={itemsInputs.address.neighborhood}
+      bind:value={item.address.neighborhood}
+      bind:isValid={itemValidation.address.neighborhood}
+      bind:this={itemInputs.address.neighborhood}
       min={2}
       max={255}
     />
     <Views.TextEdit
       disabled={true}
       placeHolder="Cidade"
-      bind:value={items.address.city}
-      bind:isValid={itemsValidation.address.city}
-      bind:this={itemsInputs.address.city}
+      bind:value={item.address.city}
+      bind:isValid={itemValidation.address.city}
+      bind:this={itemInputs.address.city}
       min={2}
       max={255}
     />
     <Views.TextEdit
       disabled={true}
       placeHolder="UF"
-      bind:value={items.address.stat}
-      bind:this={itemsInputs.address.stat}
-      bind:isValid={itemsValidation.address.stat}
+      bind:value={item.address.stat}
+      bind:this={itemInputs.address.stat}
+      bind:isValid={itemValidation.address.stat}
       min={2}
       max={2}
     />

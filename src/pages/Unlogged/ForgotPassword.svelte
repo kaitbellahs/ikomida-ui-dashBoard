@@ -112,7 +112,7 @@
 </script>
 
 <main
-  style="margin-top:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; overflow: hidden;max-width: 100%;height: 100%;"
+  style="margin-top:{styleHeight};padding: 16pt; padding-top: 0; padding-bottom: 0; overflow: hidden;max-width: 100%;height: 100%;"
 >
   <Views.Divider />
   <h2>Por favor informe seu número de telefone cadastrado</h2>

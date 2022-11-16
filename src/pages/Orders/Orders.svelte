@@ -101,7 +101,7 @@
   hasRecaptcha={true}
   let:index
 >
-  <div class="leftShadow orderContainer">
+  <div class="shadow orderContainer">
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div on:click={() => goToOrder(items[index])}>
       <h3 class="title">Pedido N˚: {items[index].customID}</h3>
@@ -199,12 +199,12 @@
       <Views.Divider height={10} />
       <div class="buttonGroup">
         {#if items[index].status && ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED].includes(items[index].status ?? initailOrderStatus)}
-          <Views.Button sizeMultiplier={0.8} type={Types.TButton.SECONDARY} on:click={() => cancel(items[index])}
+          <Views.Button sizeMultiplier={0.7} type={Types.TButton.SECONDARY} on:click={() => cancel(items[index])}
             >Cancelar</Views.Button
           >
         {/if}
         {#if items[index].status && ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED, initailOrderStatus].includes(items[index].status ?? initailOrderStatus)}
-          <Views.Button sizeMultiplier={0.8} on:click={() => next(items[index], index)}
+          <Views.Button sizeMultiplier={0.7} on:click={() => next(items[index], index)}
             >{nextButtonText(items[index])}</Views.Button
           >
         {/if}
@@ -215,10 +215,9 @@
 
 <style>
   .orderContainer {
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    padding: 20px;
-    background: #ffffffab;
+    border-radius: 4pt;
+    padding: 16pt;
+    background: #fffffffc;
     display: flex;
     flex-direction: column;
   }
@@ -254,10 +253,10 @@
     flex: 1;
   }
   .orderContainer > .buttonGroup > :global(*):first-child {
-    margin-right: 5px;
+    margin-right: 8pt;
   }
   .orderContainer > .buttonGroup > :global(*):last-child {
-    margin-left: 5px;
+    margin-left: 8pt;
   }
   .orderContainer > .value {
     display: flex;
@@ -270,7 +269,7 @@
   }
   .filters {
     width: 100%;
-    height: 73px;
+    height: 72pt;
     display: flex;
     flex-direction: row;
   }

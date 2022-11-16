@@ -243,8 +243,9 @@
   }
 </script>
 
-<Views.TextEdit marginTop={0} icon={faSearch} bind:value={searchTerm} placeHolder="Buscar no cardápio" />
 <Views.Divider />
+<Views.TextEdit marginTop={0} icon={faSearch} bind:value={searchTerm} placeHolder="Buscar no cardápio" />
+<Views.Divider height={8} />
 
 <Views.Button
   disabled={categoriesAndProducts.length <= 0}

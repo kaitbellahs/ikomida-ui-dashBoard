@@ -56,6 +56,6 @@
 
 <style>
   .pushNotification {
-    padding-bottom: 50px;
+    padding-bottom: 48pt;
   }
 </style>

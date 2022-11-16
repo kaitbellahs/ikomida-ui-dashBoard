@@ -368,8 +368,8 @@
       {/if}
       {#each product.optionsCategories ?? [] as optionsCategory, index}
         <Views.Divider height={10} />
-        <div class="optionsCategory">
-          <Views.FloatRemove top={-10} right={-10} callback={() => removeOptionsCategory(index)} />
+        <div class="shadow optionsCategory">
+          <Views.FloatRemove top={-4} right={-4} callback={() => removeOptionsCategory(index)} />
           <header>
             <div class="img">
               <Views.UploadablePhoto
@@ -422,8 +422,8 @@
           {#if (optionsCategory.options?.length ?? 0) > 0}
             {#each optionsCategory.options ?? [] as option, optionIndex}
               <Views.Divider height={15} />
-              <div class="option">
-                <Views.FloatRemove top={-10} right={-10} callback={() => removeOption(index, optionIndex)} />
+              <div class="shadow option">
+                <Views.FloatRemove top={-4} right={-4} callback={() => removeOption(index, optionIndex)} />
                 <div class="img">
                   <Views.UploadablePhoto
                     bind:image={option.image}
@@ -497,13 +497,12 @@
   .product {
     display: flex;
     flex-direction: column;
-    padding-bottom: 50px;
+    padding-bottom: 48pt;
   }
   .product > .optionsCategory {
-    background-color: #ccccccfa;
-    border: #ccd;
-    border-radius: 5px;
-    padding: 10px;
+    background-color: #fffffffa;
+    border-radius: 8pt;
+    padding: 16pt;
     position: relative;
   }
   .product > .optionsCategory > header {
@@ -511,30 +510,27 @@
     flex-direction: row;
   }
   .product > .optionsCategory > header > .img {
-    width: 45px;
-    height: 45px;
+    width: 48pt;
+    height: 48pt;
   }
   .product > .optionsCategory > header > .items {
-    width: calc(100% - 42px);
-    margin-left: 10px;
+    width: calc(100% - 40pt);
+    margin-left: 16pt;
   }
   .product > .optionsCategory > .option {
-    background-color: #ffffff26;
-    border: #ccd;
-    border-radius: 5px;
-    padding: 10px;
+    background-color: #fffffffa;
+    border-radius: 8pt;
+    padding: 16pt;
     position: relative;
-  }
-  .product > .optionsCategory > .option {
     display: flex;
     flex-direction: row;
   }
   .product > .optionsCategory > .option > .img {
-    width: 45px;
-    height: 45px;
+    width: 48pt;
+    height: 48pt;
   }
   .product > .optionsCategory > .option > .items {
-    width: calc(100% - 42px);
-    margin-left: 10px;
+    width: calc(100% - 40pt);
+    margin-left: 16pt;
   }
 </style>

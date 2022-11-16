@@ -68,20 +68,18 @@
 <style>
   article {
     position: relative;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    margin-top: 10px;
-    padding: 10px;
+    border-radius: 8pt;
+    padding: 16pt;
   }
   article > .orderTypes {
     display: flex;
     flex-direction: row;
   }
   article > .orderTypes > span {
-    padding: 2px;
-    border-radius: 5px;
-    margin: 5px;
+    border-radius: 8pt;
+    padding: 4pt;
+    margin: 8pt;
     font-size: 0.9em;
-    border: #4c0708 solid 1px;
+    border: 1pt solid #4c0708;
   }
 </style>

@@ -70,6 +70,10 @@
         const auth = await Stores.Auth.Auth.instance.data()
         if (auth) {
           userInfo = await Utils.Jws.extractToken(auth)
+          const role = Types.Types.TRoles.valueOf(String(userInfo.role))
+          if (role) {
+            userInfo.role = role
+          }
         }
       } else {
         Stores.MessageAlert.instance.show(response?.data)
@@ -83,8 +87,10 @@
 </script>
 
 {#if product}
-  <div class="product">
-    <Views.Image source={product.image} name={product.title} />
+  <div class="productImage">
+    <Views.Image source={product.image ?? '/assets/images/food-plate.svg'} name={product.title} />
+  </div>
+  <div class="product" style="background: #dfdfdf;">
     <h2>{product.title}</h2>
     <p>{product.description}</p>
     <span class="serves"
@@ -106,14 +112,14 @@
       Resta{product.quantity > 1 ? 'm' : ''} <span>{product.quantity}</span>
       unidade{product.quantity > 1 ? 's' : ''}
     </div>
-    <Views.Divider />
+    <Views.Divider height={16} />
     {#if (product.optionsCategories?.length ?? 0) > 0}
       <h2>Opções do produto:</h2>
       {#each product.optionsCategories ?? [] as optionsCategory}
-        <Views.Divider height={10} />
-        <div class="optionsCategory">
+        <Views.Divider height={16} />
+        <div class="shadow optionsCategory">
           <header>
-            <Views.Image source={optionsCategory.image} name={optionsCategory.name} height="45px" width="45px" />
+            <Views.Image source={optionsCategory.image} name={optionsCategory.name} height="48pt" width="48pt" />
             <div>
               <h3>{optionsCategory.name}</h3>
               Escolher entre {optionsCategory.min} e {optionsCategory.max} opções
@@ -122,8 +128,8 @@
           {#if (optionsCategory.options?.length ?? 0) > 0}
             {#each optionsCategory.options ?? [] as option}
               <Views.Divider height={15} />
-              <div class="option">
-                <Views.Image source={option.image} name={option.name} height="45px" width="45px" />
+              <div class="shadow option">
+                <Views.Image source={option.image} name={option.name} height="48pt" width="48pt" />
                 <div>
                   <h3>{option.name}</h3>
                   <div>
@@ -159,7 +165,7 @@
     {/if}
     <Views.Divider />
     <Views.Switch bind:name={productStatus} bind:checked={product.active} on:check={enableProduct} />
-    {#if userInfo?.role === 'VENDOR'}
+    {#if userInfo?.role === Types.Types.TRoles.VENDOR}
       <Views.Button on:click={removeProduct}><Fa icon={faTrashAlt} /> <span>Remover este produto</span></Views.Button>
       <Views.Button on:click={edit}><Fa icon={faEdit} /> <span>Editar</span></Views.Button>
     {/if}
@@ -168,11 +174,27 @@
 {/if}
 
 <style>
+  .productImage {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 64px;
+  }
   .product {
-    padding-bottom: 50px;
+    position: absolute;
+    padding: 16pt;
+    padding-bottom: 128pt;
+    left: 0;
+    right: 0;
+    top: 100vw;
+    border-radius: 16pt 16pt 0 0;
+    background: #fff;
+    box-shadow: 0 -4pt 8pt #0000009e;
+    height: fit-content;
+    padding-bottom: 72pt;
   }
   .quantity {
-    margin-top: 10px;
+    margin-top: 16pt;
     align-items: center;
     font-size: 1.8em;
     text-align: center;
@@ -181,11 +203,11 @@
     padding: 0;
     border: 0;
     background: transparent;
-    margin-right: 10px;
-    margin-left: 10px;
+    margin-right: 16pt;
+    margin-left: 16pt;
   }
   .price {
-    margin-top: 20px;
+    margin-top: 16pt;
     width: 100%;
     min-width: 100%;
     display: flex;
@@ -200,12 +222,12 @@
   .current {
     color: green;
     font-size: 1.5em;
-    margin-top: 10px;
+    margin-top: 16pt;
   }
   p {
     font-size: 0.8rem;
     font-weight: lighter;
-    margin: 10px 0;
+    margin: 16pt 0;
   }
   .serves {
     font-size: 0.8rem;
@@ -214,13 +236,12 @@
     width: 100%;
     max-width: 100%;
     object-fit: contain;
-    border-radius: 4px;
+    border-radius: 4pt;
   }
   .product > .optionsCategory {
-    background-color: #ccccccfa;
-    border: #ccd;
-    border-radius: 5px;
-    padding: 10px;
+    border-radius: 4pt;
+    padding: 16pt;
+    background-color: #fffffffa;
     position: relative;
   }
   .product > .optionsCategory > header {
@@ -228,31 +249,33 @@
     flex-direction: row;
   }
   .product > .optionsCategory > header > :global(img) {
-    width: 45px;
-    height: 45px;
+    width: 48pt;
+    height: 48pt;
   }
   .product > .optionsCategory > header > div {
-    width: calc(100% - 42px);
-    margin-left: 10px;
+    width: calc(100% - 40pt);
+    margin-left: 16pt;
   }
   .product > .optionsCategory > .option {
-    background-color: #ffffff26;
-    border: #ccd;
-    border-radius: 5px;
-    padding: 10px;
+    background-color: #fffffffa;
+    border-radius: 8pt;
+    padding: 16pt;
     position: relative;
   }
   .product > .optionsCategory > .option {
     display: flex;
     flex-direction: row;
+    border-radius: 4pt;
+    padding: 16pt;
+    background: #fffffffc;
   }
   .product > .optionsCategory > .option > :global(img) {
-    width: 45px;
-    height: 45px;
+    width: 48pt;
+    height: 48pt;
   }
   .product > .optionsCategory > .option > div {
     width: 100%;
-    margin-left: 10px;
+    margin-left: 16pt;
   }
   .product > .optionsCategory > .option > div > div {
     width: 100%;

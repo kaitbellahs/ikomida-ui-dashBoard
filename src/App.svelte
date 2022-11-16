@@ -283,13 +283,13 @@
     top: 0;
     left: 0;
     right: 0;
-    padding-top: 1px;
-    padding-bottom: 1px;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-top: 1pt;
+    padding-bottom: 1pt;
+    padding-left: 12pt;
+    padding-right: 12pt;
     z-index: 9999999999;
     text-align: center;
-    border-bottom: 1px solid white;
+    border-bottom: 1pt solid white;
   }
   :global(.grecaptcha-badge) {
     visibility: hidden;

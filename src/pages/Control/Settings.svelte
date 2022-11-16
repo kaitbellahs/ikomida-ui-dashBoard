@@ -17,8 +17,12 @@
 
   let paymentGateway: Types.Classes.CVendorPaymentGateway | undefined =
     Types.Classes.CVendorPaymentGateway.fillWith(null)
-  let delivery: Types.Classes.CVendorDelivery = Types.Classes.CVendorDelivery.init(false, 0, 0)
-  let deliveryInputs: { min?: Views.TextEdit; value?: Views.TextEdit } = { value: undefined, min: undefined }
+  let delivery: Types.Classes.CVendorDelivery = Types.Classes.CVendorDelivery.init(false, 9, 0, 0)
+  let deliveryInputs: {
+    min?: Views.TextEdit
+    value?: Views.TextEdit
+    orderMinValue?: Views.TextEdit
+  } = { value: undefined, min: undefined, orderMinValue: undefined }
   let preparation: Types.Classes.CVendorPreparation | undefined = Types.Classes.CVendorPreparation.init(0, 0)
   let preparationInputs: { min?: Views.TextEdit; max?: Views.TextEdit } = { min: undefined, max: undefined }
   let popupNewOrder = $Settings?.popups?.newOrder
@@ -186,6 +190,10 @@
   onMount(async () => {
     auth = await Stores.Auth.Auth.instance.store()
     userInfo = await Utils.Jws.extractToken($auth)
+    const role = Types.Types.TRoles.valueOf(String(userInfo.role))
+    if (role) {
+      userInfo.role = role
+    }
     const response = await getSettings()
     if (response.success) {
       const data: Types.Classes.CVendorSettings = Types.Classes.CVendorSettings.fromObject(response.data)
@@ -193,6 +201,7 @@
       business = data.business
       delivery = Object.assign(delivery, data?.delivery)
       deliveryInputs.min?.updateValue(String(delivery?.min))
+      deliveryInputs.orderMinValue?.updateValue(String(delivery?.orderMinValue))
       deliveryInputs.value?.updateValue(String(delivery?.value))
       preparation = data?.preparation
       order.types = data?.orderTypes
@@ -212,7 +221,7 @@
   <div class="data">
     <Views.DatePeriods mandatory={true} bind:business />
     <Views.Button on:click={updateHours}><Fa icon={faClock} /><span>Atualizar horários</span></Views.Button>
-    {#if userInfo?.role === 'VENDOR'}
+    {#if userInfo?.role === Types.Types.TRoles.VENDOR}
       <Views.Divider />
       <h2>Portais de pagamentos</h2>
       <Views.Divider />
@@ -257,6 +266,13 @@
         >Vai querer pagar seus entregador quanto por entrega por Km? (o quanto mais você paga seus entregadores ficaram
         felizes e seus clientes tristes e vice versa)</small
       >
+      <Views.TextEdit
+        type={Types.TTextEdit.CURRENCY}
+        bind:value={delivery.orderMinValue}
+        bind:this={deliveryInputs.orderMinValue}
+        initialValue={delivery.orderMinValue}
+        placeHolder="Valor mínimo dos pedidos"
+      />
       <Views.Switch name="Frete grátis" bind:checked={delivery.free} />
       {#if !(delivery?.free || false)}
         <Views.TextEdit
@@ -315,18 +331,18 @@
 
 <style>
   .settings {
-    padding-bottom: 50px;
+    padding-bottom: 48pt;
   }
   .settings > div {
     width: 100%;
   }
   .settings > div > h2 {
-    margin-left: 20px;
+    margin-left: 16pt;
   }
   .settings > .data {
     width: 100%;
     float: left;
-    margin-top: 20px;
+    margin-top: 16pt;
   }
   .twoCells {
     display: flex;

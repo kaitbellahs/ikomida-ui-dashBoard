@@ -3,7 +3,7 @@
   import { removeStaff } from '../../network/Staff'
   import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend'
   import { StatusBar } from '../../stores/Setup'
-  import { onMount } from 'svelte'
+  import { onMount, tick } from 'svelte'
   import Fa from 'svelte-fa'
   import { faEdit } from '@fortawesome/free-solid-svg-icons'
 
@@ -11,9 +11,17 @@
   let auth: Stores.Auth.IStore
   let items: Types.Classes.CUser[]
 
+  $: {
+    items = Types.Classes.CUser.fromObject(items)
+    console.log(items)
+  }
   onMount(async () => {
     auth = await Stores.Auth.Auth.instance.store()
     userInfo = await Utils.Jws.extractToken($auth)
+    const role = Types.Types.TRoles.valueOf(String(userInfo.role))
+    if (role) {
+      userInfo.role = role
+    }
     Stores.Loading.instance.stop()
   })
 
@@ -62,22 +70,20 @@
   let:index
 >
   <article>
-    {#if userInfo?.id !== items[index].id}
-      <Views.FloatRemove callback={() => onRemoveClick(items[index].id)} />
+    {#if userInfo && userInfo.role === Types.Types.TRoles.VENDOR && userInfo.id !== items[index]?.id}
+      <Views.FloatRemove top={-4} right={-4} callback={() => onRemoveClick(items[index].id)} />
     {/if}
-    <h2>{items[index].name} {items[index].lastName}</h2>
-    <div>Telefone: {Utils?.Strings?.formatAsPhone(items[index].phone)}</div>
-    <div>Título: {roleName(items[index].role)}</div>
+    <h2>{items?.[index]?.name} {items?.[index]?.lastName}</h2>
+    <div>Telefone: {Utils?.Strings?.formatAsPhone(items?.[index]?.phone)}</div>
+    <div>Título: {items?.[index]?.role?.name}</div>
   </article>
 </Views.LoadMoreReusableList>
 
 <style>
   article {
     position: relative;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    margin-top: 10px;
-    box-shadow: 2px 3px #cccccc7a;
-    padding: 20px;
+    border-radius: 8pt;
+    box-shadow: 0 4pt 8pt #0000009e;
+    padding: 16pt;
   }
 </style>

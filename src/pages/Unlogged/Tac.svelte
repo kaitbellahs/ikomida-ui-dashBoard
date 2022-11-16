@@ -18,7 +18,7 @@
 </script>
 
 <main
-  style="margin-top:{styleHeight};padding: 20px; padding-top: 0; padding-bottom: 0; overflow: hidden;max-width: 100%;"
+  style="margin-top:{styleHeight};padding: 16pt; padding-top: 0; padding-bottom: 0; overflow: hidden;max-width: 100%;"
 >
   <Views.Divider />
   <div class="container">
@@ -53,14 +53,14 @@
     display: flex;
     flex-direction: column;
     place-content: center;
-    margin-bottom: 30px;
+    margin-bottom: 32pt;
     min-height: 20vh;
     background: #cccccc25;
-    border-radius: 10px;
-    box-shadow: 1px 2px #cccccc33;
+    border-radius: 8pt;
+    box-shadow: 0 4pt 8pt #0000009e;
     width: 100%;
-    max-width: 1024px;
-    padding: 30px;
+    max-width: 1024pt;
+    padding: 32pt;
   }
   .jambtron > h1 {
     align-self: center;

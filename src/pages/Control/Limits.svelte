@@ -150,8 +150,8 @@
 <style>
   section > article > .chart {
     width: 100%;
-    height: 6px;
-    border-radius: 3px;
+    height: 8pt;
+    border-radius: 4pt;
     background: #c1c0c1;
     position: relative;
     overflow: hidden;
@@ -162,23 +162,23 @@
     place-items: center;
     align-items: center;
     justify-items: center;
-    margin-top: 10px;
+    margin-top: 24pt;
   }
   section > article {
-    border: 1px solid #ccc;
-    box-shadow: 2px 3px #cccccc7a;
-    padding: 20px;
+    border: 1pt solid #ccc;
+    box-shadow: 0 4pt 8pt #0000009e;
+    padding: 16pt;
     display: flex;
     flex-direction: column;
   }
   section > article > h4 {
-    margin-bottom: 10px;
+    margin-bottom: 24pt;
   }
   section > article > .chart > div {
     position: absolute;
     top: 0;
     left: 0;
-    height: 6px;
+    height: 8pt;
     width: var(--width);
     background: var(--color);
   }

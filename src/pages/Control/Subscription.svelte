@@ -120,38 +120,39 @@
   .charge {
     position: relative;
     background: #cccccc22;
-    box-shadow: 2px 1.5px #00000044;
-    padding: 15px;
-    margin-top: 20px;
+    box-shadow: 0 4pt 8pt #0000009e;
+    padding: 18pt;
+    margin-top: 16pt;
+    border-radius: 8pt;
   }
   .invoice {
     position: absolute;
-    top: -10px;
-    right: -10px;
+    top: -8pt;
+    right: -8pt;
     font-size: 1.6em;
     color: white;
     font-family: RobotoBold;
     background: #1e1c1c;
-    border-radius: 20px;
-    width: 40px;
-    height: 40px;
+    border-radius: 16pt;
+    width: 32pt;
+    height: 32pt;
     vertical-align: middle;
     text-align: center;
-    padding: 4px;
+    padding: 4pt;
   }
   .receipt {
     position: absolute;
-    top: -10px;
-    right: 35px;
+    top: -8pt;
+    right: 32pt;
     font-size: 1.6em;
     color: white;
     font-family: RobotoBold;
     background: #1e1c1c;
-    border-radius: 20px;
-    width: 40px;
-    height: 40px;
+    border-radius: 16pt;
+    width: 32pt;
+    height: 32pt;
     vertical-align: middle;
     text-align: center;
-    padding: 4px;
+    padding: 4pt;
   }
 </style>

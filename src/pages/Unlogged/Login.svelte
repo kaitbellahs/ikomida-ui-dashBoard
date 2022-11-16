@@ -10,6 +10,7 @@
   import { Capacitor } from '@capacitor/core'
   import { AppLauncher } from '@capacitor/app-launcher'
   import { Clipboard } from '@capacitor/clipboard'
+  import Divider from '@ikomida/shared-frontend/lib/components/Divider.svelte'
 
   let ikomidaid = 'com.ikomida.br.'
   let ikomidaidInput: Views.TextEdit
@@ -69,31 +70,33 @@
 </script>
 
 <main>
-  <div class="avatar">
-    <Views.Image source="/assets/icons/transparent-logo-1.svg" name="iKomida" />
-  </div>
-  <small>Digite aqui o ID do seu estabelecimento</small>
-  <Views.TextEdit
-    bind:value={ikomidaid}
-    bind:this={ikomidaidInput}
-    initialValue={ikomidaid}
-    icon={faIdCardAlt}
-    type={Types.TTextEdit.SLUG}
-    placeHolder="Id do estabelecimento"
-  />
-  <Views.TextEdit
-    bind:value={phone}
-    icon={faPhone}
-    type={Types.TTextEdit.PHONE}
-    placeHolder="Número de celular"
-    bind:isValid={isValidPhone}
-  />
-  <Views.TextEdit bind:value={password} icon={faUnlock} placeHolder="Sua senha" type={Types.TTextEdit.PASSWORD} />
-  <div />
-  <Views.Button on:click={doLogin} disabled={!canLogin}>Entrar</Views.Button>
-  <Views.Button type={Types.TButton.TRANSPARENT} on:click={forgotPassword}>Recuperar a senha</Views.Button>
-  <Views.Button type={Types.TButton.TRANSPARENT} on:click={newAccount}>Crie sua conta agora</Views.Button>
-  <Views.GTerms />
+  <header class="mainPicture">
+    <Views.Image source="assets/icons/transparent-logo-1.svg" name="iKomida" />
+  </header>
+  <section style="padding-bottom: 64pt;background-color: rgb(223, 223, 223);">
+    <small>Digite aqui o ID do seu estabelecimento</small>
+    <Views.TextEdit
+      bind:value={ikomidaid}
+      bind:this={ikomidaidInput}
+      initialValue={ikomidaid}
+      icon={faIdCardAlt}
+      type={Types.TTextEdit.SLUG}
+      placeHolder="Id do estabelecimento"
+    />
+    <Views.TextEdit
+      bind:value={phone}
+      icon={faPhone}
+      type={Types.TTextEdit.PHONE}
+      placeHolder="Número de celular"
+      bind:isValid={isValidPhone}
+    />
+    <Views.TextEdit bind:value={password} icon={faUnlock} placeHolder="Sua senha" type={Types.TTextEdit.PASSWORD} />
+    <Views.Divider />
+    <Views.Button type={Types.TButton.SECONDARY} on:click={doLogin} disabled={!canLogin}>Entrar</Views.Button>
+    <Views.Button type={Types.TButton.PRIMARY} on:click={newAccount}>Crie sua conta agora</Views.Button>
+    <Views.Button type={Types.TButton.TRANSPARENT} on:click={forgotPassword}>Recuperar a senha</Views.Button>
+    <Views.GTerms />
+  </section>
 </main>
 
 <style>
@@ -108,22 +111,47 @@
     place-content: center;
     height: 100vh;
   }
-  main > div {
-    margin-bottom: 30px;
+  header {
+    max-height: 260pt;
+    max-width: 480pt;
+    object-fit: contain;
+    width: 100%;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 48pt;
   }
-  .avatar {
+  header.mainPicture {
     display: flex;
     align-items: center;
     flex-direction: column;
+    width: 100%;
   }
-  .avatar > :global(img) {
+  header.mainPicture > :global(img) {
     font-size: 3em;
     width: 100%;
     max-width: 500px;
-    border-radius: 40px;
-    height: 210px;
     line-height: 90px;
     overflow: hidden;
     object-fit: contain;
+  }
+  section {
+    position: absolute;
+    padding: 16pt;
+    padding-bottom: 64pt;
+    left: 0;
+    right: 0;
+    top: 168pt;
+    border-radius: 16pt 16pt 0 0;
+    background: #fff;
+    box-shadow: 0 -4pt 8pt #0000009e;
+    height: fit-content;
+    text-align: center;
+    min-width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    place-content: center;
   }
 </style>

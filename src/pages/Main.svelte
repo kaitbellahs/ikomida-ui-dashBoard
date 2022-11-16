@@ -66,14 +66,14 @@
       callback: () => Stores.Navigation.instance.goTo(Routes.profile),
       icon: faUser
     },
-    userInfo?.role === 'VENDOR'
+    userInfo?.role === Types.Types.TRoles.VENDOR
       ? {
           name: 'Estabelecimento',
           callback: () => Stores.Navigation.instance.goTo(Routes.company),
           icon: faShop
         }
       : null,
-    userInfo?.role === 'VENDOR'
+    userInfo?.role === Types.Types.TRoles.VENDOR
       ? {
           name: 'Assinatura',
           callback: () => Stores.Navigation.instance.goTo(Routes.subscription),
@@ -95,7 +95,7 @@
       callback: () => Stores.Navigation.instance.goTo(Routes.pushNotifications),
       icon: faMessage
     },
-    userInfo?.role === 'VENDOR'
+    userInfo?.role === Types.Types.TRoles.VENDOR
       ? {
           name: 'Colaboradores',
           callback: () => Stores.Navigation.instance.goTo(Routes.staff),
@@ -116,6 +116,10 @@
     const auth = await Stores.Auth.Auth.instance.data()
     if (auth) {
       userInfo = await Utils.Jws.extractToken(auth)
+      const role = Types.Types.TRoles.valueOf(String(userInfo.role))
+      if (role) {
+        userInfo.role = role
+      }
     }
   })
 
@@ -123,7 +127,7 @@
     Stores.MenuHamburger.instance.reset()
     menuHamburgerItems?.forEach(page => Stores.MenuHamburger.instance.addItem(page))
   }
-  $: style = `--paddingTop:${styleHeight};--paddingBottom: ${70 + $StatusBar.bottomPadding}px; overflow: scroll;`
+  $: style = `--paddingTop:${styleHeight};--paddingBottom: ${96 + $StatusBar.bottomPadding}px; overflow: scroll;`
 </script>
 
 <main {style}>
@@ -179,7 +183,7 @@
 
 <style>
   main {
-    padding: 20px;
+    padding: 16pt;
     padding-top: var(--paddingTop);
     overflow: hidden;
     max-width: 100%;
@@ -187,6 +191,8 @@
     display: flex;
     flex-direction: column;
     padding-bottom: var(--paddingBottom);
+    height: 100vh;
+    overflow: scroll;
   }
   :global(*, *:before, *:after) {
     margin: 0;
