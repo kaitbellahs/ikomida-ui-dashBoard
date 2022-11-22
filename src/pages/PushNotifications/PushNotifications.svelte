@@ -20,9 +20,11 @@
   Stores.Title.instance.set('Mensagens push')
 </script>
 
-<Views.Button on:click={newPushNotification} bottomPadding={$StatusBar.bottomPadding}
-  ><Fa icon={faRocket} /> <span>Enviar mensagem</span></Views.Button
->
+<div style="padding: 0 16pt;">
+  <Views.Button on:click={newPushNotification} bottomPadding={$StatusBar.bottomPadding}
+    ><Fa icon={faRocket} /> <span>Enviar mensagem</span></Views.Button
+  >
+</div>
 <Views.Divider />
 <Views.LoadMoreReusableList
   noItems="Não há mensagens para exibir por enquanto, Aproveite e mande uma mensagem com um cupom de desconto para incentivar seus clientes!"

@@ -69,11 +69,7 @@
         product = Types.Classes.CProduct.fromObject({ ...initalProduct.toJSON(), ...response?.data })
         const auth = await Stores.Auth.Auth.instance.data()
         if (auth) {
-          userInfo = await Utils.Jws.extractToken(auth)
-          const role = Types.Types.TRoles.valueOf(String(userInfo.role))
-          if (role) {
-            userInfo.role = role
-          }
+          userInfo = Types.Classes.CUser.fromObject(await Utils.Jws.extractToken(auth))
         }
       } else {
         Stores.MessageAlert.instance.show(response?.data)
@@ -239,7 +235,7 @@
     border-radius: 4pt;
   }
   .product > .optionsCategory {
-    border-radius: 4pt;
+    border-radius: 8pt;
     padding: 16pt;
     background-color: #fffffffa;
     position: relative;
@@ -257,15 +253,10 @@
     margin-left: 16pt;
   }
   .product > .optionsCategory > .option {
-    background-color: #fffffffa;
-    border-radius: 8pt;
-    padding: 16pt;
     position: relative;
-  }
-  .product > .optionsCategory > .option {
     display: flex;
     flex-direction: row;
-    border-radius: 4pt;
+    border-radius: 8pt;
     padding: 16pt;
     background: #fffffffc;
   }

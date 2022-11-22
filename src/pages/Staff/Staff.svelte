@@ -17,11 +17,7 @@
   }
   onMount(async () => {
     auth = await Stores.Auth.Auth.instance.store()
-    userInfo = await Utils.Jws.extractToken($auth)
-    const role = Types.Types.TRoles.valueOf(String(userInfo.role))
-    if (role) {
-      userInfo.role = role
-    }
+    userInfo = Types.Classes.CUser.fromObject(await Utils.Jws.extractToken($auth))
     Stores.Loading.instance.stop()
   })
 
@@ -58,9 +54,11 @@
   Stores.Title.instance.set('Lista de colaboradores')
 </script>
 
-<Views.Button on:click={newStaff} bottomPadding={$StatusBar.bottomPadding}
-  ><Fa icon={faEdit} /> <span>Novo colaborador</span></Views.Button
->
+<div style="padding: 0 16pt;">
+  <Views.Button on:click={newStaff} bottomPadding={$StatusBar.bottomPadding}
+    ><Fa icon={faEdit} /> <span>Novo colaborador</span></Views.Button
+  >
+</div>
 <Views.Divider />
 <Views.LoadMoreReusableList
   noItems="Não há colaboradores cadastrados para exibir!"
@@ -83,7 +81,6 @@
   article {
     position: relative;
     border-radius: 8pt;
-    box-shadow: 0 4pt 8pt #0000009e;
     padding: 16pt;
   }
 </style>

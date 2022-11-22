@@ -324,7 +324,6 @@
   }
   #options {
     height: 100%;
-    overflow-y: scroll;
   }
   section {
     position: absolute;

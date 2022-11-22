@@ -109,17 +109,13 @@
     }
   ]
 
-  $: styleHeight = `${Number($StatusBar.height + ($StatusBar.topMargin ?? 0)) + 60}px`
+  $: styleHeight = `${Number($StatusBar.height + ($StatusBar.topMargin ?? 0)) + 62}px`
   $: route = $router.route
 
   onMount(async () => {
     const auth = await Stores.Auth.Auth.instance.data()
     if (auth) {
-      userInfo = await Utils.Jws.extractToken(auth)
-      const role = Types.Types.TRoles.valueOf(String(userInfo.role))
-      if (role) {
-        userInfo.role = role
-      }
+      userInfo = Types.Classes.CUser.fromObject(await Utils.Jws.extractToken(auth))
     }
   })
 
@@ -127,7 +123,10 @@
     Stores.MenuHamburger.instance.reset()
     menuHamburgerItems?.forEach(page => Stores.MenuHamburger.instance.addItem(page))
   }
-  $: style = `--paddingTop:${styleHeight};--paddingBottom: ${96 + $StatusBar.bottomPadding}px; overflow: scroll;`
+  $: isPageList = [Routes.orders, Routes.coupons, Routes.orders, Routes.pushNotifications, Routes.staff].includes(route)
+  $: style = `--padding: ${isPageList ? 0 : 16}pt;--paddingTop:${styleHeight};--paddingBottom: ${
+    96 + $StatusBar.bottomPadding
+  }px; overflow: scroll;`
 </script>
 
 <main {style}>
@@ -183,7 +182,7 @@
 
 <style>
   main {
-    padding: 16pt;
+    padding: var(--padding);
     padding-top: var(--paddingTop);
     overflow: hidden;
     max-width: 100%;

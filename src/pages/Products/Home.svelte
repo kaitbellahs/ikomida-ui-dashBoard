@@ -64,7 +64,9 @@
     <h2>Área de atenção.</h2>
     <small>Produtos que precisam de atenção aparecerem aqui</small>
   </header>
-  {#if (products?.length ?? 0) > 0}
+  {#if !products}
+    <Views.LocalLoading />
+  {:else if (products?.length ?? 0) > 0}
     {#each products as product}<div
         class="leftShadow item"
         style="--itemBackground: #fffffffc;--buttonBackground:#4c0708;--buttonColor:#fff;"
@@ -159,7 +161,7 @@
   .item {
     width: 100%;
     margin: 16pt 0;
-    border: 1pt solid #ccc;
+    height: fit-content;
     padding: 8pt;
     background: var(--itemBackground);
     position: relative;

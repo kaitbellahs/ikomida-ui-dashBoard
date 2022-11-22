@@ -89,7 +89,7 @@
   Stores.Title.instance.set('Pedidos')
 </script>
 
-<div class="filters">
+<div style="padding: 0 16pt;" class="filters">
   <Views.Selector bind:selected={orderType} options={Types.Types.TOrderType.values()} name="Tipo dos pedidos" />
 </div>
 <Views.LoadMoreReusableList
@@ -106,39 +106,40 @@
     <div on:click={() => goToOrder(items[index])}>
       <h3 class="title">Pedido N˚: {items[index].customID}</h3>
       {#if [initailOrderStatus, Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY].includes(items[index].status ?? initailOrderStatus) && new Date((items[index].createdAt?.getTime() ?? 0) + items[index].preparation?.max * 1000) < new Date()}
-        <Views.Divider height={5} />
+        <Views.Divider height={4} />
         <Views.Status type={Types.Status.ERROR} circle={false} showIcon={false}>Pedido atrasado</Views.Status>
       {/if}
       {#if [Types.Types.TOrderStatus.DELIVERED].includes(items[index].status ?? initailOrderStatus)}
-        <Views.Divider height={5} />
+        <Views.Divider height={4} />
         <Views.Status type={Types.Status.SUCCESS} circle={false} showIcon={false}>Pedido entregue</Views.Status>
       {/if}
       {#if [Types.Types.TOrderStatus.CANCELED].includes(items[index].status ?? initailOrderStatus)}
-        <Views.Divider height={5} />
+        <Views.Divider height={4} />
         <Views.Status type={Types.Status.ERROR} circle={false} showIcon={false}>Pedido cancelado</Views.Status>
       {/if}
-      <Views.Divider height={5} />
+      <Views.Divider height={4} />
       <Views.Status type={Types.Status.INFO} showIcon={false}
         >Pedido para {items[index].orderType?.description ?? '-'}</Views.Status
       >
-      <Views.Divider height={5} />
-      <div class="info">
-        {#if [initailOrderStatus, Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY].includes(items[index].status ?? initailOrderStatus)}
+      {#if [initailOrderStatus, Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY].includes(items[index].status ?? initailOrderStatus)}
+        <Views.Divider height={4} />
+        <div class="info">
           <Views.Status showIcon={false} type={Types.Status.WARNING}
             >Prepare o pedido antes de
             {Utils.Strings.dateToString(
               new Date((items[index].createdAt?.getTime() ?? 0) + items[index].preparation?.max * 1000).toString()
             )}</Views.Status
           >
-          <Views.Divider height={5} />
-        {/if}
-      </div>
+        </div>
+      {/if}
       {#if items[index].status && ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED].includes(items[index].status ?? initailOrderStatus)}
+        <Views.Divider height={4} />
         <Views.Status>
           Pedido {items[index].status?.description}
         </Views.Status>
-        <Views.Divider height={5} />
+        <Views.Divider height={4} />
       {/if}
+      <Views.Divider height={8} />
       <div class="time">
         Data: {Utils.Strings.dateToString(items[index].createdAt?.toString())}
       </div>
@@ -153,15 +154,15 @@
         </div>
       {/if}
       {#if items[index].orderType === Types.Types.TOrderType.DELIVERY}
-        <Views.Divider height={5} />
+        <Views.Divider height={4} />
         <div class="address">
           Entregua na: <b>{items[index].address?.street ?? '-'}</b>
         </div>
       {:else if items[index].orderType === Types.Types.TOrderType.PICKUP}
-        <Views.Divider height={5} />
+        <Views.Divider height={4} />
         <h3>Seu cliente vai retirar o pedido no seu estabelecimento.</h3>
       {:else if items[index].orderType === Types.Types.TOrderType.LOCAL}
-        <Views.Divider height={5} />
+        <Views.Divider height={4} />
         <h3>Leva o pedido até a mesa: <b>{items[index].table}</b></h3>
       {:else}
         <Views.Status type={Types.Status.ERROR}
@@ -215,7 +216,7 @@
 
 <style>
   .orderContainer {
-    border-radius: 4pt;
+    border-radius: 8pt;
     padding: 16pt;
     background: #fffffffc;
     display: flex;

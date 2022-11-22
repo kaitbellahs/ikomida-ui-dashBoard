@@ -33,9 +33,11 @@
   Stores.Title.instance.set('Cupons')
 </script>
 
-<Views.Button on:click={newCoupon} bottomPadding={$StatusBar.bottomPadding}
-  ><Fa icon={faEdit} /> <span>Novo cupom</span></Views.Button
->
+<div style="padding: 0 16pt;">
+  <Views.Button on:click={newCoupon} bottomPadding={$StatusBar.bottomPadding}
+    ><Fa icon={faEdit} /> <span>Novo cupom</span></Views.Button
+  >
+</div>
 <Views.Divider />
 <Views.LoadMoreReusableList
   noItems="Não há cupons para exibir por enquanto, aproveite e cadastre novos cupons para agradar seus clientes!"

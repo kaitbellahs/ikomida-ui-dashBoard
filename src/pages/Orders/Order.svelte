@@ -183,7 +183,6 @@
       <Views.Image source="assets/icons/transparent-logo-1_144x45.png" name="iKomida" />
       <h2>{$Settings?.profile?.contractName}</h2>
     {/if}
-    <Views.Divider height={30} />
   </div>
   <div class="orderStatus" data-html2canvas-ignore>
     {#if order.status && [Types.Types.TOrderStatus.WAITING_PAYMENT, Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY].includes(order.status) && order?.createdAt && new Date(order?.createdAt.getTime() + (order?.preparation?.max ?? 0) * 1000) < new Date()}
@@ -195,27 +194,27 @@
     {#if order.status && [Types.Types.TOrderStatus.CANCELED].includes(order.status)}
       <Views.Status type={Types.Status.ERROR}>Pedido cancelado</Views.Status>
     {/if}
-    <Views.Divider />
   </div>
+  <Views.Divider />
   <h3 class="title">Pedido N˚: {order?.customID}</h3>
   <Views.Divider />
   <div class="info" data-html2canvas-ignore>
-    <Views.Divider />
     <Views.Status type={Types.Status.INFO} showIcon={false}
       >Pedido para {order.orderType?.description ?? '-'}</Views.Status
     >
     {#if order.status && [Types.Types.TOrderStatus.WAITING_PAYMENT, Types.Types.TOrderStatus.OPEN, Types.Types.TOrderStatus.ACCEPTED, Types.Types.TOrderStatus.WAITING_DELIVERY, Types.Types.TOrderStatus.IN_DELIVERY].includes(order.status)}
+      <Views.Divider height={8} />
       <Views.Status showIcon={false} type={Types.Status.WARNING}
         >Prepare o pedido antes de
         {Utils.Strings.dateToString(
           String(new Date((order?.createdAt?.getTime() ?? 0) + (order?.preparation?.max ?? 0) * 1000))
         )}</Views.Status
       >
-      <Views.Divider />
     {/if}
   </div>
 
   {#if !order.status || ![Types.Types.TOrderStatus.DELIVERED, Types.Types.TOrderStatus.CANCELED].includes(order.status)}
+    <Views.Divider height={8} />
     <div class="orderStatus" data-html2canvas-ignore>
       <Views.Status>
         Pedido {OrderStatus(order?.status)}
@@ -377,6 +376,7 @@
   .order {
     display: flex;
     flex-direction: column;
+    padding-top: 16pt;
   }
   .order.screenShot {
     padding: 16pt;

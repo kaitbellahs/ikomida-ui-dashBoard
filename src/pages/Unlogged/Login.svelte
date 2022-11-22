@@ -119,15 +119,18 @@
     position: fixed;
     left: 0;
     right: 0;
-    top: 48pt;
-  }
-  header.mainPicture {
+    top: 0;
+    max-height: 184pt;
+    background: #4c0708;
+    display: flex;
+    place-content: center;
+    height: 300pt;
     display: flex;
     align-items: center;
     flex-direction: column;
     width: 100%;
   }
-  header.mainPicture > :global(img) {
+  header > :global(img) {
     font-size: 3em;
     width: 100%;
     max-width: 500px;

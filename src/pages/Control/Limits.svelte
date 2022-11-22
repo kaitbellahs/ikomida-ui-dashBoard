@@ -165,7 +165,7 @@
     margin-top: 24pt;
   }
   section > article {
-    border: 1pt solid #ccc;
+    border-radius: 8pt;
     box-shadow: 0 4pt 8pt #0000009e;
     padding: 16pt;
     display: flex;

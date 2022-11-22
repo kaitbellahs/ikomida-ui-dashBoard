@@ -50,6 +50,10 @@ form {
     box-shadow: 0 4pt 8pt #0000009e;
 }
 
+.minShadow {
+    box-shadow: 0 2pt 4pt #0000009e;
+}
+
 .leftShadow {
     box-shadow: 0 4pt 8pt #0000009e;
 }
@@ -107,7 +111,6 @@ textarea {
     padding: 0.4em;
     margin: 0 0 0.5em 0;
     box-sizing: border-box;
-    border: 1pt solid #ccc;
     border-radius: 4pt;
 }
 

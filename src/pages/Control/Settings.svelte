@@ -189,11 +189,7 @@
 
   onMount(async () => {
     auth = await Stores.Auth.Auth.instance.store()
-    userInfo = await Utils.Jws.extractToken($auth)
-    const role = Types.Types.TRoles.valueOf(String(userInfo.role))
-    if (role) {
-      userInfo.role = role
-    }
+    userInfo = Types.Classes.CUser.fromObject(await Utils.Jws.extractToken($auth))
     const response = await getSettings()
     if (response.success) {
       const data: Types.Classes.CVendorSettings = Types.Classes.CVendorSettings.fromObject(response.data)
@@ -218,15 +214,19 @@
 </script>
 
 <div class="settings">
-  <div class="data">
+  <div class="shadow data">
     <Views.DatePeriods mandatory={true} bind:business />
-    <Views.Button on:click={updateHours}><Fa icon={faClock} /><span>Atualizar horários</span></Views.Button>
+    <Views.Button on:click={updateHours}><Fa icon={faClock} /><span>Salvar horários</span></Views.Button>
+  </div>
+  <div class="shadow data">
     {#if userInfo?.role === Types.Types.TRoles.VENDOR}
       <Views.Divider />
       <h2>Portais de pagamentos</h2>
       <Views.Divider />
       <Views.Button on:click={requestPagSeguroIntegration}>{integrateButtonName}</Views.Button>
     {/if}
+  </div>
+  <div class="shadow data">
     <Views.Divider />
     <h2>A entrega</h2>
     <Views.Divider />
@@ -301,7 +301,9 @@
       />
     {/if}
     <Views.Divider />
-    <Views.Button on:click={updateDelivery}>Atualizar tipos de pedidos</Views.Button>
+    <Views.Button on:click={updateDelivery}>Salvar</Views.Button>
+  </div>
+  <div class="shadow data">
     <Views.Divider />
     <h3>Exibir popups</h3>
     <small>Aqui você escolhe quais popups vão ser exibidos a você:</small>
@@ -332,6 +334,10 @@
 <style>
   .settings {
     padding-bottom: 48pt;
+  }
+  .settings > .data {
+    padding: 16pt;
+    border-radius: 8pt;
   }
   .settings > div {
     width: 100%;
