@@ -26,5 +26,6 @@ export default {
   quotas: Symbol('/quotas'),
   newStaff: Symbol('/newStaff'),
   staff: Symbol('/staff'),
-  subscription: Symbol('/subscription')
+  subscription: Symbol('/subscription'),
+  app: Symbol('/app')
 }

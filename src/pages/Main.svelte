@@ -20,6 +20,7 @@
   import NewCategory from './Products/NewCategory.svelte'
   import Staff from './Staff/Staff.svelte'
   import NewStaff from './Staff/NewStaff.svelte'
+  import App from './Control/App.svelte'
   import { StatusBar } from '../stores/Setup'
   import {
     faHome,
@@ -32,7 +33,8 @@
     faChartColumn,
     faUserGroup,
     faMessage,
-    faShop
+    faShop,
+    faMobile
   } from '@fortawesome/free-solid-svg-icons'
   import { onMount } from 'svelte'
 
@@ -78,6 +80,13 @@
           name: 'Assinatura',
           callback: () => Stores.Navigation.instance.goTo(Routes.subscription),
           icon: faMoneyBill1Wave
+        }
+      : null,
+    userInfo?.role === Types.Types.TRoles.VENDOR
+      ? {
+          name: 'Meu app',
+          callback: () => Stores.Navigation.instance.goTo(Routes.app),
+          icon: faMobile
         }
       : null,
     {
@@ -168,6 +177,8 @@
     <NewStaff />
   {:else if route == Routes.limits}
     <Limits />
+  {:else if route == Routes.app}
+    <App />
   {:else}
     <Home />
   {/if}
