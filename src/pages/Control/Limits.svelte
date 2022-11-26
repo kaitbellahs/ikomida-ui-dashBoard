@@ -53,6 +53,7 @@
   $: billing = percent(limits?.billing?.limits, limits?.billing?.used)
 </script>
 
+<Views.Divider />
 <h2>Métricas do uso do seu plano</h2>
 
 <section>

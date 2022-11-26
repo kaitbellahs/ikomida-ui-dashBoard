@@ -74,6 +74,7 @@
   Stores.Title.instance.set('Perfil')
 </script>
 
+<Views.Divider />
 {#if userInfo}
   <Views.UploadablePhoto
     type={Types.TUploadablePhoto.PROFILE}

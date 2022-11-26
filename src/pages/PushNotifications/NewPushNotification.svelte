@@ -39,14 +39,14 @@
 </script>
 
 <div class="pushNotification">
-  <Views.TextEdit placeHolder="Título" bind:value={item.title} bind:isValid={itemsValidation.title} min={3} max={55} />
+  <Views.TextEdit placeHolder="Título" bind:value={item.title} bind:isValid={itemsValidation.title} min={0} max={64} />
   <Views.TextEdit
     type={Types.TTextEdit.TEXT}
     placeHolder="texto"
     bind:value={item.body}
     bind:isValid={itemsValidation.body}
-    min={1}
-    max={255}
+    min={0}
+    max={128}
   />
   <Views.Divider />
   <Views.Button disabled={!canContinue} on:click={submit} bottomPadding={$StatusBar.bottomPadding}

@@ -10,7 +10,6 @@
   import { Capacitor } from '@capacitor/core'
   import { AppLauncher } from '@capacitor/app-launcher'
   import { Clipboard } from '@capacitor/clipboard'
-  import Divider from '@ikomida/shared-frontend/lib/components/Divider.svelte'
 
   let ikomidaid = 'com.ikomida.br.'
   let ikomidaidInput: Views.TextEdit
@@ -148,7 +147,6 @@
     border-radius: 16pt 16pt 0 0;
     background: #fff;
     box-shadow: 0 -4pt 8pt #0000009e;
-    height: fit-content;
     text-align: center;
     min-width: 100%;
     margin: 0 auto;

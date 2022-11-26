@@ -20,7 +20,7 @@
   import NewCategory from './Products/NewCategory.svelte'
   import Staff from './Staff/Staff.svelte'
   import NewStaff from './Staff/NewStaff.svelte'
-  import App from './Control/App.svelte'
+  import Apps from './Control/Apps.svelte'
   import { StatusBar } from '../stores/Setup'
   import {
     faHome,
@@ -84,8 +84,8 @@
       : null,
     userInfo?.role === Types.Types.TRoles.VENDOR
       ? {
-          name: 'Meu app',
-          callback: () => Stores.Navigation.instance.goTo(Routes.app),
+          name: 'Meus apps',
+          callback: () => Stores.Navigation.instance.goTo(Routes.apps),
           icon: faMobile
         }
       : null,
@@ -177,8 +177,8 @@
     <NewStaff />
   {:else if route == Routes.limits}
     <Limits />
-  {:else if route == Routes.app}
-    <App />
+  {:else if route == Routes.apps}
+    <Apps />
   {:else}
     <Home />
   {/if}
