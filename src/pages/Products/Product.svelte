@@ -83,10 +83,10 @@
 </script>
 
 {#if product}
-  <div class="productImage">
+  <productImage>
     <Views.Image source={product.image ?? '/assets/images/food-plate.svg'} name={product.title} />
-  </div>
-  <div class="product" style="background: #dfdfdf;">
+  </productImage>
+  <product>
     <h2>{product.title}</h2>
     <p>{product.description}</p>
     <span class="serves"
@@ -166,29 +166,10 @@
       <Views.Button on:click={edit}><Fa icon={faEdit} /> <span>Editar</span></Views.Button>
     {/if}
     <Views.Button on:click={newProduct}><Fa icon={faEdit} /> <span>Novo produto Similar</span></Views.Button>
-  </div>
+  </product>
 {/if}
 
 <style>
-  .productImage {
-    position: fixed;
-    left: 0;
-    right: 0;
-    top: 64px;
-  }
-  .product {
-    position: absolute;
-    padding: 16pt;
-    padding-bottom: 128pt;
-    left: 0;
-    right: 0;
-    top: 100vw;
-    border-radius: 16pt 16pt 0 0;
-    background: #fff;
-    box-shadow: 0 -4pt 8pt #0000009e;
-    height: fit-content;
-    padding-bottom: 72pt;
-  }
   .quantity {
     margin-top: 16pt;
     align-items: center;
@@ -228,31 +209,31 @@
   .serves {
     font-size: 0.8rem;
   }
-  .product > :global(img) {
+  product > :global(img) {
     width: 100%;
     max-width: 100%;
     object-fit: contain;
     border-radius: 4pt;
   }
-  .product > .optionsCategory {
+  product > .optionsCategory {
     border-radius: 8pt;
     padding: 16pt;
     background-color: #fffffffa;
     position: relative;
   }
-  .product > .optionsCategory > header {
+  product > .optionsCategory > header {
     display: flex;
     flex-direction: row;
   }
-  .product > .optionsCategory > header > :global(img) {
+  product > .optionsCategory > header > :global(img) {
     width: 48pt;
     height: 48pt;
   }
-  .product > .optionsCategory > header > div {
+  product > .optionsCategory > header > div {
     width: calc(100% - 40pt);
     margin-left: 16pt;
   }
-  .product > .optionsCategory > .option {
+  product > .optionsCategory > .option {
     position: relative;
     display: flex;
     flex-direction: row;
@@ -260,30 +241,30 @@
     padding: 16pt;
     background: #fffffffc;
   }
-  .product > .optionsCategory > .option > :global(img) {
+  product > .optionsCategory > .option > :global(img) {
     width: 48pt;
     height: 48pt;
   }
-  .product > .optionsCategory > .option > div {
+  product > .optionsCategory > .option > div {
     width: 100%;
     margin-left: 16pt;
   }
-  .product > .optionsCategory > .option > div > div {
+  product > .optionsCategory > .option > div > div {
     width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     text-align: center;
   }
-  .product > .optionsCategory > .option > div > div > div {
+  product > .optionsCategory > .option > div > div > div {
     display: flex;
     flex-direction: column;
   }
-  .product > .optionsCategory > .option > div > div > div > b {
+  product > .optionsCategory > .option > div > div > div > b {
     font-size: 1.1em;
     font-family: RobotoBold;
   }
-  .product > .optionsCategory > .option > div > h3 {
+  product > .optionsCategory > .option > div > h3 {
     text-align: center;
   }
 </style>

@@ -44,6 +44,18 @@
     hasErrorCallBack,
     permissionStatus
   )
+  let style: HTMLElement
+  
+    $: if (style){
+        style.innerHTML = `
+        main {
+          --paddingTop: ${styleHeight};
+          --paddingBottom: 64pt;
+        }
+      `
+      }
+
+  $: styleHeight = `${Number($_StatusBar.height + ($_StatusBar.topMargin ?? 0)) + 48}pt`
 
   $: route = $router.route
   $: if ($auth) {

@@ -70,10 +70,10 @@
 </script>
 
 <main>
-  <header class="mainPicture">
+  <jumbotron>
     <Views.Image source="assets/icons/transparent-logo-1.svg" name="iKomida" />
-  </header>
-  <section style="padding-bottom: 64pt;background-color: rgb(223, 223, 223);">
+  </jumbotron>
+  <content>
     <small>Digite aqui o ID do seu estabelecimento</small>
     <Views.TextEdit
       bind:value={ikomidaid}
@@ -96,7 +96,7 @@
     <Views.Button type={Types.TButton.PRIMARY} on:click={newAccount}>Crie sua conta agora</Views.Button>
     <Views.Button type={Types.TButton.TRANSPARENT} on:click={forgotPassword}>Recuperar a senha</Views.Button>
     <Views.GTerms />
-  </section>
+  </content>
 </main>
 
 <style>
