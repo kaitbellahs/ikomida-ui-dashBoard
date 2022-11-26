@@ -107,6 +107,7 @@
   Stores.Title.instance.set('O estabelecimento')
 </script>
 
+<Views.Divider />
 <div class="profile">
   <Views.UploadablePhoto
     type={Types.TUploadablePhoto.VENDOR}

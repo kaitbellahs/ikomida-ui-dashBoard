@@ -33,7 +33,9 @@
   Stores.Title.instance.set('Assinatura')
 </script>
 
+<Views.Divider />
 <h2>dados da sua assinatura</h2>
+<Views.Divider />
 {#if subscription}
   <Views.TextValue text="plano" value=": {subscription.plan}" fontSize="1.2em" />
   <Views.TextValue text="Valor" value=": {Utils.Strings.currency(subscription.value)}" fontSize="1.2em" />

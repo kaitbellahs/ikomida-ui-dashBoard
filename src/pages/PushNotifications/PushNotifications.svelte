@@ -2,13 +2,18 @@
   import Routes from '../../stores/Routes'
   import Fa from 'svelte-fa'
   import { faRocket } from '@fortawesome/free-solid-svg-icons'
-  import { Views, Utils, Stores } from '@ikomida/shared-frontend'
+  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend'
   import { StatusBar } from '../../stores/Setup'
   import { onMount } from 'svelte'
 
-  //TODO: -- implement CPush class
-  let items: any[]
+  let items: Types.Classes.CPushNotificationMessage[]
 
+  $: if (items) {
+    for (let index = 0; index < items.length; index++) {
+      items[index] = Types.Classes.CPushNotificationMessage.fromObject(items[index])
+    }
+    items = items
+  }
   onMount(async () => {
     Stores.Loading.instance.stop()
   })

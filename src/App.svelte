@@ -261,31 +261,33 @@
   })
 </script>
 
-{#if initialazation}
-  <LaunchScreen />
-{:else if logedIn}
-  <Main />
-{:else if route == Routes.forgotPassword}
-  <ForgotPassword />
-{:else if route == Routes.tac}
-  <Tac />
-{:else}
-  <Login />
-{/if}
-<Views.LoadJS url="https://www.google.com/recaptcha/api.js?render=6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS" />
-{#if networkStatus == null || !networkStatus.connected}
-  <div id="internetError">Esperando por conexão a internet...</div>
-{/if}
-{#if showNotificationPopup}
-  <Views.Alert
-    title={notificationPopup?.title}
-    message={notificationPopup?.body}
-    closeCallBack={togglePushNotificationPopup}
-    buttons={notificationPopup?.buttons}
-  />
-{/if}
-<Views.Loading topPadding={$_StatusBar.height} bottomPadding={$_StatusBar.bottomPadding} />
-<Views.MessageAlert />
+<mainContainer>
+  {#if initialazation}
+    <LaunchScreen />
+  {:else if logedIn}
+    <Main />
+  {:else if route == Routes.forgotPassword}
+    <ForgotPassword />
+  {:else if route == Routes.tac}
+    <Tac />
+  {:else}
+    <Login />
+  {/if}
+  <Views.LoadJS url="https://www.google.com/recaptcha/api.js?render=6LebYzshAAAAAIXhka3WrAjus5tDXtefR1QefVZS" />
+  {#if networkStatus == null || !networkStatus.connected}
+    <div id="internetError">Esperando por conexão a internet...</div>
+  {/if}
+  {#if showNotificationPopup}
+    <Views.Alert
+      title={notificationPopup?.title}
+      message={notificationPopup?.body}
+      closeCallBack={togglePushNotificationPopup}
+      buttons={notificationPopup?.buttons}
+    />
+  {/if}
+  <Views.Loading topPadding={$_StatusBar.height} bottomPadding={$_StatusBar.bottomPadding} />
+  <Views.MessageAlert />
+</mainContainer>
 
 <style>
   #internetError {
