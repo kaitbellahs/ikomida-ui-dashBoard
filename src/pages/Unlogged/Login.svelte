@@ -110,49 +110,12 @@
     place-content: center;
     height: 100vh;
   }
-  header {
-    max-height: 260pt;
-    max-width: 480pt;
-    object-fit: contain;
-    width: 100%;
-    position: fixed;
-    left: 0;
-    right: 0;
-    top: 0;
-    max-height: 184pt;
-    background: #4c0708;
-    display: flex;
-    place-content: center;
-    height: 300pt;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    width: 100%;
-  }
-  header > :global(img) {
+  jumbotron > :global(img) {
     font-size: 3em;
     width: 100%;
     max-width: 500px;
     line-height: 90px;
     overflow: hidden;
     object-fit: contain;
-  }
-  section {
-    position: absolute;
-    padding: 16pt;
-    padding-bottom: 64pt;
-    left: 0;
-    right: 0;
-    top: 168pt;
-    border-radius: 16pt 16pt 0 0;
-    background: #fff;
-    box-shadow: 0 -4pt 8pt #0000009e;
-    text-align: center;
-    min-width: 100%;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    place-content: center;
   }
 </style>

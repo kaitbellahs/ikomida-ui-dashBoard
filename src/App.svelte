@@ -45,15 +45,15 @@
     permissionStatus
   )
   let style: HTMLElement
-  
-    $: if (style){
-        style.innerHTML = `
-        main {
+
+  $: if (style) {
+    style.innerHTML = `
+        body {
           --paddingTop: ${styleHeight};
           --paddingBottom: 64pt;
         }
       `
-      }
+  }
 
   $: styleHeight = `${Number($_StatusBar.height + ($_StatusBar.topMargin ?? 0)) + 48}pt`
 
@@ -205,6 +205,8 @@
   }
 
   onMount(async () => {
+    style = document.createElement('style')
+    document.head.appendChild(style)
     auth = await Stores.Auth.Auth.instance.store()
     if ($auth) {
       const token = await Utils.Jws.extractToken($auth)
