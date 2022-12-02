@@ -10,6 +10,7 @@
   import { Capacitor } from '@capacitor/core'
   import { AppLauncher } from '@capacitor/app-launcher'
   import { Clipboard } from '@capacitor/clipboard'
+  import { Browser } from '@capacitor/browser'
 
   let ikomidaid = 'com.ikomida.br.'
   let ikomidaidInput: Views.TextEdit
@@ -26,13 +27,17 @@
 
   async function newAccount() {
     const url = 'https://ikomida.com/plans'
-    const { value } = await AppLauncher.canOpenUrl({ url })
-    await AppLauncher.openUrl({ url })
-    if (!value) {
-      await Clipboard.write({ string: url })
-      Stores.MessageAlert.instance.show(
-        `Se o navigador externo nao abriu: abra o e digitar essa URL: ${url}, também foi copiado para sua área de transferência para colar-lo!`
-      )
+    if (Capacitor.getPlatform() === 'ios') {
+      await Browser.open({ url })
+    } else {
+      const { value } = await AppLauncher.canOpenUrl({ url })
+      await AppLauncher.openUrl({ url })
+      if (!value) {
+        await Clipboard.write({ string: url })
+        Stores.MessageAlert.instance.show(
+          `Se o navigador externo nao abriu: abra o e digitar essa URL: ${url}, também foi copiado para sua área de transferência para colar-lo!`
+        )
+      }
     }
   }
 
