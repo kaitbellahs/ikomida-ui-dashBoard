@@ -129,6 +129,10 @@
   }
 
   async function updateDelivery() {
+    if((preparation?.min??0)>(preparation?.max??0)){
+      Stores.MessageAlert.instance.show(`O tempo máximo de preparação deve ser maior ou igual ao tempo mínimo!`)
+      return
+    }
     const vendorSettings: Types.Classes.CVendorSettings = Types.Classes.CVendorSettings.fromObject({
       preparation,
       delivery,

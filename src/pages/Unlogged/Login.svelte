@@ -96,8 +96,10 @@
     />
     <Views.TextEdit bind:value={password} icon={faUnlock} placeHolder="Sua senha" type={Types.TTextEdit.PASSWORD} />
     <Views.Divider />
-    <Views.Button type={Types.TButton.SECONDARY} on:click={doLogin} disabled={!canLogin}>Entrar</Views.Button>
+    <Views.Button type={Capacitor.getPlatform() === 'ios' ? Types.TButton.PRIMARY : Types.TButton.SECONDARY} on:click={doLogin} disabled={!canLogin}>Entrar</Views.Button>
+    {#if Capacitor.getPlatform() !== 'ios'}
     <Views.Button type={Types.TButton.PRIMARY} on:click={newAccount}>Crie sua conta agora</Views.Button>
+    {/if}
     <Views.Button type={Types.TButton.TRANSPARENT} on:click={forgotPassword}>Recuperar a senha</Views.Button>
     <Views.GTerms />
   </content>
@@ -114,6 +116,9 @@
     align-items: center;
     place-content: center;
     height: 100vh;
+  }
+  jumbotron{
+    background-color: #4c0708;
   }
   jumbotron > :global(img) {
     font-size: 3em;
