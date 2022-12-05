@@ -196,14 +196,14 @@
       paymentGateway = data.paymentGateway
       business = data.business
       delivery = Object.assign(delivery, data?.delivery)
-      deliveryInputs.min?.updateValue(String(delivery?.min))
-      deliveryInputs.orderMinValue?.updateValue(String(delivery?.orderMinValue))
-      deliveryInputs.value?.updateValue(String(delivery?.value))
+      deliveryInputs.min?.updateValue?.(String(delivery?.min))
+      deliveryInputs.orderMinValue?.updateValue?.(String(delivery?.orderMinValue))
+      deliveryInputs.value?.updateValue?.(String(delivery?.value))
       preparation = data?.preparation
       order.types = data?.orderTypes
       order.tip = data?.tip
-      preparationInputs?.min?.updateValue(String(preparation?.min))
-      preparationInputs?.max?.updateValue(String(preparation?.max))
+      preparationInputs?.min?.updateValue?.(String(preparation?.min))
+      preparationInputs?.max?.updateValue?.(String(preparation?.max))
     } else {
       Stores.MessageAlert.instance.show(response.data)
     }

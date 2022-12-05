@@ -68,7 +68,7 @@
   onMount(async () => {
     const value = await ikomidaID.get()
     ikomidaid = value && value !== undefined ? value : ikomidaid
-    ikomidaidInput.updateValue(ikomidaid)
+    ikomidaidInput.updateValue?.(ikomidaid)
     Stores.Loading.instance.stop()
   })
 </script>
