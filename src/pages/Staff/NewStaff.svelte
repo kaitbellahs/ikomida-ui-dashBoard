@@ -119,7 +119,7 @@
     max={255}
   />
   <Views.TextEdit
-    placeHolder="Sobre nome"
+    placeHolder="Sobrenome"
     bind:value={item.lastName}
     bind:this={itemInputs.lastName}
     bind:isValid={itemValidation.lastName}
