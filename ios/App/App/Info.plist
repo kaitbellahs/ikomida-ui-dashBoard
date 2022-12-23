@@ -5,7 +5,7 @@
 	<key></key>
 	<string></string>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>en</string>
+	<string>pt-BR</string>
 	<key>CFBundleDisplayName</key>
 	<string>iKomida Dashboard</string>
 	<key>CFBundleExecutable</key>
@@ -44,17 +44,15 @@
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Usamos sua localizacao para entregar seus pedidos</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>this app need localizaion</string>
+	<string>Usamos sua localizacao para entregar seus pedidos</string>
 	<key>UILaunchStoryboardName</key>
-	<string>Main</string>
+	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>
 	</array>
-	<key>UIStatusBarStyle</key>
-	<string>UIStatusBarStyleLightContent</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
