@@ -190,7 +190,7 @@ product {
     padding: 16pt;
     left: 0;
     right: 0;
-    top: calc(160pt - 16pt);
+    top: calc(40vw - 16pt);
     border-radius: 16pt 16pt 0 0;
     background: #dfdfdf;
     box-shadow: 0 -4pt 8pt #0000009e;

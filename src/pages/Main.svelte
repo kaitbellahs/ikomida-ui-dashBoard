@@ -7,16 +7,16 @@
   import CompanyProfile from './User/CompanyProfile.svelte'
   import Profile from './User/Profile.svelte'
   import Settings from './Control/Settings.svelte'
-  import Subscription from './Control/Subscription.svelte'
-  import Product from './Products/Product.svelte'
-  import Products from './Products/Products.svelte'
   import Layout from './Control/Layout.svelte'
-  import NewProduct from './Products/NewProduct.svelte'
   import Coupons from './Coupons/Coupons.svelte'
   import NewCoupon from './Coupons/NewCoupon.svelte'
   import PushNotifications from './PushNotifications/PushNotifications.svelte'
   import NewPushNotification from './PushNotifications/NewPushNotification.svelte'
   import Limits from './Control/Limits.svelte'
+  import Subscription from './Control/Subscription.svelte'
+  import Product from './Products/Product.svelte'
+  import Products from './Products/Products.svelte'
+  import NewProduct from './Products/NewProduct.svelte'
   import NewCategory from './Products/NewCategory.svelte'
   import Staff from './Staff/Staff.svelte'
   import NewStaff from './Staff/NewStaff.svelte'
@@ -58,11 +58,13 @@
     }
   ]
   $: menuHamburgerItems = [
-    {
-      name: 'Home',
-      callback: () => Stores.Navigation.instance.reset(Routes.home),
-      icon: faHome
-    },
+    [Types.Types.TRoles.VENDOR, Types.Types.TRoles.STAFF].includes(userInfo?.role)
+      ? {
+          name: 'Home',
+          callback: () => Stores.Navigation.instance.reset(Routes.home),
+          icon: faHome
+        }
+      : null,
     {
       name: 'Perfil',
       callback: () => Stores.Navigation.instance.goTo(Routes.profile),
@@ -89,21 +91,27 @@
           icon: faMobile
         }
       : null,
-    {
-      name: 'Configurações',
-      callback: () => Stores.Navigation.instance.goTo(Routes.settings),
-      icon: faSlidersH
-    },
-    {
-      name: 'Limites',
-      callback: () => Stores.Navigation.instance.goTo(Routes.limits),
-      icon: faChartColumn
-    },
-    {
-      name: 'Comunicação',
-      callback: () => Stores.Navigation.instance.goTo(Routes.pushNotifications),
-      icon: faMessage
-    },
+    [Types.Types.TRoles.VENDOR, Types.Types.TRoles.STAFF].includes(userInfo?.role)
+      ? {
+          name: 'Configurações',
+          callback: () => Stores.Navigation.instance.goTo(Routes.settings),
+          icon: faSlidersH
+        }
+      : null,
+    [Types.Types.TRoles.VENDOR, Types.Types.TRoles.STAFF].includes(userInfo?.role)
+      ? {
+          name: 'Limites',
+          callback: () => Stores.Navigation.instance.goTo(Routes.limits),
+          icon: faChartColumn
+        }
+      : null,
+    [Types.Types.TRoles.VENDOR, Types.Types.TRoles.STAFF].includes(userInfo?.role)
+      ? {
+          name: 'Comunicação',
+          callback: () => Stores.Navigation.instance.goTo(Routes.pushNotifications),
+          icon: faMessage
+        }
+      : null,
     userInfo?.role === Types.Types.TRoles.VENDOR
       ? {
           name: 'Colaboradores',
@@ -179,8 +187,10 @@
     <Limits />
   {:else if route == Routes.apps}
     <Apps />
-  {:else}
+  {:else if [Types.Types.TRoles.VENDOR, Types.Types.TRoles.STAFF].includes(userInfo?.role)}
     <Home />
+  {:else}
+    <Orders />
   {/if}
 </main>
 <Views.NavigationBar
@@ -189,7 +199,9 @@
   topMargin={$StatusBar.topMargin}
   paddingBottom={$StatusBar.bottomPadding}
 />
-<Views.Tabs {tabs} bottomPadding={$StatusBar.bottomPadding} />
+{#if [Types.Types.TRoles.VENDOR, Types.Types.TRoles.STAFF].includes(userInfo?.role)}
+  <Views.Tabs {tabs} bottomPadding={$StatusBar.bottomPadding} />
+{/if}
 
 <style>
   main {
