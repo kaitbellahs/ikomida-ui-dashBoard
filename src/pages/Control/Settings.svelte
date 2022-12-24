@@ -29,6 +29,7 @@
   let userInfo: Types.Classes.CUser
   let auth: Stores.Auth.IStore
   let showDeIntegrationPagSeguroAlert = false
+  let ExpandableBox: Stores.ExpandableBox
   const router = Stores.Navigation.instance.router
 
   let business: Types.Classes.CBusinessTime[] = Types.Classes.CBusinessTime.fromObject([])
@@ -75,6 +76,19 @@
     ? 'Cancelar a integgração com pagseguro'
     : 'Integrar sua conta pagseguro'
 
+  $: if ($ExpandableBox) {
+    updateInputs()
+  }
+
+  function updateInputs() {
+    deliveryInputs.min?.updateValue?.(String(delivery?.min))
+    deliveryInputs.orderMinValue?.updateValue?.(String(delivery?.orderMinValue))
+    deliveryInputs.value?.updateValue?.(String(delivery?.value))
+    preparationInputs?.min?.updateValue?.(String(preparation?.min))
+    preparationInputs?.max?.updateValue?.(String(preparation?.max))
+    business = business
+  }
+
   function toggleDeIntegrationPagSeguroAlert() {
     showDeIntegrationPagSeguroAlert = !showDeIntegrationPagSeguroAlert
   }
@@ -82,7 +96,9 @@
   async function updateHours() {
     Stores.Loading.instance.start()
     if (business && Utils.Objects.validateBusinessTime(business)) {
-      let response = await updateBusinessHours(business)
+      let response = await updateBusinessHours(
+        business.filter(expedient => expedient && JSON.stringify(expedient.toJSON()) !== '{}')
+      )
       if (response.success) {
         Stores.MessageAlert.instance.show('O horário de funcionamento atualizado com sucesso!')
       } else {
@@ -158,6 +174,7 @@
   }
 
   onMount(async () => {
+    ExpandableBox = Stores.ExpandableBox.createInstance().store
     auth = await Stores.Auth.Auth.instance.store()
     userInfo = Types.Classes.CUser.fromObject(await Utils.Jws.extractToken($auth))
     const response = await getSettings()
@@ -165,17 +182,13 @@
       const data: Types.Classes.CVendorSettings = Types.Classes.CVendorSettings.fromObject(response.data)
       paymentGateway = data.paymentGateway
       if (data.business) {
-        business = data.business
+        business = Types.Classes.CBusinessTime.fromObject(data.business)
       }
       delivery = Object.assign(delivery, data?.delivery)
-      deliveryInputs.min?.updateValue?.(String(delivery?.min))
-      deliveryInputs.orderMinValue?.updateValue?.(String(delivery?.orderMinValue))
-      deliveryInputs.value?.updateValue?.(String(delivery?.value))
       preparation = data?.preparation
       order.types = data?.orderTypes
       order.tip = data?.tip
-      preparationInputs?.min?.updateValue?.(String(preparation?.min))
-      preparationInputs?.max?.updateValue?.(String(preparation?.max))
+      updateInputs()
     } else {
       Stores.MessageAlert.instance.show(response.data)
     }
@@ -186,7 +199,7 @@
 </script>
 
 <div class="settings">
-  <Views.ExpandableBox title="Expediente">
+  <Views.ExpandableBox title="Expediente" expand={true}>
     <Views.DatePeriods mandatory={true} bind:value={business} />
     <Views.Divider height={8} />
     <Views.Button on:click={updateHours}><Fa icon={faClock} /><span>Salvar horários</span></Views.Button>
@@ -222,7 +235,6 @@
           leftPadding={10}
         />
       </div>
-      <Views.Divider />
     {/if}
     <Views.Divider />
     <Views.CheckBoxList
@@ -305,20 +317,8 @@
   .settings {
     padding-bottom: 48pt;
   }
-  .settings > .data {
-    padding: 16pt;
-    border-radius: 8pt;
-  }
   .settings > div {
     width: 100%;
-  }
-  .settings > div > h2 {
-    margin-left: 16pt;
-  }
-  .settings > .data {
-    width: 100%;
-    float: left;
-    margin-top: 16pt;
   }
   .twoCells {
     display: flex;

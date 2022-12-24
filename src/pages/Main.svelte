@@ -146,7 +146,7 @@
   }px; overflow: scroll;`
 </script>
 
-<main {style}>
+<Views.MainContainer {style}>
   {#if route == Routes.home}
     <Home />
   {:else if route == Routes.orders}
@@ -192,7 +192,7 @@
   {:else}
     <Orders />
   {/if}
-</main>
+</Views.MainContainer>
 <Views.NavigationBar
   logo="/assets/icons/transparent-logo-1.svg"
   paddingTop={$StatusBar.height}
@@ -204,18 +204,6 @@
 {/if}
 
 <style>
-  main {
-    padding: var(--padding);
-    padding-top: var(--paddingTop);
-    overflow: hidden;
-    max-width: 100%;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    padding-bottom: var(--paddingBottom);
-    height: 100vh;
-    overflow: scroll;
-  }
   :global(*, *:before, *:after) {
     margin: 0;
     padding: 0;

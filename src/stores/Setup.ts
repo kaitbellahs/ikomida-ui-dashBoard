@@ -41,10 +41,7 @@ function createSettings() {
         phone: '',
         email: ''
       },
-      business: {
-        hours: [],
-        days: []
-      },
+      business: [],
       isActive: ''
     }).toJSON()
   })
