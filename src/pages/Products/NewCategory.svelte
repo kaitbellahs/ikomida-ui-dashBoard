@@ -43,7 +43,11 @@
   }
 
   function isBusinessTime(business?: Types.Classes.CBusinessTime[]) {
-    return !business || business.filter(businessDay => (businessDay.hours?.length ?? 0) > 0).length === 0
+    return (
+      !business ||
+      (Array.isArray(business) ? business : [business]).filter(businessDay => (businessDay.hours?.length ?? 0) > 0)
+        .length === 0
+    )
   }
 
   onMount(() => {
