@@ -8,7 +8,6 @@
   import { onMount } from 'svelte'
 
   const router = Stores.Navigation.instance.router
-
   let category: Types.Classes.CProductCategory = $router.options.category
   let edit: boolean = $router.options.edit
   let itemValidation = {
@@ -21,9 +20,9 @@
   const submit = async () => {
     Stores.Loading.instance.start()
     if (alwaysShowCategory) {
-      category.business = undefined
+      category.business = []
     }
-    if (!category.business || !Utils.Objects.validateBusinessTime(category.business)) {
+    if (category.business && category.business.length > 0 && !Utils.Objects.validateBusinessTime(category.business)) {
       Stores.Loading.instance.stop()
       return
     }
@@ -78,7 +77,12 @@
   <Views.Divider />
   <Views.Switch name="Aparecer sempre" bind:checked={alwaysShowCategory} />
   {#if !alwaysShowCategory}
-    <Views.DatePeriods title="Horário de ativação da categoria" mandatory={true} bind:value={category.business} />
+    <Views.DatePeriods
+      refresh={!alwaysShowCategory}
+      title="Horário de ativação da categoria"
+      mandatory={true}
+      bind:value={category.business}
+    />
   {/if}
   <Views.Divider />
   <Views.Button disabled={!canContinue} on:click={submit} bottomPadding={$StatusBar.bottomPadding}

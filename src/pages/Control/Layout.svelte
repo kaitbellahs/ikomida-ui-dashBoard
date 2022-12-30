@@ -37,7 +37,7 @@
         out: undefined
       }
     },
-    tabs: { background: '#ffe4c4', color: '#4c0708' },
+    tabs: { background: '#e5e4e3', color: '#4c0708' },
     button: { background: '#4c0708', color: '#ffffff' },
     dialog: { background: '#ffffffdf', color: '#4c0708' }
   })
@@ -123,7 +123,7 @@
         ?.background}; --headerTextColor: {layout.header?.color}; --menuHamburger: {layout.header?.menuHamburger};"
     >
       <div class="iphone outSide">
-        <div class="inSide" style={layout.backgroundImage ? `background-image: url("${layout.backgroundImage}");` : ''}>
+        <div class="inSide">
           <div class="ear" />
           <div class="header">
             <div class="menuSandwich">
@@ -133,11 +133,16 @@
             </div>
             <span>Título da página</span>
           </div>
-          <div class="body">
+          <div
+            class="body"
+            style="--backgroundImage: url('{layout.backgroundImage ? layout.backgroundImage : 'none'}');"
+          >
+            <Views.Divider height={16} />
             <div class="box">
               Aqui é uma simulação dos textos normais do seu app.<br />
               <span style="color: {layout.link};">Aqui está um link</span>
             </div>
+            <Views.Divider height={8} />
             <div
               class="shadow box {ANIMATION_PREFIX}animated"
               style="background: {layout.itemBackground};"
@@ -146,8 +151,8 @@
               <h2>Produto</h2>
               <p>Aqui é uma simulação da caixa dos produtos.</p>
             </div>
-            <Views.Divider height={16} />
-            <button class="shadow" style="background: {layout.button?.background};color: {layout.button?.color}"
+            <Views.Divider height={8} />
+            <button class="button shadow" style="background: {layout.button?.background};color: {layout.button?.color}"
               >Aqui um texto dentro de um botão</button
             >
           </div>
@@ -304,8 +309,8 @@
     margin-top: 16pt;
   }
   .sample {
+    background: var(--background) url(/assets/images/paint.jpg) center center/cover no-repeat;
     height: 320pt;
-    background: var(--background);
     color: var(--color);
     padding: 16pt 16pt 40pt 16pt;
     position: fixed;
@@ -355,6 +360,7 @@
     color: var(--headerTextColor);
     display: flex;
     align-items: center;
+    z-index: 999998;
   }
   .iphone > .inSide > .header > span {
     margin-left: 16pt;
@@ -370,7 +376,23 @@
     height: 2pt;
     border-radius: 2pt;
   }
+  .iphone > .inSide > .body > .button {
+    z-index: 999998;
+    position: relative;
+  }
+  .iphone > .inSide > .body::before {
+    content: '';
+    background-image: var(--backgroundImage);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0.3;
+  }
   .iphone > .inSide > .body > .box {
+    background-color: var(--background);
+    position: relative;
     margin-top: 8pt;
     border-radius: 4pt;
     padding: 16pt;
@@ -387,6 +409,7 @@
     border-radius: 4pt;
     background: gray;
     overflow: hidden;
+    z-index: 999997;
   }
   .iphone > .inSide > .tabs > div {
     border: 0;
