@@ -143,7 +143,7 @@
   $: isPageList = [Routes.orders, Routes.coupons, Routes.orders, Routes.pushNotifications, Routes.staff].includes(route)
   $: style = `--padding: ${isPageList ? 0 : 16}pt;--paddingTop:${styleHeight};--paddingBottom: ${
     96 + $StatusBar.bottomPadding
-  }px; overflow: scroll;`
+  }px;`
 </script>
 
 <Views.MainContainer {style}>
