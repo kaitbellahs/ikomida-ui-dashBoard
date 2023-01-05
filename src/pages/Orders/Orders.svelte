@@ -89,7 +89,7 @@
   Stores.Title.instance.set('Pedidos')
 </script>
 
-<div style="padding: 0 16pt;" class="filters">
+<div style="padding: 0 16px;" class="filters">
   <Views.Selector bind:selected={orderType} options={Types.Types.TOrderType.values()} name="Tipo dos pedidos" />
 </div>
 <Views.LoadMoreReusableList
@@ -216,8 +216,8 @@
 
 <style>
   .orderContainer {
-    border-radius: 8pt;
-    padding: 16pt;
+    border-radius: 8px;
+    padding: 16px;
     background: #fffffffc;
     display: flex;
     flex-direction: column;
@@ -254,10 +254,10 @@
     flex: 1;
   }
   .orderContainer > .buttonGroup > :global(*):first-child {
-    margin-right: 8pt;
+    margin-right: 8px;
   }
   .orderContainer > .buttonGroup > :global(*):last-child {
-    margin-left: 8pt;
+    margin-left: 8px;
   }
   .orderContainer > .value {
     display: flex;
@@ -270,7 +270,7 @@
   }
   .filters {
     width: 100%;
-    height: 72pt;
+    height: 72px;
     display: flex;
     flex-direction: row;
   }

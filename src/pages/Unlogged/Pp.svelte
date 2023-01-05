@@ -19,7 +19,7 @@
 
 <Views.NavigationBar paddingTop={$StatusBar.height} />
 <main
-  style="margin-top:{styleHeight};padding: 16pt; padding-top: 0; padding-bottom: 0; overflow: hidden;max-width: 100%;"
+  style="margin-top:{styleHeight};padding: 16px; padding-top: 0; padding-bottom: 0; overflow: hidden;max-width: 100%;"
 >
   <Views.Divider />
   <div class="container">
@@ -48,13 +48,13 @@
     flex-direction: column;
     /* align-items: center; */
     place-content: center;
-    margin-bottom: 32pt;
+    margin-bottom: 32px;
     min-height: 20vh;
     background: #cccccc25;
-    border-radius: 8pt;
-    box-shadow: 0 4pt 8pt #0000009e;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px #0000009e;
     width: 100%;
-    padding: 16pt;
+    padding: 16px;
   }
   .jambtron > h1 {
     align-self: center;

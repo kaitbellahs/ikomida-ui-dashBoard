@@ -35,7 +35,7 @@
       if (!value) {
         await Clipboard.write({ string: url })
         Stores.MessageAlert.instance.show(
-          `Se o navigador externo nao abriu: abra o e digitar essa URL: ${url}, também foi copiado para sua área de transferência para colar-lo!`
+          `Se o navegador externo não abriu: abra o e digitar essa URL: ${url}, também foi copiado para sua área de transferência para colar-lo!`
         )
       }
     }
@@ -96,9 +96,13 @@
     />
     <Views.TextEdit bind:value={password} icon={faUnlock} placeHolder="Sua senha" type={Types.TTextEdit.PASSWORD} />
     <Views.Divider />
-    <Views.Button type={Capacitor.getPlatform() === 'ios' ? Types.TButton.PRIMARY : Types.TButton.SECONDARY} on:click={doLogin} disabled={!canLogin}>Entrar</Views.Button>
+    <Views.Button
+      type={Capacitor.getPlatform() === 'ios' ? Types.TButton.PRIMARY : Types.TButton.SECONDARY}
+      on:click={doLogin}
+      disabled={!canLogin}>Entrar</Views.Button
+    >
     {#if Capacitor.getPlatform() !== 'ios'}
-    <Views.Button type={Types.TButton.PRIMARY} on:click={newAccount}>Crie sua conta agora</Views.Button>
+      <Views.Button type={Types.TButton.PRIMARY} on:click={newAccount}>Crie sua conta agora</Views.Button>
     {/if}
     <Views.Button type={Types.TButton.TRANSPARENT} on:click={forgotPassword}>Recuperar a senha</Views.Button>
     <Views.GTerms />
@@ -117,7 +121,7 @@
     place-content: center;
     height: 100vh;
   }
-  jumbotron{
+  jumbotron {
     background-color: #4c0708;
   }
   jumbotron > :global(img) {

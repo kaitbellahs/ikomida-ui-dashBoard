@@ -115,7 +115,7 @@
         <Views.Divider height={16} />
         <div class="shadow optionsCategory">
           <header>
-            <Views.Image source={optionsCategory.image} name={optionsCategory.name} height="48pt" width="48pt" />
+            <Views.Image source={optionsCategory.image} name={optionsCategory.name} height="48px" width="48px" />
             <div>
               <h3>{optionsCategory.name}</h3>
               Escolher entre {optionsCategory.min} e {optionsCategory.max} opções
@@ -125,7 +125,7 @@
             {#each optionsCategory.options ?? [] as option}
               <Views.Divider height={15} />
               <div class="shadow option">
-                <Views.Image source={option.image} name={option.name} height="48pt" width="48pt" />
+                <Views.Image source={option.image} name={option.name} height="48px" width="48px" />
                 <div>
                   <h3>{option.name}</h3>
                   <div>
@@ -171,7 +171,7 @@
 
 <style>
   .quantity {
-    margin-top: 16pt;
+    margin-top: 16px;
     align-items: center;
     font-size: 1.8em;
     text-align: center;
@@ -180,11 +180,11 @@
     padding: 0;
     border: 0;
     background: transparent;
-    margin-right: 16pt;
-    margin-left: 16pt;
+    margin-right: 16px;
+    margin-left: 16px;
   }
   .price {
-    margin-top: 16pt;
+    margin-top: 16px;
     width: 100%;
     min-width: 100%;
     display: flex;
@@ -199,12 +199,12 @@
   .current {
     color: green;
     font-size: 1.5em;
-    margin-top: 16pt;
+    margin-top: 16px;
   }
   p {
     font-size: 0.8rem;
     font-weight: lighter;
-    margin: 16pt 0;
+    margin: 16px 0;
   }
   .serves {
     font-size: 0.8rem;
@@ -213,11 +213,11 @@
     width: 100%;
     max-width: 100%;
     object-fit: contain;
-    border-radius: 4pt;
+    border-radius: 4px;
   }
   product > .optionsCategory {
-    border-radius: 8pt;
-    padding: 16pt;
+    border-radius: 8px;
+    padding: 16px;
     background-color: #fffffffa;
     position: relative;
   }
@@ -226,28 +226,28 @@
     flex-direction: row;
   }
   product > .optionsCategory > header > :global(img) {
-    width: 48pt;
-    height: 48pt;
+    width: 48px;
+    height: 48px;
   }
   product > .optionsCategory > header > div {
-    width: calc(100% - 40pt);
-    margin-left: 16pt;
+    width: calc(100% - 40px);
+    margin-left: 16px;
   }
   product > .optionsCategory > .option {
     position: relative;
     display: flex;
     flex-direction: row;
-    border-radius: 8pt;
-    padding: 16pt;
+    border-radius: 8px;
+    padding: 16px;
     background: #fffffffc;
   }
   product > .optionsCategory > .option > :global(img) {
-    width: 48pt;
-    height: 48pt;
+    width: 48px;
+    height: 48px;
   }
   product > .optionsCategory > .option > div {
     width: 100%;
-    margin-left: 16pt;
+    margin-left: 16px;
   }
   product > .optionsCategory > .option > div > div {
     width: 100%;

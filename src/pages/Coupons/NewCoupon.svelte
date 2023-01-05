@@ -136,6 +136,6 @@
 
 <style>
   .coupon {
-    padding-bottom: 48pt;
+    padding-bottom: 48px;
   }
 </style>

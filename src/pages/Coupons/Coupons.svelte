@@ -33,7 +33,7 @@
   Stores.Title.instance.set('Cupons')
 </script>
 
-<div style="padding: 0 16pt;">
+<div style="padding: 0 16px;">
   <Views.Button on:click={newCoupon} bottomPadding={$StatusBar.bottomPadding}
     ><Fa icon={faEdit} /> <span>Novo cupom</span></Views.Button
   >
@@ -50,7 +50,7 @@
     <Views.FloatRemove callback={() => removeCoupon(items[index].id)} />
     <h2>{items[index].name}</h2>
     <div>
-      Disconto: {Types.Types.TDiscount.VALUE === items[index].valueType
+      Desconto: {Types.Types.TDiscount.VALUE === items[index].valueType
         ? Utils.Strings.currency(items[index].value)
         : Utils.Strings.percent(items[index].value)}
     </div>
@@ -70,18 +70,18 @@
 <style>
   article {
     position: relative;
-    border-radius: 8pt;
-    padding: 16pt;
+    border-radius: 8px;
+    padding: 16px;
   }
   article > .orderTypes {
     display: flex;
     flex-direction: row;
   }
   article > .orderTypes > span {
-    border-radius: 8pt;
-    padding: 4pt;
-    margin: 8pt;
+    border-radius: 8px;
+    padding: 4px;
+    margin: 8px;
     font-size: 0.9em;
-    border: 1pt solid #4c0708;
+    border: 1px solid #4c0708;
   }
 </style>

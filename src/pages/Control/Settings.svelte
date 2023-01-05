@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Views, Utils, Logics, Stores, Types } from '@ikomida/shared-frontend'
+  import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend'
   import {
     getSettings,
     updatePaymentGateway,
@@ -29,12 +29,10 @@
   let userInfo: Types.Classes.CUser
   let auth: Stores.Auth.IStore
   let showDeIntegrationPagSeguroAlert = false
+  let ExpandableBox: Stores.ExpandableBox
   const router = Stores.Navigation.instance.router
 
-  let business: Types.Classes.CBusinessTime | undefined = Types.Classes.CBusinessTime.fromObject({
-    days: [],
-    hours: []
-  })
+  let business: Types.Classes.CBusinessTime[] = Types.Classes.CBusinessTime.fromObject([])
 
   let order: { types: Types.Types.TOrderType[] | undefined; tip: number | undefined } = { types: [], tip: 0 }
   let orderInputs: { tip?: Views.TextEdit } = { tip: undefined }
@@ -78,45 +76,29 @@
     ? 'Cancelar a integgração com pagseguro'
     : 'Integrar sua conta pagseguro'
 
+  $: if ($ExpandableBox) {
+    updateInputs()
+  }
+
+  function updateInputs() {
+    deliveryInputs.min?.updateValue?.(String(delivery?.min))
+    deliveryInputs.orderMinValue?.updateValue?.(String(delivery?.orderMinValue))
+    deliveryInputs.value?.updateValue?.(String(delivery?.value))
+    preparationInputs?.min?.updateValue?.(String(preparation?.min))
+    preparationInputs?.max?.updateValue?.(String(preparation?.max))
+    business = business
+  }
+
   function toggleDeIntegrationPagSeguroAlert() {
     showDeIntegrationPagSeguroAlert = !showDeIntegrationPagSeguroAlert
   }
 
   async function updateHours() {
     Stores.Loading.instance.start()
-    if (!business?.hours || (business?.hours?.length ?? 0) < 1) {
-      Stores.MessageAlert.instance.show('Precisa escolher pelo menos um horário de funcionamento!')
-      Stores.Loading.instance.stop()
-      return
-    }
-    for (const businessHour of business?.hours ?? []) {
-      if (!Logics.DateTime.validateTime(businessHour?.start)) {
-        Stores.MessageAlert.instance.show(
-          'O horário de abertura é inválido, o formato deve ser HH:mm e entre 00:00 e 23:59!'
-        )
-        Stores.Loading.instance.stop()
-        return
-      } else if (!Logics.DateTime.validateTime(businessHour?.end)) {
-        Stores.MessageAlert.instance.show(
-          'O horário de fechamento é inválido, o formato deve ser HH:mm e entre 00:00 e 23:59!'
-        )
-        Stores.Loading.instance.stop()
-        return
-      } else if (Number(businessHour.start) > Number(businessHour.end)) {
-        Stores.MessageAlert.instance.show(
-          'O horário de abertura deve ser menor que o horário de fechamento, exemplo de abertura: 09:00 e fechamento: 18:00!'
-        )
-        Stores.Loading.instance.stop()
-        return
-      }
-    }
-    if (business) {
-      if (!business.days || business.days.length < 1) {
-        Stores.MessageAlert.instance.show('Precisa escolher pelo menos um dia de funcionamento!')
-        Stores.Loading.instance.stop()
-        return
-      }
-      let response = await updateBusinessHours(business)
+    if (business && Utils.Objects.validateBusinessTime(business)) {
+      let response = await updateBusinessHours(
+        business.filter(expedient => expedient && JSON.stringify(expedient.toJSON()) !== '{}')
+      )
       if (response.success) {
         Stores.MessageAlert.instance.show('O horário de funcionamento atualizado com sucesso!')
       } else {
@@ -129,7 +111,7 @@
   }
 
   async function updateDelivery() {
-    if((preparation?.min??0)>(preparation?.max??0)){
+    if ((preparation?.min ?? 0) > (preparation?.max ?? 0)) {
       Stores.MessageAlert.instance.show(`O tempo máximo de preparação deve ser maior ou igual ao tempo mínimo!`)
       return
     }
@@ -182,7 +164,7 @@
           await AppLauncher.openUrl({ url })
           await Clipboard.write({ string: url })
           Stores.MessageAlert.instance.show(
-            `Se o navegador externo no for aberto automaticamente, por favor o abra e digita esa URL: ${url}, que também foi copiado para sua área de transferência!`
+            `Se o navegador externo no for aberto automaticamente, por favor o abra e digite a URL: ${url}, que também foi copiado para sua área de transferência!`
           )
         }
       }
@@ -192,22 +174,21 @@
   }
 
   onMount(async () => {
+    ExpandableBox = Stores.ExpandableBox.createInstance().store
     auth = await Stores.Auth.Auth.instance.store()
     userInfo = Types.Classes.CUser.fromObject(await Utils.Jws.extractToken($auth))
     const response = await getSettings()
     if (response.success) {
       const data: Types.Classes.CVendorSettings = Types.Classes.CVendorSettings.fromObject(response.data)
       paymentGateway = data.paymentGateway
-      business = data.business
+      if (data.business) {
+        business = Types.Classes.CBusinessTime.fromObject(data.business)
+      }
       delivery = Object.assign(delivery, data?.delivery)
-      deliveryInputs.min?.updateValue?.(String(delivery?.min))
-      deliveryInputs.orderMinValue?.updateValue?.(String(delivery?.orderMinValue))
-      deliveryInputs.value?.updateValue?.(String(delivery?.value))
       preparation = data?.preparation
       order.types = data?.orderTypes
       order.tip = data?.tip
-      preparationInputs?.min?.updateValue?.(String(preparation?.min))
-      preparationInputs?.max?.updateValue?.(String(preparation?.max))
+      updateInputs()
     } else {
       Stores.MessageAlert.instance.show(response.data)
     }
@@ -218,22 +199,21 @@
 </script>
 
 <div class="settings">
-  <div class="shadow data">
-    <Views.DatePeriods mandatory={true} bind:business />
+  <Views.ExpandableBox title="Expediente" expand={true}>
+    <Views.DatePeriods mandatory={true} bind:value={business} />
+    <Views.Divider height={8} />
     <Views.Button on:click={updateHours}><Fa icon={faClock} /><span>Salvar horários</span></Views.Button>
-  </div>
-  <div class="shadow data">
-    {#if userInfo?.role === Types.Types.TRoles.VENDOR}
-      <Views.Divider />
-      <h2>Portais de pagamentos</h2>
-      <Views.Divider />
+  </Views.ExpandableBox>
+  {#if userInfo?.role === Types.Types.TRoles.VENDOR}
+    <Views.ExpandableBox title="Pagamentos">
+      <Views.Divider height={16} />
+      <p>Conecte sua conta do PagSeguro aqui para poder receber pagamentos via cartão de crédito online.</p>
+      <Views.Divider height={8} />
       <Views.Button on:click={requestPagSeguroIntegration}>{integrateButtonName}</Views.Button>
-    {/if}
-  </div>
-  <div class="shadow data">
-    <Views.Divider />
-    <h2>A entrega</h2>
-    <Views.Divider />
+    </Views.ExpandableBox>
+  {/if}
+  <Views.ExpandableBox title="Delivery">
+    <Views.Divider height={16} />
     <h3>Tempo de preparação em minutos</h3>
     <small>Quanto tempo você vai precisar para preparar seus pedidos em média?</small>
     {#if preparation}
@@ -255,7 +235,6 @@
           leftPadding={10}
         />
       </div>
-      <Views.Divider />
     {/if}
     <Views.Divider />
     <Views.CheckBoxList
@@ -301,18 +280,17 @@
         bind:value={order.tip}
         bind:this={orderInputs.tip}
         initialValue={order.tip}
-        placeHolder="Percentagem da gorjeta"
+        placeHolder="Porcentagem da gorjeta"
       />
     {/if}
     <Views.Divider />
     <Views.Button on:click={updateDelivery}>Salvar</Views.Button>
-  </div>
-  <div class="shadow data">
-    <Views.Divider />
-    <h3>Exibir popups</h3>
+  </Views.ExpandableBox>
+  <Views.ExpandableBox title="Exibir popups">
+    <Views.Divider height={16} />
     <small>Aqui você escolhe quais popups vão ser exibidos a você:</small>
     <Views.Switch name="Mostrar novos pedidos:" bind:checked={popupNewOrder} />
-  </div>
+  </Views.ExpandableBox>
 </div>
 {#if showDeIntegrationPagSeguroAlert}
   <Views.Alert
@@ -337,22 +315,10 @@
 
 <style>
   .settings {
-    padding-bottom: 48pt;
-  }
-  .settings > .data {
-    padding: 16pt;
-    border-radius: 8pt;
+    padding-bottom: 48px;
   }
   .settings > div {
     width: 100%;
-  }
-  .settings > div > h2 {
-    margin-left: 16pt;
-  }
-  .settings > .data {
-    width: 100%;
-    float: left;
-    margin-top: 16pt;
   }
   .twoCells {
     display: flex;

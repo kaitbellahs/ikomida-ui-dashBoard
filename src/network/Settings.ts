@@ -25,7 +25,7 @@ export async function revokePaymentGateway() {
   return Network.instance?.remove('/vendor/revokePaymentGateway', true, undefined, 'revokePaymentGateway')
 }
 
-export async function updateBusinessHours(object: Types.Classes.CBusinessTime) {
+export async function updateBusinessHours(object: Types.Classes.CBusinessTime[]) {
   return Network.instance?.put('/vendor/businessHours', true, object)
 }
 
