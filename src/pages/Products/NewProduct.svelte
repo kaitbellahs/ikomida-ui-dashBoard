@@ -70,7 +70,7 @@
       return
     }
     if (!product.discountType || (!productsValidation.discount && product.discountType !== Types.Types.TDiscount.NO)) {
-      Stores.MessageAlert.instance.show('Escolha um tipo de discunto')
+      Stores.MessageAlert.instance.show('Escolha um tipo de desconto')
       return
     }
     if (!product.measureUnit) {
@@ -332,21 +332,21 @@
       bind:selected={product.orderTypes}
       options={Types.Types.TOrderType.values()}
     />
-    <Views.Selector bind:selected={product.discountType} name="selecione seu discunto" options={discountTypeOptions} />
+    <Views.Selector bind:selected={product.discountType} name="selecione seu desconto" options={discountTypeOptions} />
     {#if product.discountType}
       {#if product.discountType === Types.Types.TDiscount.PERCENT}
         <Views.TextEdit
           type={Types.TTextEdit.PERCENT}
-          placeHolder="Disconto"
+          placeHolder="Desconto"
           bind:value={product.discount}
           bind:isValid={productsValidation.discount}
           initialValue={product.discount}
           validation={percentValidation}
-          error="A percentagem do desconto deve ser maior que % 0,00 e menor que % 100,00"
+          error="A porcentagem do desconto deve ser maior que % 0,00 e menor que % 100,00"
         />
       {:else if product.discountType === Types.Types.TDiscount.VALUE}
         <Views.TextEdit
-          placeHolder="Disconto"
+          placeHolder="Desconto"
           bind:value={product.discount}
           bind:isValid={productsValidation.discount}
           initialValue={product.discount}
@@ -497,12 +497,12 @@
   .product {
     display: flex;
     flex-direction: column;
-    padding-bottom: 48pt;
+    padding-bottom: 48px;
   }
   .product > .optionsCategory {
     background-color: #fffffffa;
-    border-radius: 8pt;
-    padding: 16pt;
+    border-radius: 8px;
+    padding: 16px;
     position: relative;
   }
   .product > .optionsCategory > header {
@@ -510,27 +510,27 @@
     flex-direction: row;
   }
   .product > .optionsCategory > header > .img {
-    width: 48pt;
-    height: 48pt;
+    width: 48px;
+    height: 48px;
   }
   .product > .optionsCategory > header > .items {
-    width: calc(100% - 40pt);
-    margin-left: 16pt;
+    width: calc(100% - 40px);
+    margin-left: 16px;
   }
   .product > .optionsCategory > .option {
     background-color: #fffffffa;
-    border-radius: 8pt;
-    padding: 16pt;
+    border-radius: 8px;
+    padding: 16px;
     position: relative;
     display: flex;
     flex-direction: row;
   }
   .product > .optionsCategory > .option > .img {
-    width: 48pt;
-    height: 48pt;
+    width: 48px;
+    height: 48px;
   }
   .product > .optionsCategory > .option > .items {
-    width: calc(100% - 40pt);
-    margin-left: 16pt;
+    width: calc(100% - 40px);
+    margin-left: 16px;
   }
 </style>

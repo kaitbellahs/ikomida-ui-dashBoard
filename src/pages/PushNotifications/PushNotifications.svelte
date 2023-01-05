@@ -25,7 +25,7 @@
   Stores.Title.instance.set('Mensagens push')
 </script>
 
-<div style="padding: 0 16pt;">
+<div style="padding: 0 16px;">
   <Views.Button on:click={newPushNotification} bottomPadding={$StatusBar.bottomPadding}
     ><Fa icon={faRocket} /> <span>Enviar mensagem</span></Views.Button
   >
@@ -53,6 +53,6 @@
 <style>
   article {
     position: relative;
-    padding: 16pt;
+    padding: 16px;
   }
 </style>

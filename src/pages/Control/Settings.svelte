@@ -164,7 +164,7 @@
           await AppLauncher.openUrl({ url })
           await Clipboard.write({ string: url })
           Stores.MessageAlert.instance.show(
-            `Se o navegador externo no for aberto automaticamente, por favor o abra e digita esa URL: ${url}, que também foi copiado para sua área de transferência!`
+            `Se o navegador externo no for aberto automaticamente, por favor o abra e digite a URL: ${url}, que também foi copiado para sua área de transferência!`
           )
         }
       }
@@ -280,7 +280,7 @@
         bind:value={order.tip}
         bind:this={orderInputs.tip}
         initialValue={order.tip}
-        placeHolder="Percentagem da gorjeta"
+        placeHolder="Porcentagem da gorjeta"
       />
     {/if}
     <Views.Divider />
@@ -315,7 +315,7 @@
 
 <style>
   .settings {
-    padding-bottom: 48pt;
+    padding-bottom: 48px;
   }
   .settings > div {
     width: 100%;

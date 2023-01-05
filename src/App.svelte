@@ -50,12 +50,12 @@
     style.innerHTML = `
         body {
           --paddingTop: ${styleHeight};
-          --paddingBottom: 64pt;
+          --paddingBottom: 64px;
         }
       `
   }
 
-  $: styleHeight = `${Number($_StatusBar.height + ($_StatusBar.topMargin ?? 0)) + 48}pt`
+  $: styleHeight = `${Number($_StatusBar.height + ($_StatusBar.topMargin ?? 0)) + 48}px`
 
   $: route = $router.route
   $: if ($auth) {
@@ -299,13 +299,13 @@
     top: 0;
     left: 0;
     right: 0;
-    padding-top: 1pt;
-    padding-bottom: 1pt;
-    padding-left: 12pt;
-    padding-right: 12pt;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    padding-left: 12px;
+    padding-right: 12px;
     z-index: 9999999999;
     text-align: center;
-    border-bottom: 1pt solid white;
+    border-bottom: 1px solid white;
   }
   :global(.grecaptcha-badge) {
     visibility: hidden;

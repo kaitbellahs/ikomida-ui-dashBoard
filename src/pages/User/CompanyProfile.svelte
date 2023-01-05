@@ -218,12 +218,12 @@
     width: 100%;
   }
   .profile > div > h2 {
-    margin-left: 16pt;
+    margin-left: 16px;
   }
   .profile > .data {
     width: 100%;
     float: left;
-    margin-top: 16pt;
+    margin-top: 16px;
   }
 
   .profile > .data > h2 {

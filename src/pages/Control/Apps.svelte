@@ -152,8 +152,8 @@
 
 <style>
   .data {
-    padding: 16pt;
-    border-radius: 8pt;
+    padding: 16px;
+    border-radius: 8px;
   }
   box {
     display: flex;

@@ -92,6 +92,6 @@
 
 <style>
   .category {
-    padding-bottom: 48pt;
+    padding-bottom: 48px;
   }
 </style>

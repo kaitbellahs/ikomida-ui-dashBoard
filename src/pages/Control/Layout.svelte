@@ -164,7 +164,7 @@
         </div>
       </div>
     </div>
-    <section style="padding-bottom: 64pt;background-color: rgb(223, 223, 223);">
+    <section style="padding-bottom: 64px;background-color: rgb(223, 223, 223);">
       <h2>Layout</h2>
       <small>Aqui você pode alterar as cores do seu APP como quiser</small>
       <Views.ExpandableBox title="Cabeçalho">
@@ -298,7 +298,7 @@
 
 <style>
   .settings {
-    padding-bottom: 48pt;
+    padding-bottom: 48px;
   }
   .settings > div {
     width: 100%;
@@ -306,28 +306,28 @@
   .settings > .data {
     width: 100%;
     float: left;
-    margin-top: 16pt;
+    margin-top: 16px;
   }
   .sample {
     background: var(--background) url(/assets/images/paint.jpg) center center/cover no-repeat;
-    height: 320pt;
+    height: 320px;
     color: var(--color);
-    padding: 16pt 16pt 40pt 16pt;
+    padding: 16px 16px 40px 16px;
     position: fixed;
     left: 0;
     right: 0;
-    top: 48pt;
+    top: 48px;
     display: flex;
     align-items: center;
     place-content: center;
   }
   .iphone.outSide {
     position: relative;
-    width: 160pt;
+    width: 160px;
     height: 100%;
     background-color: black;
-    padding: 2pt;
-    border-radius: 4pt;
+    padding: 2px;
+    border-radius: 4px;
     overflow: hidden;
   }
   .iphone > .inSide {
@@ -337,13 +337,13 @@
     height: 100%;
     background-color: var(--background);
     font-size: 0.7rem;
-    padding: 16pt;
+    padding: 16px;
   }
   .iphone > .inSide > .ear {
-    top: -2pt;
+    top: -2px;
     background-color: #fff;
-    border-radius: 0 0pt 4pt 4pt;
-    height: 7pt;
+    border-radius: 0 0px 4px 4px;
+    height: 7px;
     left: 40%;
     position: absolute;
     right: 40%;
@@ -354,8 +354,8 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 32pt;
-    padding: 4pt;
+    height: 32px;
+    padding: 4px;
     background: var(--header);
     color: var(--headerTextColor);
     display: flex;
@@ -363,18 +363,18 @@
     z-index: 999998;
   }
   .iphone > .inSide > .header > span {
-    margin-left: 16pt;
+    margin-left: 16px;
   }
   .iphone > .inSide > .header > .menuSandwich {
-    height: 32pt;
-    width: 24pt;
-    padding-top: 2pt;
+    height: 32px;
+    width: 24px;
+    padding-top: 2px;
   }
   .iphone > .inSide > .header > .menuSandwich > div {
     background: var(--menuHamburger);
-    margin-top: 6pt;
-    height: 2pt;
-    border-radius: 2pt;
+    margin-top: 6px;
+    height: 2px;
+    border-radius: 2px;
   }
   .iphone > .inSide > .body > .button {
     z-index: 999998;
@@ -393,9 +393,9 @@
   .iphone > .inSide > .body > .box {
     background-color: var(--background);
     position: relative;
-    margin-top: 8pt;
-    border-radius: 4pt;
-    padding: 16pt;
+    margin-top: 8px;
+    border-radius: 4px;
+    padding: 16px;
   }
   .iphone > .inSide > .body > .box.shadow {
     margin-top: 0;
@@ -403,10 +403,10 @@
   .iphone > .inSide > .tabs {
     display: flex;
     position: absolute;
-    left: 8pt;
-    right: 8pt;
-    bottom: 8pt;
-    border-radius: 4pt;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    border-radius: 4px;
     background: gray;
     overflow: hidden;
     z-index: 999997;
@@ -418,21 +418,21 @@
     flex: 1 33%;
     align-self: center;
     margin: 0;
-    height: 24pt;
+    height: 24px;
     text-align: center;
     justify-content: center;
     flex-direction: column;
   }
   section {
     position: absolute;
-    padding: 16pt;
-    padding-bottom: 104pt;
+    padding: 16px;
+    padding-bottom: 104px;
     left: 0;
     right: 0;
-    top: 336pt;
-    border-radius: 16pt 16pt 0 0;
+    top: 336px;
+    border-radius: 16px 16px 0 0;
     background: #fff;
-    box-shadow: 0 -4pt 8pt #0000009e;
+    box-shadow: 0 -4px 8px #0000009e;
     text-align: center;
     min-width: 100%;
     margin: 0 auto;

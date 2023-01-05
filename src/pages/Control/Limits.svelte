@@ -65,7 +65,7 @@
       </h4>
       <span><b>Usado:</b> {limits?.orders?.used ?? 0} Pedidos este Mês</span><span>
         <b>Limite:</b> {limit(limits?.orders?.limits)} Pedidos por Mês</span
-      ><span><b>Percentagem:</b> {orders}% saturado</span>
+      ><span><b>Porcentagem:</b> {orders}% saturado</span>
       <div class="chart">
         <div style="--width: {orders}%; --color: {color(orders)};" />
       </div>
@@ -79,7 +79,7 @@
         ><b>Usado:</b>
         {Utils.Strings.currency(limits?.billing?.used) ?? 0} este Mês</span
       ><span> <b>Limite:</b> {limitCurrency(limits?.billing?.limits)} por Mês</span><span
-        ><b>Percentagem:</b> {billing}% saturado</span
+        ><b>Porcentagem:</b> {billing}% saturado</span
       >
       <div class="chart">
         <div style="--width: {billing}%; --color: {color(billing)};" />
@@ -92,7 +92,7 @@
       </h4>
       <span><b>Usado:</b> {limits?.products?.used ?? 0}</span><span>
         <b>Limite:</b> {limit(limits?.products?.limits)}</span
-      ><span><b>Percentagem:</b> {products}% saturado</span>
+      ><span><b>Porcentagem:</b> {products}% saturado</span>
       <div class="chart">
         <div style="--width: {products}%; --color: {color(products)};" />
       </div>
@@ -104,7 +104,7 @@
       </h4>
       <span><b>Usado:</b> {limits?.pushNotifications?.used ?? 0} este Mês</span><span>
         <b>Limite:</b> {limit(limits?.pushNotifications?.limits)} por Mês</span
-      ><span><b>Percentagem:</b> {pushNotifications}% saturado</span>
+      ><span><b>Porcentagem:</b> {pushNotifications}% saturado</span>
       <div class="chart">
         <div style="--width: {pushNotifications}%; --color: {color(pushNotifications)};" />
       </div>
@@ -116,7 +116,7 @@
       </h4>
       <span><b>Usado:</b> {limits?.coupons?.used ?? 0}</span><span>
         <b>Limite:</b> {limit(limits?.coupons?.limits)}</span
-      ><span><b>Percentagem:</b> {coupons}% saturado</span>
+      ><span><b>Porcentagem:</b> {coupons}% saturado</span>
       <div class="chart">
         <div style="--width: {coupons}%; --color: {color(coupons)};" />
       </div>
@@ -128,7 +128,7 @@
       </h4>
       <span><b>Usado:</b> {limits?.staff?.used ?? 0}</span><span>
         <b>Limite:</b> {limit(limits?.staff?.limits)}</span
-      ><span><b>Percentagem:</b> {staff}% saturado</span>
+      ><span><b>Porcentagem:</b> {staff}% saturado</span>
       <div class="chart">
         <div style="--width: {staff}%; --color: {color(staff)};" />
       </div>
@@ -140,7 +140,7 @@
       </h4>
       <span><b>Usado:</b> {limits?.categories?.used ?? 0}</span><span>
         <b>Limite:</b> {limit(limits?.categories?.limits)}</span
-      ><span><b>Percentagem:</b> {categories}% saturado</span>
+      ><span><b>Porcentagem:</b> {categories}% saturado</span>
       <div class="chart">
         <div style="--width: {categories}%; --color: {color(categories)};" />
       </div>
@@ -151,8 +151,8 @@
 <style>
   section > article > .chart {
     width: 100%;
-    height: 8pt;
-    border-radius: 4pt;
+    height: 8px;
+    border-radius: 4px;
     background: #c1c0c1;
     position: relative;
     overflow: hidden;
@@ -163,23 +163,23 @@
     place-items: center;
     align-items: center;
     justify-items: center;
-    margin-top: 24pt;
+    margin-top: 24px;
   }
   section > article {
-    border-radius: 8pt;
-    box-shadow: 0 4pt 8pt #0000009e;
-    padding: 16pt;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px #0000009e;
+    padding: 16px;
     display: flex;
     flex-direction: column;
   }
   section > article > h4 {
-    margin-bottom: 24pt;
+    margin-bottom: 24px;
   }
   section > article > .chart > div {
     position: absolute;
     top: 0;
     left: 0;
-    height: 8pt;
+    height: 8px;
     width: var(--width);
     background: var(--color);
   }

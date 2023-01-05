@@ -110,9 +110,9 @@
   section.product {
     height: 100%;
     flex-direction: row;
-    border: 1pt solid red;
-    padding: 16pt;
-    border-radius: 8pt;
+    border: 1px solid red;
+    padding: 16px;
+    border-radius: 8px;
     overflow-y: scroll;
     overflow-x: hidden;
   }
@@ -127,16 +127,16 @@
   }
   section > :global(button) {
     flex: 1;
-    padding: 8pt;
-    border: 1pt solid #ccc;
-    border-radius: 4pt;
-    margin: 8pt;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin: 8px;
     width: 50%;
     display: flex;
     flex-direction: column;
     flex-basis: 40%;
-    text-shadow: 0.8pt 1pt #18056b66;
-    box-shadow: 0 4pt 8pt #0000009e;
+    text-shadow: 0.8px 1px #18056b66;
+    box-shadow: 0 4px 8px #0000009e;
   }
   section.product > :global(button) {
     width: 100%;
@@ -160,12 +160,12 @@
   }
   .item {
     width: 100%;
-    margin: 16pt 0;
+    margin: 16px 0;
     height: fit-content;
-    padding: 8pt;
+    padding: 8px;
     background: var(--itemBackground);
     position: relative;
-    border-radius: 8pt;
+    border-radius: 8px;
   }
   .item > button {
     background-color: transparent;
@@ -181,18 +181,18 @@
     flex-wrap: wrap;
   }
   .item > button > .orderTypes > span {
-    padding: 4pt;
-    border-radius: 8pt;
-    margin: 4pt;
+    padding: 4px;
+    border-radius: 8px;
+    margin: 4px;
     font-size: 0.9em;
-    border: var(--buttonBackground) solid 1pt;
+    border: var(--buttonBackground) solid 1px;
   }
   .item > button > div > .body > h3 {
     padding: 0;
     margin: 0;
     font-size: 1.5em;
     text-align: center;
-    margin-bottom: 16pt;
+    margin-bottom: 16px;
   }
   .item > button > div {
     display: flex;
@@ -203,7 +203,7 @@
   }
   .item > button > div > div {
     width: 100%;
-    min-height: 1pt;
+    min-height: 1px;
     display: flex;
     -o-flex-wrap: wrap;
     flex-wrap: wrap;

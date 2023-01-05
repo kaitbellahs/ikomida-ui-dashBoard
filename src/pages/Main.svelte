@@ -141,7 +141,7 @@
     menuHamburgerItems?.forEach(page => Stores.MenuHamburger.instance.addItem(page))
   }
   $: isPageList = [Routes.orders, Routes.coupons, Routes.orders, Routes.pushNotifications, Routes.staff].includes(route)
-  $: style = `--padding: ${isPageList ? 0 : 16}pt;--paddingTop:${styleHeight};--paddingBottom: ${
+  $: style = `--padding: ${isPageList ? 0 : 16}px;--paddingTop:${styleHeight};--paddingBottom: ${
     96 + $StatusBar.bottomPadding
   }px;`
 </script>
