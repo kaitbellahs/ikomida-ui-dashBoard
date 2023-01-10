@@ -131,14 +131,9 @@
                   <div>
                     <div>
                       <span>Valor</span>
-                      {#if [Types.Types.TDiscount.PERCENT, Types.Types.TDiscount.VALUE].includes(product.discountType) && option.price > 0}
-                        <span class="oldPrice">{Utils.Strings.currency(option.price)}</span>
-                      {/if}
                       <b
                         >{Utils.Strings.currency(
-                          option.price -
-                            Logics.Finances.calcDiscount(option.price, product.discount, product.discountType)
-                        )}</b
+                          option.price)}</b
                       >
                     </div>
                     <div>

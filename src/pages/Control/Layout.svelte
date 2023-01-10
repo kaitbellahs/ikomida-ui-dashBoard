@@ -2,6 +2,7 @@
   import { Views, Utils, Stores, Types } from '@ikomida/shared-frontend'
   import { getLayout, updateLayout } from '../../network/Layout'
   import { onMount, tick } from 'svelte'
+  import { StatusBar } from '../../stores/Setup'
 
   const ANIMATION_PREFIX = 'animate__'
 
@@ -62,6 +63,8 @@
   let backgroundImage: Views.UploadablePhoto
 
   let product: HTMLDivElement
+
+  $: styleHeight = `--height:${Number($StatusBar.height + ($StatusBar.topMargin ?? 0)) + 62}px;`
 
   $: if (inAnimation && product) {
     layout.product.animation.in = inAnimation.id
@@ -302,7 +305,7 @@
     position: fixed;
     left: 0;
     right: 0;
-    top: 48px;
+    top: var(--height);
     display: flex;
     align-items: center;
     place-content: center;
@@ -433,7 +436,7 @@
     padding-bottom: 104px;
     left: 0;
     right: 0;
-    top: 336px;
+    top: calc(288px + var(--height));
     border-radius: 16px 16px 0 0;
     background: #fff;
     box-shadow: 0 -4px 8px #0000009e;
