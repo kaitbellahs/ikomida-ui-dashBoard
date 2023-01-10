@@ -64,7 +64,7 @@
 
   let product: HTMLDivElement
 
-  $: styleHeight = `--height:${Number($StatusBar.height + ($StatusBar.topMargin ?? 0)) + 62}px;`
+  $: styleHeight = `--height:${Number($StatusBar.height + ($StatusBar.topMargin ?? 0)) + 44}px;`
 
   $: if (inAnimation && product) {
     layout.product.animation.in = inAnimation.id
@@ -118,7 +118,7 @@
   Stores.Title.instance.set('Ajustes')
 </script>
 
-<data>
+<data style={styleHeight}>
   <sample
     class="shadow"
     style="--background: {layout.background}; --color: {layout.color}; --header: {layout.header
@@ -292,6 +292,7 @@
 
 <style>
   data {
+    position: relative;
     padding-bottom: 48px;
     width: 100%;
     float: left;
@@ -436,7 +437,7 @@
     padding-bottom: 104px;
     left: 0;
     right: 0;
-    top: calc(288px + var(--height));
+    top: calc(222px + var(--height));
     border-radius: 16px 16px 0 0;
     background: #fff;
     box-shadow: 0 -4px 8px #0000009e;
