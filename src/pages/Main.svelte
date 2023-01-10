@@ -143,7 +143,7 @@
   }
   $: isPageList = [Routes.orders, Routes.coupons, Routes.orders, Routes.pushNotifications, Routes.staff].includes(route)
   $: style = `--padding: ${isPageList ? 0 : 16}px;--paddingTop:${styleHeight};--paddingBottom: ${
-    (screenWidth > 480 ? 32 : 96) + $StatusBar.bottomPadding
+    (screenWidth > 480 ? 88 : 96) + $StatusBar.bottomPadding
   }px;`
 </script>
 

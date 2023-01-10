@@ -123,6 +123,7 @@
   }
   jumbotron {
     background-color: #4c0708;
+    min-height: 100%;
   }
   jumbotron > :global(img) {
     font-size: 3em;

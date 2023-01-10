@@ -258,3 +258,9 @@ jumbotron.mainPicture>.avatarCircle {
         max-width: 448px;
     }
 }
+
+data {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}

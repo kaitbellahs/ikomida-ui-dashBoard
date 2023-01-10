@@ -297,6 +297,7 @@
     width: 100%;
     float: left;
     margin-top: 16px;
+    flex-direction: row;
   }
   sample {
     background: var(--background) url(/assets/images/paint.jpg) center center/cover no-repeat;
@@ -318,6 +319,7 @@
     background-color: black;
     padding: 2px;
     border-radius: 4px;
+    max-height: 45vh;
     overflow: hidden;
   }
   iphone > inSide {
