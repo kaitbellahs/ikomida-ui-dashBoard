@@ -108,13 +108,13 @@
 </script>
 
 <Views.Divider />
-<div class="profile">
-  <Views.UploadablePhoto
-    type={Types.TUploadablePhoto.VENDOR}
-    bind:image={profile.mainPicture}
-    title={profile?.contractName}
-  />
-  <div class="data">
+<profile>
+  <data>
+    <Views.UploadablePhoto
+      type={Types.TUploadablePhoto.VENDOR}
+      bind:image={profile.mainPicture}
+      title={profile?.contractName}
+    />
     <h2>{profile?.contractName}</h2>
     <Views.Divider />
     <Views.TextValue
@@ -140,6 +140,8 @@
       bind:this={profileInputs.email}
     />
     <Views.Divider />
+  </data>
+  <data>
     <h2>Endereço</h2>
     <Views.TextEdit
       type={Types.TTextEdit.CEP}
@@ -204,29 +206,36 @@
     <Views.Button disabled={!canProceed} on:click={submit} bottomPadding={$StatusBar.bottomPadding}
       ><Fa icon={faEdit} /> <span>Atualizar</span></Views.Button
     >
-  </div>
-</div>
+  </data>
+</profile>
 
-<!-- {#if profile === {} || isLoading}
-  <Views.Loading
-    topPadding={$StatusBar.height}
-    bottomPadding={$StatusBar.bottomPadding}
-  />
-{/if} -->
 <style>
-  .profile > div {
+  profile {
     width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
   }
-  .profile > div > h2 {
-    margin-left: 16px;
-  }
-  .profile > .data {
+  profile > data {
     width: 100%;
     float: left;
     margin-top: 16px;
+    display: flex;
+    flex-direction: column;
   }
-
-  .profile > .data > h2 {
+  profile > data > h2 {
+    margin-left: 16px;
+  }
+  profile > data > h2 {
     text-align: center;
+  }
+  @media (min-width: 481px) {
+    profile > data {
+      flex-grow: 1;
+      width: calc(50% -16px);
+      max-width: calc(50% -16px);
+      margin-left: 8px;
+      margin-right: 8px;
+    }
   }
 </style>

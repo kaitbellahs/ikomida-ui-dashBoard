@@ -38,7 +38,7 @@
   Stores.Title.instance.set('Novo cupom')
 </script>
 
-<div class="pushNotification">
+<pushNotification>
   <Views.TextEdit placeHolder="Título" bind:value={item.title} bind:isValid={itemsValidation.title} min={0} max={64} />
   <Views.TextEdit
     type={Types.TTextEdit.TEXT}
@@ -52,10 +52,12 @@
   <Views.Button disabled={!canContinue} on:click={submit} bottomPadding={$StatusBar.bottomPadding}
     ><Fa icon={faRocket} /> <span>Enviar</span></Views.Button
   >
-</div>
+</pushNotification>
 
 <style>
-  .pushNotification {
+  pushNotification {
     padding-bottom: 48px;
+    min-width: 50%;
+    height: fit-content;
   }
 </style>

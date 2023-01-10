@@ -65,19 +65,18 @@ form {
 html,
 body {
     position: relative;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     overscroll-behavior-y: none;
     overscroll-behavior-x: none;
     overscroll-behavior: none;
-    max-height: 100%;
+    max-height: 100vh;
     padding: 0;
     margin: 0;
     color: #333;
     box-sizing: border-box;
     font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-    max-height: 100%;
-    padding-top: 1px;
+    padding-top: 0;
     background: #dfdfdf;
     display: flex;
     flex-direction: column;
@@ -153,6 +152,7 @@ h4,
 h5,
 b {
     font-family: RobotoMedium;
+    width: 100%;
 }
 
 img {
@@ -162,16 +162,16 @@ img {
 main {
     display: flex;
     flex-direction: column;
-    flex: 1 0 100%;
+    flex: 1 0 100vw;
     padding: 16px;
-    width: 100%;
+    width: 100vw;
     background-color: rgb(223, 223, 223);
 }
 
 jumbotron,
 productImage {
     object-fit: contain;
-    width: 100%;
+    width: 100vw;
     position: fixed;
     left: 0;
     right: 0;
@@ -180,7 +180,7 @@ productImage {
     justify-content: center;
     justify-items: center;
     align-items: center;
-    height: 100%;
+    height: 100vh;
     max-height: 100vw;
     /* max-width: 480px; */
 }
@@ -214,13 +214,13 @@ jumbotron.mainPicture {
     display: flex;
     align-items: center;
     flex-direction: column;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
 }
 
 jumbotron.mainPicture> :global(img) {
     font-size: 3em;
-    width: 100%;
+    width: 100vw;
     max-width: 500px;
     line-height: 88px;
     overflow: hidden;
@@ -239,4 +239,22 @@ jumbotron.mainPicture>.avatarCircle {
     vertical-align: middle;
     display: table-cell;
     overflow: hidden;
+}
+
+@media (min-width: 481px) {
+    jumbotron {
+        max-height: fit-content;
+        place-items: flex-start;
+        padding-top: 16px;
+    }
+
+    content {
+        border-radius: 16px;
+        top: unset;
+        left: unset;
+        right: unset;
+        min-height: unset;
+        width: 448px;
+        max-width: 448px;
+    }
 }

@@ -115,200 +115,186 @@
   Stores.Title.instance.set('Ajustes')
 </script>
 
-<div class="settings">
-  <div class="data">
-    <div
-      class="shadow sample"
-      style="--background: {layout.background}; --color: {layout.color}; --header: {layout.header
-        ?.background}; --headerTextColor: {layout.header?.color}; --menuHamburger: {layout.header?.menuHamburger};"
-    >
-      <div class="iphone outSide">
-        <div class="inSide">
-          <div class="ear" />
-          <div class="header">
-            <div class="menuSandwich">
-              <div />
-              <div />
-              <div />
-            </div>
-            <span>Título da página</span>
+<data>
+  <sample
+    class="shadow"
+    style="--background: {layout.background}; --color: {layout.color}; --header: {layout.header
+      ?.background}; --headerTextColor: {layout.header?.color}; --menuHamburger: {layout.header?.menuHamburger};"
+  >
+    <iphone>
+      <inSide>
+        <ear />
+        <div class="header">
+          <div class="menuSandwich">
+            <div />
+            <div />
+            <div />
           </div>
+          <span>Título da página</span>
+        </div>
+        <div class="body" style="--backgroundImage: url('{layout.backgroundImage ? layout.backgroundImage : 'none'}');">
+          <Views.Divider height={16} />
+          <div class="box">
+            Aqui é uma simulação dos textos normais do seu app.<br />
+            <span style="color: {layout.link};">Aqui está um link</span>
+          </div>
+          <Views.Divider height={8} />
           <div
-            class="body"
-            style="--backgroundImage: url('{layout.backgroundImage ? layout.backgroundImage : 'none'}');"
+            class="shadow box {ANIMATION_PREFIX}animated"
+            style="background: {layout.itemBackground};"
+            bind:this={product}
           >
-            <Views.Divider height={16} />
-            <div class="box">
-              Aqui é uma simulação dos textos normais do seu app.<br />
-              <span style="color: {layout.link};">Aqui está um link</span>
-            </div>
-            <Views.Divider height={8} />
-            <div
-              class="shadow box {ANIMATION_PREFIX}animated"
-              style="background: {layout.itemBackground};"
-              bind:this={product}
-            >
-              <h2>Produto</h2>
-              <p>Aqui é uma simulação da caixa dos produtos.</p>
-            </div>
-            <Views.Divider height={8} />
-            <button class="button shadow" style="background: {layout.button?.background};color: {layout.button?.color}"
-              >Aqui um texto dentro de um botão</button
-            >
+            <h2>Produto</h2>
+            <p>Aqui é uma simulação da caixa dos produtos.</p>
           </div>
-          <div class="shadow tabs" style="background-color: {layout.tabs?.background};color: {layout.tabs?.color};">
-            <div style="color: {layout.tabs?.background};background-color: {layout.tabs?.color};">Home</div>
-            <div>Produtos</div>
-            <div>Pedidos</div>
-          </div>
+          <Views.Divider height={8} />
+          <button class="button shadow" style="background: {layout.button?.background};color: {layout.button?.color}"
+            >Aqui um texto dentro de um botão</button
+          >
         </div>
+        <div class="shadow tabs" style="background-color: {layout.tabs?.background};color: {layout.tabs?.color};">
+          <div style="color: {layout.tabs?.background};background-color: {layout.tabs?.color};">Home</div>
+          <div>Produtos</div>
+          <div>Pedidos</div>
+        </div>
+      </inSide>
+    </iphone>
+  </sample>
+  <section style="padding-bottom: 64px;background-color: rgb(223, 223, 223);">
+    <h2>Layout</h2>
+    <small>Aqui você pode alterar as cores do seu APP como quiser</small>
+    <Views.ExpandableBox title="Cabeçalho">
+      <Views.TextEdit
+        type={Types.TTextEdit.COLOR}
+        placeHolder="A cor do cabeçalho"
+        bind:value={layout.header.background}
+        bind:this={layoutInputs.header.background}
+        initialValue={layout.header.background}
+      />
+      <Views.TextEdit
+        type={Types.TTextEdit.COLOR}
+        placeHolder="A cor do texto do cabeçalho"
+        bind:value={layout.header.color}
+        bind:this={layoutInputs.header.color}
+        initialValue={layout.header.color}
+      />
+      <Views.TextEdit
+        type={Types.TTextEdit.COLOR}
+        placeHolder="A cor do menu hamburger"
+        bind:value={layout.header.menuHamburger}
+        bind:this={layoutInputs.header.menuHamburger}
+        initialValue={layout.header.menuHamburger}
+      />
+    </Views.ExpandableBox>
+    <Views.ExpandableBox title="Geral">
+      <div class="image">
+        <Views.FloatRemove top={0} right={0} callback={resetBackgroundImage} />
+        <span>Imagem do fundo</span>
+        <Views.UploadablePhoto
+          bind:this={backgroundImage}
+          bind:image={layout.backgroundImage}
+          title="Imagem do fundo"
+          type={Types.TUploadablePhoto.THUMB}
+        />
       </div>
-    </div>
-    <section style="padding-bottom: 64px;background-color: rgb(223, 223, 223);">
-      <h2>Layout</h2>
-      <small>Aqui você pode alterar as cores do seu APP como quiser</small>
-      <Views.ExpandableBox title="Cabeçalho">
-        <Views.TextEdit
-          type={Types.TTextEdit.COLOR}
-          placeHolder="A cor do cabeçalho"
-          bind:value={layout.header.background}
-          bind:this={layoutInputs.header.background}
-          initialValue={layout.header.background}
-        />
-        <Views.TextEdit
-          type={Types.TTextEdit.COLOR}
-          placeHolder="A cor do texto do cabeçalho"
-          bind:value={layout.header.color}
-          bind:this={layoutInputs.header.color}
-          initialValue={layout.header.color}
-        />
-        <Views.TextEdit
-          type={Types.TTextEdit.COLOR}
-          placeHolder="A cor do menu hamburger"
-          bind:value={layout.header.menuHamburger}
-          bind:this={layoutInputs.header.menuHamburger}
-          initialValue={layout.header.menuHamburger}
-        />
-      </Views.ExpandableBox>
-      <Views.ExpandableBox title="Geral">
-        <div class="image">
-          <Views.FloatRemove top={0} right={0} callback={resetBackgroundImage} />
-          <span>Imagem do fundo</span>
-          <Views.UploadablePhoto
-            bind:this={backgroundImage}
-            bind:image={layout.backgroundImage}
-            title="Imagem do fundo"
-            type={Types.TUploadablePhoto.THUMB}
-          />
-        </div>
-        <Views.TextEdit
-          type={Types.TTextEdit.COLOR}
-          placeHolder="A cor do fundo"
-          bind:value={layout.background}
-          bind:this={layoutInputs.background}
-          initialValue={layout.background}
-        />
-        <Views.TextEdit
-          type={Types.TTextEdit.COLOR}
-          placeHolder="A cor do link"
-          bind:value={layout.link}
-          bind:this={layoutInputs.link}
-          initialValue={layout.link}
-        />
-        <Views.TextEdit
-          type={Types.TTextEdit.COLOR}
-          placeHolder="A cor do texto"
-          bind:value={layout.color}
-          bind:this={layoutInputs.color}
-          initialValue={layout.color}
-        />
-      </Views.ExpandableBox>
-      <Views.ExpandableBox title="Botão">
-        <Views.TextEdit
-          type={Types.TTextEdit.COLOR}
-          placeHolder="A cor do fundo do botão"
-          bind:value={layout.button.background}
-          bind:this={layoutInputs.button.background}
-          initialValue={layout.button.background}
-        />
-        <Views.TextEdit
-          type={Types.TTextEdit.COLOR}
-          placeHolder="A cor do botão"
-          bind:value={layout.button.color}
-          bind:this={layoutInputs.button.color}
-          initialValue={layout.button.color}
-        />
-      </Views.ExpandableBox>
-      <Views.ExpandableBox title="Produtos">
-        <Views.TextEdit
-          type={Types.TTextEdit.COLOR}
-          placeHolder="A cor da caixa dos produtos"
-          bind:value={layout.itemBackground}
-          bind:this={layoutInputs.itemBackground}
-          initialValue={layout.itemBackground}
-        />
-        <Views.Selector
-          bind:selected={inAnimation}
-          options={Types.Types.TAnimation.values()}
-          name="Animação de entrada"
-        />
-        <Views.Selector
-          bind:selected={outAnimation}
-          options={Types.Types.TAnimation.values()}
-          name="animação de saída"
-        />
-      </Views.ExpandableBox>
-      <Views.ExpandableBox title="Alerta">
-        <Views.TextEdit
-          type={Types.TTextEdit.COLOR}
-          placeHolder="A cor do fundo do alerta"
-          bind:value={layout.dialog.background}
-          bind:this={layoutInputs.dialog.background}
-          initialValue={layout.dialog.background}
-        />
-        <Views.TextEdit
-          type={Types.TTextEdit.COLOR}
-          placeHolder="A cor do alerta"
-          bind:value={layout.dialog.color}
-          bind:this={layoutInputs.dialog.color}
-          initialValue={layout.dialog.color}
-        />
-      </Views.ExpandableBox>
-      <Views.ExpandableBox title="Rodapé">
-        <Views.TextEdit
-          type={Types.TTextEdit.COLOR}
-          placeHolder="A cor do fundo do tabs"
-          bind:value={layout.tabs.background}
-          bind:this={layoutInputs.tabs.background}
-          initialValue={layout.tabs.background}
-        />
-        <Views.TextEdit
-          type={Types.TTextEdit.COLOR}
-          placeHolder="A cor do texto do tabs"
-          bind:value={layout.tabs.color}
-          bind:this={layoutInputs.tabs.color}
-          initialValue={layout.tabs.color}
-        />
-      </Views.ExpandableBox>
-      <Views.Divider />
-      <Views.Button on:click={setLaout}>Atualizar o layout</Views.Button>
-    </section>
-  </div>
-</div>
+      <Views.TextEdit
+        type={Types.TTextEdit.COLOR}
+        placeHolder="A cor do fundo"
+        bind:value={layout.background}
+        bind:this={layoutInputs.background}
+        initialValue={layout.background}
+      />
+      <Views.TextEdit
+        type={Types.TTextEdit.COLOR}
+        placeHolder="A cor do link"
+        bind:value={layout.link}
+        bind:this={layoutInputs.link}
+        initialValue={layout.link}
+      />
+      <Views.TextEdit
+        type={Types.TTextEdit.COLOR}
+        placeHolder="A cor do texto"
+        bind:value={layout.color}
+        bind:this={layoutInputs.color}
+        initialValue={layout.color}
+      />
+    </Views.ExpandableBox>
+    <Views.ExpandableBox title="Botão">
+      <Views.TextEdit
+        type={Types.TTextEdit.COLOR}
+        placeHolder="A cor do fundo do botão"
+        bind:value={layout.button.background}
+        bind:this={layoutInputs.button.background}
+        initialValue={layout.button.background}
+      />
+      <Views.TextEdit
+        type={Types.TTextEdit.COLOR}
+        placeHolder="A cor do botão"
+        bind:value={layout.button.color}
+        bind:this={layoutInputs.button.color}
+        initialValue={layout.button.color}
+      />
+    </Views.ExpandableBox>
+    <Views.ExpandableBox title="Produtos">
+      <Views.TextEdit
+        type={Types.TTextEdit.COLOR}
+        placeHolder="A cor da caixa dos produtos"
+        bind:value={layout.itemBackground}
+        bind:this={layoutInputs.itemBackground}
+        initialValue={layout.itemBackground}
+      />
+      <Views.Selector
+        bind:selected={inAnimation}
+        options={Types.Types.TAnimation.values()}
+        name="Animação de entrada"
+      />
+      <Views.Selector bind:selected={outAnimation} options={Types.Types.TAnimation.values()} name="animação de saída" />
+    </Views.ExpandableBox>
+    <Views.ExpandableBox title="Alerta">
+      <Views.TextEdit
+        type={Types.TTextEdit.COLOR}
+        placeHolder="A cor do fundo do alerta"
+        bind:value={layout.dialog.background}
+        bind:this={layoutInputs.dialog.background}
+        initialValue={layout.dialog.background}
+      />
+      <Views.TextEdit
+        type={Types.TTextEdit.COLOR}
+        placeHolder="A cor do alerta"
+        bind:value={layout.dialog.color}
+        bind:this={layoutInputs.dialog.color}
+        initialValue={layout.dialog.color}
+      />
+    </Views.ExpandableBox>
+    <Views.ExpandableBox title="Rodapé">
+      <Views.TextEdit
+        type={Types.TTextEdit.COLOR}
+        placeHolder="A cor do fundo do tabs"
+        bind:value={layout.tabs.background}
+        bind:this={layoutInputs.tabs.background}
+        initialValue={layout.tabs.background}
+      />
+      <Views.TextEdit
+        type={Types.TTextEdit.COLOR}
+        placeHolder="A cor do texto do tabs"
+        bind:value={layout.tabs.color}
+        bind:this={layoutInputs.tabs.color}
+        initialValue={layout.tabs.color}
+      />
+    </Views.ExpandableBox>
+    <Views.Divider />
+    <Views.Button on:click={setLaout}>Atualizar o layout</Views.Button>
+  </section>
+</data>
 
 <style>
-  .settings {
+  data {
     padding-bottom: 48px;
-  }
-  .settings > div {
-    width: 100%;
-  }
-  .settings > .data {
     width: 100%;
     float: left;
     margin-top: 16px;
   }
-  .sample {
+  sample {
     background: var(--background) url(/assets/images/paint.jpg) center center/cover no-repeat;
     height: 320px;
     color: var(--color);
@@ -321,7 +307,7 @@
     align-items: center;
     place-content: center;
   }
-  .iphone.outSide {
+  iphone {
     position: relative;
     width: 160px;
     height: 100%;
@@ -330,16 +316,20 @@
     border-radius: 4px;
     overflow: hidden;
   }
-  .iphone > .inSide {
-    position: relative;
-    top: -0;
-    width: 100%;
-    height: 100%;
+  iphone > inSide {
     background-color: var(--background);
     font-size: 0.7rem;
-    padding: 16px;
+    padding: 0;
+    position: absolute;
+    left: 2px;
+    right: 2px;
+    width: unset;
+    height: unset;
+    bottom: 2px;
+    border-radius: 4px;
+    top: 2px;
   }
-  .iphone > .inSide > .ear {
+  iphone > inSide > ear {
     top: -2px;
     background-color: #fff;
     border-radius: 0 0px 4px 4px;
@@ -349,7 +339,7 @@
     right: 40%;
     z-index: 999999;
   }
-  .iphone > .inSide > .header {
+  iphone > inSide > .header {
     position: absolute;
     top: 0;
     left: 0;
@@ -362,45 +352,59 @@
     align-items: center;
     z-index: 999998;
   }
-  .iphone > .inSide > .header > span {
+  iphone > inSide > .header > span {
     margin-left: 16px;
   }
-  .iphone > .inSide > .header > .menuSandwich {
+  iphone > inSide > .header > .menuSandwich {
     height: 32px;
     width: 24px;
     padding-top: 2px;
   }
-  .iphone > .inSide > .header > .menuSandwich > div {
+  iphone > inSide > .header > .menuSandwich > div {
     background: var(--menuHamburger);
     margin-top: 6px;
     height: 2px;
     border-radius: 2px;
   }
-  .iphone > .inSide > .body > .button {
+  iphone > inSide > .body {
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    overflow: hidden;
+    overflow-y: scroll;
+    max-height: 100%;
+    padding: 8px;
+    padding-bottom: 32px;
+    z-index: 9;
+    padding-top: 16px;
+    height: 100%;
+  }
+  iphone > inSide > .body > .button {
     z-index: 999998;
     position: relative;
   }
-  .iphone > .inSide > .body::before {
+  iphone > inSide > .body::before {
     content: '';
     background-image: var(--backgroundImage);
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    bottom: 0;
+    bottom: -52px;
     opacity: 0.3;
   }
-  .iphone > .inSide > .body > .box {
+  iphone > inSide > .body > .box {
     background-color: var(--background);
     position: relative;
     margin-top: 8px;
     border-radius: 4px;
     padding: 16px;
   }
-  .iphone > .inSide > .body > .box.shadow {
+  iphone > inSide > .body > .box.shadow {
     margin-top: 0;
   }
-  .iphone > .inSide > .tabs {
+  iphone > inSide > .tabs {
     display: flex;
     position: absolute;
     left: 8px;
@@ -411,7 +415,7 @@
     overflow: hidden;
     z-index: 999997;
   }
-  .iphone > .inSide > .tabs > div {
+  iphone > inSide > .tabs > div {
     border: 0;
     background: transparent;
     display: flex;
@@ -441,5 +445,38 @@
     align-items: center;
     max-height: 60vh;
     overflow-x: scroll;
+  }
+
+  @media (min-width: 481px) {
+    data {
+      flex-wrap: wrap;
+      display: flex;
+      height: 100%;
+    }
+    iphone {
+      width: 25vw;
+      max-width: 25vw;
+    }
+    sample {
+      height: unset;
+      position: relative;
+      left: unset;
+      right: unset;
+      top: unset;
+      width: 40%;
+      flex-grow: 1;
+    }
+    section {
+      position: relative;
+      left: unset;
+      right: unset;
+      top: unset;
+      min-width: 40%;
+      margin: unset;
+      max-height: 100%;
+      width: 40%;
+      flex-grow: 1;
+      border-radius: 0;
+    }
   }
 </style>

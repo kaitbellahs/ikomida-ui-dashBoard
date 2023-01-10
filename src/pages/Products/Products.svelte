@@ -243,44 +243,53 @@
   }
 </script>
 
-<Views.Divider />
-<Views.TextEdit marginTop={0} icon={faSearch} bind:value={searchTerm} placeHolder="Buscar no cardápio" />
-<Views.Divider height={8} />
+<data>
+  <Views.Divider />
+  <Views.TextEdit marginTop={0} icon={faSearch} bind:value={searchTerm} placeHolder="Buscar no cardápio" />
+  <Views.Divider height={8} />
 
-<Views.Button
-  disabled={categoriesAndProducts.length <= 0}
-  on:click={newProduct}
-  bottomPadding={$StatusBar.bottomPadding}><Fa icon={faEdit} /> <span>Novo produto</span></Views.Button
->
-<Views.Button on:click={newCategory} bottomPadding={$StatusBar.bottomPadding}
-  ><Fa icon={faEdit} /> <span>Nova categoria</span></Views.Button
->
-<Views.Divider />
-{#if (listableCategoryProducts.length > 0 || searchTerm) && !error}
-  <Views.ItemsList
-    {removeCategory}
-    {editCategory}
-    bind:categoriesAndProducts={listableCategoryProducts}
-    productPage={Routes.product}
-    {removeProduct}
-  />
-{:else if error}
-  <h2>Nenhum produto foi encontrado</h2>
-  <h3>Tente usar outro termo para pequisar</h3>
-{:else if categoriesAndProducts.length > 0}
-  <Views.ItemsList
-    itemUp={productUp}
-    itemDown={productDown}
-    {categoryUp}
-    {categoryDown}
-    {removeCategory}
-    {editCategory}
-    bind:categoriesAndProducts
-    productPage={Routes.product}
-    {removeProduct}
-  />
-{:else}
-  <Views.CentredMessage text="Nenhum produto foi encontrad">
-    <h3>Tente usar outro termo para pequisar ou cadastre novos produtos</h3>
-  </Views.CentredMessage>
-{/if}
+  <Views.Button
+    disabled={categoriesAndProducts.length <= 0}
+    on:click={newProduct}
+    bottomPadding={$StatusBar.bottomPadding}><Fa icon={faEdit} /> <span>Novo produto</span></Views.Button
+  >
+  <Views.Button on:click={newCategory} bottomPadding={$StatusBar.bottomPadding}
+    ><Fa icon={faEdit} /> <span>Nova categoria</span></Views.Button
+  >
+  <Views.Divider />
+  {#if (listableCategoryProducts.length > 0 || searchTerm) && !error}
+    <Views.ItemsList
+      {removeCategory}
+      {editCategory}
+      bind:categoriesAndProducts={listableCategoryProducts}
+      productPage={Routes.product}
+      {removeProduct}
+    />
+  {:else if error}
+    <h2>Nenhum produto foi encontrado</h2>
+    <h3>Tente usar outro termo para pequisar</h3>
+  {:else if categoriesAndProducts.length > 0}
+    <Views.ItemsList
+      itemUp={productUp}
+      itemDown={productDown}
+      {categoryUp}
+      {categoryDown}
+      {removeCategory}
+      {editCategory}
+      bind:categoriesAndProducts
+      productPage={Routes.product}
+      {removeProduct}
+    />
+  {:else}
+    <Views.CentredMessage text="Nenhum produto foi encontrad">
+      <h3>Tente usar outro termo para pequisar ou cadastre novos produtos</h3>
+    </Views.CentredMessage>
+  {/if}
+</data>
+
+<style>
+  data {
+    height: fit-content;
+    width: 100%;
+  }
+</style>

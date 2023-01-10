@@ -34,9 +34,7 @@
     body: '',
     buttons: [] as IAlertButton[]
   }
-  function togglePushNotificationPopup() {
-    showNotificationPopup = !showNotificationPopup
-  }
+  let screenWidth: number
   let pushNotification = new Utils.PushNotification(
     hasRegisteredCallBack,
     receivedCallBack,
@@ -48,11 +46,11 @@
 
   $: if (style) {
     style.innerHTML = `
-        body {
-          --paddingTop: ${styleHeight};
-          --paddingBottom: 64px;
-        }
-      `
+    body {
+      --paddingTop: ${styleHeight};
+      --paddingBottom: ${screenWidth > 480 ? 32 : 64}px;
+    }
+    `
   }
 
   $: styleHeight = `${Number($_StatusBar.height + ($_StatusBar.topMargin ?? 0)) + 48}px`
@@ -80,6 +78,10 @@
     const statusBar = $_StatusBar
     statusBar.topMargin = 0
     _StatusBar.setStatusBar(statusBar)
+  }
+
+  function togglePushNotificationPopup() {
+    showNotificationPopup = !showNotificationPopup
   }
 
   async function openNotification(notification: Types.Classes.CNotificationPayload) {
@@ -228,7 +230,7 @@
       logedIn = false
     }
     networkStatus = await Network.getStatus()
-    if (Capacitor.isNativePlatform()) {
+    if (Capacitor.isNativePlatform() && Capacitor.getPlatform() !== 'electron') {
       const statusBar = (await StatusBar.getInfo()) as StatusBarType
       statusBar.topMargin = statusBar?.topMargin ?? 0
       _StatusBar.setStatusBar(statusBar)
@@ -263,6 +265,7 @@
   })
 </script>
 
+<svelte:window bind:innerWidth={screenWidth} />
 <mainContainer>
   {#if initialazation}
     <LaunchScreen />

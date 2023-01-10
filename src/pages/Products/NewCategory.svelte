@@ -57,7 +57,7 @@
   Stores.Title.instance.set(edit ? 'Editar categoria' : 'Novo categoria')
 </script>
 
-<div class="category">
+<category>
   <Views.TextEdit
     placeHolder="Nome da categoria"
     bind:value={category.title}
@@ -88,10 +88,15 @@
   <Views.Button disabled={!canContinue} on:click={submit} bottomPadding={$StatusBar.bottomPadding}
     ><Fa icon={faEdit} /> <span>Salvar</span></Views.Button
   >
-</div>
+</category>
 
 <style>
-  .category {
+  category {
     padding-bottom: 48px;
+  }
+  @media (min-width: 481px) {
+    category {
+      min-width: 50%;
+    }
   }
 </style>

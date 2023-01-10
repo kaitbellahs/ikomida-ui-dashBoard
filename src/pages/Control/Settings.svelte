@@ -198,7 +198,7 @@
   Stores.Title.instance.set('Seus ajustes')
 </script>
 
-<div class="settings">
+<data>
   <Views.ExpandableBox title="Expediente" expand={true}>
     <Views.DatePeriods mandatory={true} bind:value={business} />
     <Views.Divider height={8} />
@@ -214,84 +214,94 @@
   {/if}
   <Views.ExpandableBox title="Delivery">
     <Views.Divider height={16} />
-    <h3>Tempo de preparação em minutos</h3>
-    <small>Quanto tempo você vai precisar para preparar seus pedidos em média?</small>
-    {#if preparation}
-      <div class="twoCells">
-        <Views.TextEdit
-          placeHolder="Tempo mínimo"
-          bind:value={preparation.min}
-          bind:this={preparationInputs.min}
-          initialValue={preparation.min}
-          type={Types.TTextEdit.NUMBER}
-          rightPadding={10}
+    <settings>
+      <box>
+        <h3>Tempo de preparação em minutos</h3>
+        <small>Quanto tempo você vai precisar para preparar seus pedidos em média?</small>
+        {#if preparation}
+          <twoCells>
+            <Views.TextEdit
+              placeHolder="Tempo mínimo"
+              bind:value={preparation.min}
+              bind:this={preparationInputs.min}
+              initialValue={preparation.min}
+              type={Types.TTextEdit.NUMBER}
+              rightPadding={10}
+            />
+            <Views.TextEdit
+              placeHolder="Tempo máximo"
+              bind:value={preparation.max}
+              bind:this={preparationInputs.max}
+              initialValue={preparation.max}
+              type={Types.TTextEdit.NUMBER}
+              leftPadding={10}
+            />
+          </twoCells>
+        {/if}
+        <Views.Divider />
+      </box>
+      <box>
+        <Views.CheckBoxList
+          title="Tipos dos pedidos"
+          bind:selected={order.types}
+          options={Types.Types.TOrderType.values()}
         />
-        <Views.TextEdit
-          placeHolder="Tempo máximo"
-          bind:value={preparation.max}
-          bind:this={preparationInputs.max}
-          initialValue={preparation.max}
-          type={Types.TTextEdit.NUMBER}
-          leftPadding={10}
-        />
-      </div>
-    {/if}
-    <Views.Divider />
-    <Views.CheckBoxList
-      title="Tipos dos pedidos"
-      bind:selected={order.types}
-      options={Types.Types.TOrderType.values()}
-    />
-    {#if order.types?.includes(Types.Types.TOrderType.DELIVERY)}
+      </box>
+      <box>
+        {#if order.types?.includes(Types.Types.TOrderType.DELIVERY)}
+          <Views.Divider />
+          <h3>Valor de entrega</h3>
+          <small
+            >Vai querer pagar seus entregador quanto por entrega por Km? (o quanto mais você paga seus entregadores
+            ficaram felizes e seus clientes tristes e vice versa)</small
+          >
+          <Views.TextEdit
+            type={Types.TTextEdit.CURRENCY}
+            bind:value={delivery.orderMinValue}
+            bind:this={deliveryInputs.orderMinValue}
+            initialValue={delivery.orderMinValue}
+            placeHolder="Valor mínimo dos pedidos"
+          />
+          <Views.Switch name="Frete grátis" bind:checked={delivery.free} />
+          {#if !(delivery?.free || false)}
+            <Views.TextEdit
+              type={Types.TTextEdit.CURRENCY}
+              bind:value={delivery.value}
+              bind:this={deliveryInputs.value}
+              initialValue={delivery.value}
+              placeHolder="Valor por KM"
+            />
+            <Views.TextEdit
+              type={Types.TTextEdit.CURRENCY}
+              bind:value={delivery.min}
+              bind:this={deliveryInputs.min}
+              initialValue={delivery.min}
+              placeHolder="Valor mínimo"
+            />
+          {/if}
+        {/if}
+      </box>
+      <box>
+        {#if order.types?.includes(Types.Types.TOrderType.LOCAL)}
+          <Views.TextEdit
+            type={Types.TTextEdit.PERCENT}
+            bind:value={order.tip}
+            bind:this={orderInputs.tip}
+            initialValue={order.tip}
+            placeHolder="Porcentagem da gorjeta"
+          />
+        {/if}
+      </box>
       <Views.Divider />
-      <h3>Valor de entrega</h3>
-      <small
-        >Vai querer pagar seus entregador quanto por entrega por Km? (o quanto mais você paga seus entregadores ficaram
-        felizes e seus clientes tristes e vice versa)</small
-      >
-      <Views.TextEdit
-        type={Types.TTextEdit.CURRENCY}
-        bind:value={delivery.orderMinValue}
-        bind:this={deliveryInputs.orderMinValue}
-        initialValue={delivery.orderMinValue}
-        placeHolder="Valor mínimo dos pedidos"
-      />
-      <Views.Switch name="Frete grátis" bind:checked={delivery.free} />
-      {#if !(delivery?.free || false)}
-        <Views.TextEdit
-          type={Types.TTextEdit.CURRENCY}
-          bind:value={delivery.value}
-          bind:this={deliveryInputs.value}
-          initialValue={delivery.value}
-          placeHolder="Valor por KM"
-        />
-        <Views.TextEdit
-          type={Types.TTextEdit.CURRENCY}
-          bind:value={delivery.min}
-          bind:this={deliveryInputs.min}
-          initialValue={delivery.min}
-          placeHolder="Valor mínimo"
-        />
-      {/if}
-    {/if}
-    {#if order.types?.includes(Types.Types.TOrderType.LOCAL)}
-      <Views.TextEdit
-        type={Types.TTextEdit.PERCENT}
-        bind:value={order.tip}
-        bind:this={orderInputs.tip}
-        initialValue={order.tip}
-        placeHolder="Porcentagem da gorjeta"
-      />
-    {/if}
-    <Views.Divider />
-    <Views.Button on:click={updateDelivery}>Salvar</Views.Button>
+      <Views.Button on:click={updateDelivery}>Salvar</Views.Button>
+    </settings>
   </Views.ExpandableBox>
   <Views.ExpandableBox title="Exibir popups">
     <Views.Divider height={16} />
     <small>Aqui você escolhe quais popups vão ser exibidos a você:</small>
     <Views.Switch name="Mostrar novos pedidos:" bind:checked={popupNewOrder} />
   </Views.ExpandableBox>
-</div>
+</data>
 {#if showDeIntegrationPagSeguroAlert}
   <Views.Alert
     title="Alerta"
@@ -314,13 +324,27 @@
 <Views.GTerms />
 
 <style>
-  .settings {
-    padding-bottom: 48px;
-  }
-  .settings > div {
+  data {
     width: 100%;
   }
-  .twoCells {
+  settings {
+    padding-bottom: 48px;
+    width: fit-content;
+  }
+  twoCells {
     display: flex;
+  }
+  @media (min-width: 481px) {
+    settings {
+      flex-wrap: wrap;
+      display: flex;
+    }
+    box {
+      flex-grow: 1;
+      width: 50%;
+      max-width: calc(50% - 16px);
+      margin-left: 8px;
+      margin-right: 8px;
+    }
   }
 </style>

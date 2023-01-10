@@ -267,4 +267,18 @@
   product > .optionsCategory > .option > div > h3 {
     text-align: center;
   }
+  @media (min-width: 481px) {
+    productImage,
+    product {
+      position: static;
+      flex-grow: 1;
+      width: calc(50% -16px);
+      max-width: calc(50% -16px);
+      margin-left: 8px;
+      margin-right: 8px;
+      height: fit-content;
+      padding-bottom: 32px;
+      border-radius: 0;
+    }
+  }
 </style>

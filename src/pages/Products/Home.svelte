@@ -57,8 +57,8 @@
       <span class="name">Cupons</span>
     {/await}
   </Views.Button>
+  <Views.Divider />
 </section>
-<Views.Divider />
 <section class="product shadow">
   <header>
     <h2>Área de atenção.</h2>
@@ -106,6 +106,7 @@
   section {
     display: flex;
     flex-wrap: wrap;
+    height: fit-content;
   }
   section.product {
     height: 100%;
@@ -224,5 +225,14 @@
     width: 100%;
     max-width: 100%;
     object-fit: contain;
+  }
+  @media (min-width: 481px) {
+    section {
+      flex-grow: 1;
+      width: calc(50% - 16px);
+      max-width: calc(50% - 16px);
+      margin-left: 8px;
+      margin-right: 8px;
+    }
   }
 </style>

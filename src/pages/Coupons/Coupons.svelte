@@ -27,7 +27,10 @@
   }
 
   $: if (items) {
-    items = Types.Classes.CCoupon.fromObject(items)
+    for (let index = 0; index < items.length; index++) {
+      items[index] = Types.Classes.CCoupon.fromObject(items[index])
+    }
+    items = items
   }
 
   Stores.Title.instance.set('Cupons')
@@ -69,7 +72,10 @@
 
 <style>
   article {
+    display: flex;
     position: relative;
+    flex-direction: column;
+    height: 100%;
     border-radius: 8px;
     padding: 16px;
   }

@@ -58,7 +58,6 @@
 
 <section>
   {#if limits}
-    <Views.Divider />
     <article>
       <h4>
         <Fa style="color: #4c0708;" icon={faTruck} /> Pedidos
@@ -70,7 +69,6 @@
         <div style="--width: {orders}%; --color: {color(orders)};" />
       </div>
     </article>
-    <Views.Divider />
     <article>
       <h4>
         <Fa style="color: #4c0708;" icon={faMoneyBill1Wave} /> Faturamento
@@ -85,7 +83,6 @@
         <div style="--width: {billing}%; --color: {color(billing)};" />
       </div>
     </article>
-    <Views.Divider />
     <article>
       <h4>
         <Fa style="color: #4c0708;" icon={faCartShopping} /> Produtos
@@ -97,7 +94,6 @@
         <div style="--width: {products}%; --color: {color(products)};" />
       </div>
     </article>
-    <Views.Divider />
     <article>
       <h4>
         <Fa style="color: #4c0708;" icon={faRocket} /> Mensagens push
@@ -109,7 +105,6 @@
         <div style="--width: {pushNotifications}%; --color: {color(pushNotifications)};" />
       </div>
     </article>
-    <Views.Divider />
     <article>
       <h4>
         <Fa style="color: #4c0708;" icon={faPercent} /> Cupons
@@ -121,7 +116,6 @@
         <div style="--width: {coupons}%; --color: {color(coupons)};" />
       </div>
     </article>
-    <Views.Divider />
     <article>
       <h4>
         <Fa style="color: #4c0708;" icon={faUserGroup} /> Colaboradores
@@ -133,7 +127,6 @@
         <div style="--width: {staff}%; --color: {color(staff)};" />
       </div>
     </article>
-    <Views.Divider />
     <article>
       <h4>
         <Fa style="color: #4c0708;" icon={faTableList} /> Categorias
@@ -165,12 +158,20 @@
     justify-items: center;
     margin-top: 24px;
   }
+  section {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+  }
   section > article {
     border-radius: 8px;
     box-shadow: 0 4px 8px #0000009e;
     padding: 16px;
     display: flex;
     flex-direction: column;
+    margin-top: 16px;
+    width: 100%;
   }
   section > article > h4 {
     margin-bottom: 24px;
@@ -186,5 +187,14 @@
   section > article > span {
     color: #4c0708;
     z-index: 999;
+  }
+  @media (min-width: 481px) {
+    section > article {
+      flex-grow: 1;
+      width: 50%;
+      max-width: calc(50% - 16px);
+      margin-left: 8px;
+      margin-right: 8px;
+    }
   }
 </style>

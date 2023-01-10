@@ -76,14 +76,14 @@
 
 <Views.Divider />
 {#if userInfo}
-  <Views.UploadablePhoto
-    type={Types.TUploadablePhoto.PROFILE}
-    bind:image={userInfo.avatar}
-    name={userInfo.name[0]}
-    lastName={userInfo.lastName[0]}
-  />
-  <Views.Divider />
-  <div class="data" style="--color:{$Layout?.button?.background ?? '#4c0708'};">
+  <data style="--color:{$Layout?.button?.background ?? '#4c0708'};">
+    <Views.UploadablePhoto
+      type={Types.TUploadablePhoto.PROFILE}
+      bind:image={userInfo.avatar}
+      name={userInfo.name[0]}
+      lastName={userInfo.lastName[0]}
+    />
+    <Views.Divider />
     <h2 class="name">{userInfo.name} {userInfo.lastName}</h2>
     <Views.Divider />
     <Views.TextValue
@@ -100,6 +100,8 @@
     />
     <Views.TextValue text="mail:" value={userInfo.email} fontSize="1.3em" leftMargin={30} />
     <Views.Divider />
+  </data>
+  <data>
     <h2>Senha</h2>
     <Views.TextEdit type={Types.TTextEdit.PASSWORD} placeHolder="Senha atual" bind:value={passwordObject.oldPass} />
     <Views.TextEdit
@@ -119,17 +121,33 @@
       error="A confirmação da senha não é válida"
     />
     <Views.Divider />
-  </div>
-  <Views.Button on:click={editPassword}>Atualizar senha</Views.Button>
-  <Views.Button type={Types.TButton.TRANSPARENT} on:click={out}>Logout</Views.Button>
+    <Views.Button on:click={editPassword}>Atualizar senha</Views.Button>
+    <Views.Button type={Types.TButton.TRANSPARENT} on:click={out}>Logout</Views.Button>
+  </data>
   <Views.GTerms />
 {/if}
 
 <style>
+  data {
+    width: 100%;
+    float: left;
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+  }
   h2 {
     text-align: center;
   }
   h2.name {
     color: var(--color);
+  }
+  @media (min-width: 481px) {
+    data {
+      flex-grow: 1;
+      width: calc(50% -16px);
+      max-width: calc(50% -16px);
+      margin-left: 8px;
+      margin-right: 8px;
+    }
   }
 </style>

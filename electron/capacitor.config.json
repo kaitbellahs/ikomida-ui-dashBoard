@@ -1,0 +1,22 @@
+{
+  "appId": "com.ikomida.br.vendor",
+  "appName": "iKomida",
+  "webDir": "App",
+  "bundledWebRuntime": false,
+  "loggingBehavior": "debug",
+  "npmClient": "yarn",
+  "overrideUserAgent": "iKomida",
+  "plugins": {
+    "PushNotifications": {
+      "presentationOptions": [
+        "badge",
+        "sound",
+        "alert"
+      ]
+    }
+  },
+  "android": {
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false
+  }
+}

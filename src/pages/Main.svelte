@@ -38,6 +38,7 @@
   } from '@fortawesome/free-solid-svg-icons'
   import { onMount } from 'svelte'
 
+  let screenWidth: number
   let userInfo: Types.Classes.CUser
   let router = Stores.Navigation.instance.router
   const tabs = [
@@ -142,10 +143,11 @@
   }
   $: isPageList = [Routes.orders, Routes.coupons, Routes.orders, Routes.pushNotifications, Routes.staff].includes(route)
   $: style = `--padding: ${isPageList ? 0 : 16}px;--paddingTop:${styleHeight};--paddingBottom: ${
-    96 + $StatusBar.bottomPadding
+    (screenWidth > 480 ? 32 : 96) + $StatusBar.bottomPadding
   }px;`
 </script>
 
+<svelte:window bind:innerWidth={screenWidth} />
 <Views.MainContainer {style}>
   {#if route == Routes.home}
     <Home />

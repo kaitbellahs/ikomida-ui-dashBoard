@@ -99,58 +99,63 @@
   Stores.Title.instance.set('Seus ajustes')
 </script>
 
-{#if apps?.length === 2}
-  <Views.ExpandableBox title="Meus apps">
-    <Views.Divider />
-    <div class="shadow data">
-      <box><b>Android Link:&nbsp;</b>{androidApp.iosLink ?? 'Em preparação.'} </box>
-      <box><b>iOS Link:&nbsp;</b>{iosApp.androidLink ?? 'Em preparação.'}</box>
-    </div>
-    <Views.Divider />
-    <qrcode class="shadow data">
-      <h3>Android App QrCode</h3>
-      <Views.Divider height={8} />
-      {#if androidApp?.androidLink}
-        <Views.Image source={androidQrCode} />
-      {:else}
-        <Views.Status>QrCode não está disponível por enquanto.</Views.Status>
-      {/if}
+<data>
+  {#if apps?.length === 2}
+    <Views.ExpandableBox title="Meus apps" expand={true}>
       <Views.Divider />
-      <h3>iOS App QrCode</h3>
-      <Views.Divider height={8} />
-      {#if iosApp?.iosLink}
-        <Views.Image source={iosQrCode} />
-      {:else}
-        <Views.Status>QrCode não está disponível por enquanto.</Views.Status>
-      {/if}
-    </qrcode>
-  </Views.ExpandableBox>
-  <Views.ExpandableBox title="Configure a loja de apps">
-    <Views.Divider />
-    <Views.UploadablePhoto bind:image={androidApp.icon} name={androidApp.displayName} />
-    <Views.Divider />
-    <div class="shadow data">
-      <h2>Escolha a descrição do seu app.</h2>
-      <Views.TextEdit
-        placeHolder="Descrição do app"
-        bind:isValid={appValidation.description}
-        min={100}
-        max={3500}
-        bind:value={androidApp.description}
-        initialValue={androidApp.description}
-        type={Types.TTextEdit.TEXT}
-      />
+      <div class="shadow data">
+        <box><b>Android Link:&nbsp;</b>{androidApp.iosLink ?? 'Em preparação.'} </box>
+        <box><b>iOS Link:&nbsp;</b>{iosApp.androidLink ?? 'Em preparação.'}</box>
+      </div>
       <Views.Divider />
-      <Views.Button disabled={!(appValidation.icon && appValidation.description)} on:click={updateAppValues}
-        >Atualizar</Views.Button
-      >
-    </div>
-  </Views.ExpandableBox>
-{:else}
-  <Views.CentredMessage text="Não foi possível baixar os dados do seu app, tente novamente." />
-{/if}
+      <qrcode class="shadow data">
+        <h3>Android App QrCode</h3>
+        <Views.Divider height={8} />
+        {#if androidApp?.androidLink}
+          <Views.Image source={androidQrCode} />
+        {:else}
+          <Views.Status>QrCode não está disponível por enquanto.</Views.Status>
+        {/if}
+        <Views.Divider />
+        <h3>iOS App QrCode</h3>
+        <Views.Divider height={8} />
+        {#if iosApp?.iosLink}
+          <Views.Image source={iosQrCode} />
+        {:else}
+          <Views.Status>QrCode não está disponível por enquanto.</Views.Status>
+        {/if}
+      </qrcode>
+    </Views.ExpandableBox>
+    <Views.ExpandableBox title="Configure a loja de apps">
+      <Views.Divider />
+      <Views.UploadablePhoto bind:image={androidApp.icon} name={androidApp.displayName} />
+      <Views.Divider />
+      <div class="shadow data">
+        <h2>Escolha a descrição do seu app.</h2>
+        <Views.TextEdit
+          placeHolder="Descrição do app"
+          bind:isValid={appValidation.description}
+          min={100}
+          max={3500}
+          bind:value={androidApp.description}
+          initialValue={androidApp.description}
+          type={Types.TTextEdit.TEXT}
+        />
+        <Views.Divider />
+        <Views.Button disabled={!(appValidation.icon && appValidation.description)} on:click={updateAppValues}
+          >Atualizar</Views.Button
+        >
+      </div>
+    </Views.ExpandableBox>
+  {:else}
+    <Views.CentredMessage text="Não foi possível baixar os dados do seu app, tente novamente." />
+  {/if}
+</data>
 
 <style>
+  data {
+    width: 100%;
+  }
   .data {
     padding: 16px;
     border-radius: 8px;

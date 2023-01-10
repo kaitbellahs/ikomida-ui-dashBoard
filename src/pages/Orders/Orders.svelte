@@ -101,7 +101,7 @@
   hasRecaptcha={true}
   let:index
 >
-  <div class="shadow orderContainer">
+  <orderContainer class="shadow">
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div on:click={() => goToOrder(items[index])}>
       <h3 class="title">Pedido N˚: {items[index].customID}</h3>
@@ -211,60 +211,61 @@
         {/if}
       </div>
     {/if}
-  </div></Views.LoadMoreReusableList
+  </orderContainer></Views.LoadMoreReusableList
 >
 
 <style>
-  .orderContainer {
+  orderContainer {
     border-radius: 8px;
     padding: 16px;
     background: #fffffffc;
     display: flex;
     flex-direction: column;
+    height: 100%;
   }
-  .orderContainer > div {
+  orderContainer > div {
     display: flex;
     flex-direction: column;
   }
-  .orderContainer > div > h3 {
+  orderContainer > div > h3 {
     padding: 0;
     font-size: 1.1em;
     text-align: center;
   }
-  .orderContainer > div > .product {
+  orderContainer > div > .product {
     font-family: RobotoLight;
     font-size: 0.9em;
   }
-  .orderContainer > div > .address {
+  orderContainer > div > .address {
     font-family: RobotoThin;
     font-size: 0.9em;
   }
-  .orderContainer > div > .paymentMethod {
+  orderContainer > div > .paymentMethod {
     font-family: RobotoThin;
     font-size: 0.9em;
   }
   .time {
     font-size: 0.8em;
   }
-  .orderContainer > .buttonGroup {
+  orderContainer > .buttonGroup {
     display: flex;
     flex-direction: row;
   }
-  .orderContainer > .buttonGroup > :global(*) {
+  orderContainer > .buttonGroup > :global(*) {
     flex: 1;
   }
-  .orderContainer > .buttonGroup > :global(*):first-child {
+  orderContainer > .buttonGroup > :global(*):first-child {
     margin-right: 8px;
   }
-  .orderContainer > .buttonGroup > :global(*):last-child {
+  orderContainer > .buttonGroup > :global(*):last-child {
     margin-left: 8px;
   }
-  .orderContainer > .value {
+  orderContainer > .value {
     display: flex;
     flex-direction: row;
     align-self: center;
   }
-  .orderContainer > .value > span {
+  orderContainer > .value > span {
     color: green;
     font-size: 1.1em;
   }

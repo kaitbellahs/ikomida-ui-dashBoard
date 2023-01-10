@@ -106,7 +106,7 @@
   Stores.Title.instance.set('Novo colaborador')
 </script>
 
-<div class="staff">
+<staff>
   <h2>Dados pessoais</h2>
   <Views.Selector bind:selected={item.role} options={Types.Types.TRoles.vendors} name="Tipo do colaborador" />
   <Views.TextEdit
@@ -215,7 +215,11 @@
   <Views.Button disabled={!canProceed} on:click={submit} bottomPadding={$StatusBar.bottomPadding}
     ><Fa icon={faEdit} /> <span>Adicionar</span></Views.Button
   >
-</div>
+</staff>
 
 <style>
+  staff {
+    min-width: 50%;
+    height: fit-content;
+  }
 </style>

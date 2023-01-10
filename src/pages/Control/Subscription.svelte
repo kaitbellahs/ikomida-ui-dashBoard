@@ -59,7 +59,7 @@
   <h2>Ciclo de pagamento</h2>
   {#if subscription.charges}
     {#each subscription.charges.sort((i1, i2) => (i2?.dueDate.getTime() ?? 0) - (i1?.dueDate.getTime() ?? 0)) as charges (charges.invoiceUrl)}
-      <div class="charge">
+      <charge>
         {#if charges.invoiceUrl}
           <button name="Abrir comprovante de pagamento" on:click={() => open(charges.invoiceUrl)} class="invoice"
             ><Fa icon={faFileInvoice} /></button
@@ -109,7 +109,7 @@
             ? 'yellow'
             : 'red'}
         />
-      </div>
+      </charge>
     {/each}
   {/if}
 {/if}
@@ -119,7 +119,7 @@
     background-color: transparent;
     border: 0;
   }
-  .charge {
+  charge {
     position: relative;
     background: #cccccc22;
     box-shadow: 0 4px 8px #0000009e;
@@ -156,5 +156,14 @@
     vertical-align: middle;
     text-align: center;
     padding: 4px;
+  }
+  @media (min-width: 481px) {
+    charge {
+      flex-grow: 1;
+      width: calc(50% - 16px);
+      max-width: calc(50% - 16px);
+      margin-left: 8px;
+      margin-right: 8px;
+    }
   }
 </style>
