@@ -8,9 +8,19 @@
   import Routes from '../../stores/Routes'
 
   let products: Types.Classes.CProduct[]
+  let box={
+    status:'open'
+  }
 
   function onClick(product: Types.Classes.CProduct) {
     Stores.Navigation.instance?.goTo(Routes.product, { product, active: product.active })
+  }
+  function openBox(){
+    if(box.status==='open'){
+      box.status='close'
+    }else{
+      box.status='open'
+    }
   }
   onMount(async () => {
     const response = await getLowQuantityProducts()
@@ -56,6 +66,15 @@
       <span class="count">{couponsCount}</span>
       <span class="name">Cupons</span>
     {/await}
+  </Views.Button>
+  <Views.Button type={Types.TButton.CONTAINER} on:click={openBox}>
+    {#if box.status === 'open'}
+      <span class="count">Caixa fechado</span>
+      <span class="name">clica pra abrir</span>
+    {:else}
+      <span class="count">Caixa aberto</span>
+      <span class="name">clica pra fechar</span>
+    {/if}
   </Views.Button>
   <Views.Divider />
 </section>
