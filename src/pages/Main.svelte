@@ -21,6 +21,10 @@
   import Staff from './Staff/Staff.svelte'
   import NewStaff from './Staff/NewStaff.svelte'
   import Apps from './Control/Apps.svelte'
+  import Pos from './Pos/Pos.svelte'
+  import Poses from './Pos/Poses.svelte'
+  import OrdersGroup from './OrdersGroup/OrdersGroup.svelte'
+  import OrdersGroups from './OrdersGroup/OrdersGroups.svelte'
   import { StatusBar } from '../stores/Setup'
   import {
     faHome,
@@ -189,6 +193,14 @@
     <Limits />
   {:else if route == Routes.apps}
     <Apps />
+  {:else if route == Routes.pos}
+    <Pos />
+  {:else if route == Routes.poses}
+    <Poses />
+  {:else if route == Routes.ordersGroup}
+    <OrdersGroup />
+  {:else if route == Routes.ordersGroups}
+    <OrdersGroups />
   {:else if [Types.Types.TRoles.VENDOR, Types.Types.TRoles.STAFF].includes(userInfo?.role)}
     <Home />
   {:else}

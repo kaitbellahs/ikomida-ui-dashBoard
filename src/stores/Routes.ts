@@ -27,5 +27,9 @@ export default {
   newStaff: Symbol('/newStaff'),
   staff: Symbol('/staff'),
   subscription: Symbol('/subscription'),
+  pos: Symbol('/pos'),
+  poses: Symbol('/poses'),
+  ordersGroup: Symbol('/ordersGroup'),
+  ordersGroups: Symbol('/ordersGroups'),
   apps: Symbol('/apps')
 }

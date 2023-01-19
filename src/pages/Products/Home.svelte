@@ -6,6 +6,7 @@
   import { Views, Stores, Types } from '@ikomida/shared-frontend'
   import { onMount, tick } from 'svelte'
   import Routes from '../../stores/Routes'
+  import { isPosOpen } from '../../network/Pos'
 
   let products: Types.Classes.CProduct[]
 
@@ -55,6 +56,14 @@
     {:then couponsCount}
       <span class="count">{couponsCount}</span>
       <span class="name">Cupons</span>
+    {/await}
+  </Views.Button>
+  <Views.Button type={Types.TButton.CONTAINER} route={Routes.pos}>
+    {#await isPosOpen()}
+      <Views.LocalLoading />
+    {:then pos}
+      <span class="count">Caixa</span>
+      <span class="name">{pos ? 'aberto' : 'fechado'}</span>
     {/await}
   </Views.Button>
   <Views.Divider />
