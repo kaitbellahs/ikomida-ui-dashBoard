@@ -6,7 +6,8 @@
   "license": "UNLICENSED",
   "type": "module",
   "scripts": {
-    "desktop:start": "yarn build:win:dev && yarn cap open @capacitor-community/electron",
+    "desktop:win:start": "yarn build:win:dev && yarn cap open @capacitor-community/electron",
+    "desktop:unix:start": "yarn build:unix:dev && yarn cap open @capacitor-community/electron",
     "watch:prod": "rollup -c -w --environment ENV:production",
     "watch:hmlg": "rollup -c -w --environment ENV:homologation",
     "watch:dev": "rollup -c -w --environment ENV:development",

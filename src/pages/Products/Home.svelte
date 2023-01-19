@@ -9,9 +9,19 @@
   import { isPosOpen } from '../../network/Pos'
 
   let products: Types.Classes.CProduct[]
+  let box={
+    status:'open'
+  }
 
   function onClick(product: Types.Classes.CProduct) {
     Stores.Navigation.instance?.goTo(Routes.product, { product, active: product.active })
+  }
+  function openBox(){
+    if(box.status==='open'){
+      box.status='close'
+    }else{
+      box.status='open'
+    }
   }
   onMount(async () => {
     const response = await getLowQuantityProducts()
