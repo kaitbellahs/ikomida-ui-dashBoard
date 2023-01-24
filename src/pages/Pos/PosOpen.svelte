@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Stores, Utils, Views } from '@ikomida/shared-frontend'
-  import { onMount } from 'svelte'
+  import { Stores, Utils, Views, Types as FrontTypes } from '@ikomida/shared-frontend'
+  import { onMount, tick } from 'svelte'
   import { Classes, Types } from '@ikomida/shared-types'
   import { faTicket, faShoppingBag, faBarcode, faCamera, faBroom } from '@fortawesome/free-solid-svg-icons'
 
@@ -8,62 +8,86 @@
   import { search, all } from '../../network/Products'
 
   import HideContainer from '../Components/HideContainer.svelte'
-  import Products from '../Products/Products.svelte'
+  import { Finances } from '@ikomida/shared-logics'
 
-  export let pos: Classes.CPos
-  let ordersGroup: Classes.COrdersGroup | undefined
+  export let pos: Classes.CPos | undefined = undefined
+  let ordersGroup: Classes.COrdersGroup | undefined = undefined
+  let order: Classes.COrder | undefined = undefined
+  let orderType: Types.TOrderType | undefined = undefined
   const cache = Stores.Cache.createInstance('Products')
 
   let searchTerm: string = ''
+  let searchDate = new Date()
   let oldValue: string
   let error = false
+  let working = false
 
   let listableCategoryProducts: Classes.CCategoryProducts[] = []
   let categoriesAndProducts: Classes.CCategoryProducts[] = []
 
-  $: if (searchTerm !== oldValue) {
-    error = false
-    if (searchTerm.length > 0) {
-      Stores.Loading.instance.start()
-      search(searchTerm).then(result => {
-        listableCategoryProducts = result
-      })
-      oldValue = searchTerm
-      Stores.Loading.instance.stop()
-    } else {
-      listableCategoryProducts = []
-      oldValue = ''
-    }
+  $: if (
+    searchTerm !== oldValue &&
+    searchDate.getTime() < new Date(new Date().setSeconds(new Date().getSeconds() - 2)).getTime()
+  ) {
+    console.log('searchTern:', searchTerm)
+    searchDate = new Date()
+    setTimeout(() => {
+      error = false
+      if (searchTerm.length > 0) {
+        Stores.Loading.instance.start()
+        search(searchTerm).then(result => {
+          listableCategoryProducts = result
+        })
+        oldValue = searchTerm
+        Stores.Loading.instance.stop()
+      } else {
+        listableCategoryProducts = []
+        oldValue = ''
+      }
+    }, new Date(new Date().setSeconds(new Date().getSeconds() - 2)).getTime() - searchDate.getTime())
   }
 
   $: productCategoriesList = listableCategoryProducts.length > 0 ? listableCategoryProducts : categoriesAndProducts
+  $: subTotalArray =
+    ordersGroup?.orders?.flatMap(order => {
+      const productsTotalArray = order.products.flatMap(product => product.price * product.quantity) ?? []
+      order.subtotal = productsTotalArray.length > 0 ? productsTotalArray.reduce((i1, i2) => i1 + i2) : 0
+      return order.subtotal
+    }) ?? []
+  $: subTotal = subTotalArray.length > 0 ? subTotalArray.reduce((i1, i2) => i1 + i2) : 0
 
-  $: subTotal =
-    ordersGroup?.orders
-      ?.flatMap(order => {
-        return order.subtotal
-      })
-      .reduce((i1, i2) => i1 + i2) ?? 0
-
-  $: discount =
-    ordersGroup?.orders
-      ?.flatMap(order => {
-        return order.discount
-      })
-      .reduce((i1, i2) => i1 + i2) ?? 0
+  $: discounArray =
+    ordersGroup?.orders?.flatMap(order => {
+      const productsDiscountArray =
+        order.products.flatMap(
+          product => Finances.calcDiscount(product.price, product.discount, product.discountType) * product.quantity
+        ) ?? []
+      order.discount = productsDiscountArray.length > 0 ? productsDiscountArray.reduce((i1, i2) => i1 + i2) : 0
+      return order.discount
+    }) ?? []
+  $: discount = discounArray.length > 0 ? discounArray.reduce((i1, i2) => i1 + i2) : 0
 
   $: total = subTotal - discount
 
+  $: if (ordersGroup && !working) {
+    console.log('ok:', ordersGroup.orders)
+    ordersGroup.orders?.forEach(order => {
+      order.products.forEach(product => {
+        product.quantity = Number(Finances.toNumber(product.quantity))
+      })
+    })
+  }
+
   function sortItems() {
     categoriesAndProducts = categoriesAndProducts
-      .map(category => {
+      ?.map(category => {
         category.products = category?.products?.sort((i1, i2) => (i1?.order ?? 0) - (i2?.order ?? 0))
         return category
       })
-      .sort((i1, i2) => (i1.order ?? 0) - (i2.order ?? 0))
+      ?.sort((i1, i2) => (i1.order ?? 0) - (i2.order ?? 0))
     cache.setObject(
       'Products',
-      categoriesAndProducts.map(category => category.toJSON())
+      categoriesAndProducts?.map(category => category.toJSON())
     )
   }
 
@@ -82,20 +106,67 @@
       Math.ceil(Math.random() * 10000).toString(),
       Types.TOrdersGroup.CASHIER,
       new Date(),
-      new Date()
+      new Date(),
+      undefined,
+      undefined,
+      pos,
+      []
     )
   }
+
   function closeOrdersGroup() {
     ordersGroup = undefined
+    order = undefined
   }
 
-  function getText() {
-    const text = 'Item test dsfgdgsd gdfg fdg dfgh fdh fdh dfh fdg hgf jfdj'.split(' ')
-    let start = Math.ceil(Math.random() * 10)
-    start = start < text.length ? start : 0
-    let end = Math.ceil(Math.random() * 10)
-    end = end < text.length - start ? end : 1
-    return text.splice(start, end).join(' ')
+  async function addProduct(product: Classes.CProduct) {
+    working = true
+    const productCart = FrontTypes.CCart.fromObject(product.toJSON())
+    productCart.optionsCategories = undefined
+    productCart.quantity = 1
+    productCart.image = undefined
+    productCart.order = undefined
+    productCart.options = product.options?.map(option => {
+      option.image = undefined
+      return option
+    })
+    if (!order) {
+      order = Classes.COrder.init(
+        0,
+        0,
+        0, //TODO: calc delivery
+        [productCart],
+        new Classes.CAddress(), //TODO: add address if delivery
+        Types.TPaymentMethod.CASH_ON_DELIVERY, // TODO: add payment type
+        new Classes.COrderPreparation(), //TODO: add preparation if aplicable
+        undefined, //TODO: add coupon if aplicable
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined, //TODO: Add payment if aplicable
+        undefined,
+        undefined, //TODO: Add localization
+        orderType,
+        undefined, //TODO: add tip if aplicable
+        undefined, //TODO: add table number if aplicable
+        undefined //TODO: add payment change if aplicable
+      )
+      ordersGroup?.orders.push(order)
+    } else {
+      const currentProduct = order.products.filter(product => product.id === productCart.id)?.[0]
+      if (currentProduct) {
+        const index = order.products.indexOf(currentProduct)
+        order.products[index].quantity++
+      } else {
+        order.products.push(productCart)
+      }
+    }
+    ordersGroup = ordersGroup
+    console.log('addProduct:', ordersGroup?.orders)
+    await tick()
+    console.log('addProduct:', ordersGroup?.orders)
+    working = false
   }
 
   Stores.Title.instance.set('Produtos')
@@ -132,7 +203,7 @@
   </box>
   <aside class="orderGroups shadow box">
     {#if ordersGroup}
-      <h2>Comanda #000</h2>
+      <h2>Comanda #{ordersGroup.code}</h2>
       <list>
         <Views.TextValue text="CPF:" value={ordersGroup.user?.identity ?? 'N/A'} />
         <Views.TextValue text="Nome:" value={ordersGroup.user?.name ?? 'N/A'} />
@@ -163,12 +234,16 @@
       {#each ordersGroup?.orders ?? [] as order}
         {#each order.products as product}
           <item>
-            <div class="span2">{product.code}</div>
+            <div class="span2">{product.code ?? '-'}</div>
             <div class="description span4 textOverflow">{product.title}</div>
-            <div>{product.quantity}</div>
+            <div contenteditable="true" bind:textContent={product.quantity} />
             <div class="span2">{Utils.Strings.currency(product.price)}</div>
-            <div class="span2">{Utils.Strings.currency(product.discount)}</div>
-            <div class="span2">{Utils.Strings.currency(product.price)}</div>
+            <div class="span1">
+              {Utils.Strings.currency(Finances.calcDiscount(product.price, product.discount, product.discountType))}
+            </div>
+            <div class="span2">
+              {Utils.Strings.currency(product.quantity * product.price)}
+            </div>
           </item>
         {/each}
       {/each}
@@ -207,7 +282,7 @@
       {#each productCategoriesList as productCategory}
         {#each productCategory.products ?? [] as product}
           <productBox>
-            <productContent class="shadow box">
+            <productContent class="shadow box" on:click={() => addProduct(product)}>
               <Views.Image
                 styleString="min-height:100%;position:absolute;object-fit:cover;"
                 source={product.image}
