@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "private": true,
   "author": "Khalid Ait Bellahs",
-  "license": "UNLICENSED",
+  "license": "Apache-2.0",
   "type": "module",
   "scripts": {
     "desktop:win:start": "yarn build:win:dev && yarn cap open @capacitor-community/electron",
@@ -117,5 +117,9 @@
     "postcss": "^8.4.21",
     "rollup-plugin-postcss": "^4.0.2",
     "uuid": "^9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kaitbellahs/ikomida-ui-dashBoard.git"
   }
 }
